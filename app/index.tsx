@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from 'react'
-import { View, Text ,StyleSheet, ScrollView,Image, Pressable } from 'react-native'
+import { View, Text ,StyleSheet, ScrollView,Image, Pressable, Button } from 'react-native'
 const pic1 =require('../assets/images/homepic1.jpg');
 const pic2 =require('../assets/images/homepic2.jpg');
 const pic3 =require('../assets/images/homepic3.jpg');
 const pic4 =require('../assets/images/homepic4.jpg');
+import{useRouter} from 'expo-router'
 
 export default function index() {
   const [index ,setIndex]=useState(0);
+  const router = useRouter();
+
    useEffect(() => {
     const interval = setInterval(() => {
       setIndex((index + 1) % 4);
@@ -41,6 +44,10 @@ export default function index() {
         <Text style={styles.btn}>Sign up</Text>
        </Pressable>
       <Text style={styles.cta}> Your Home, Your Rules – Find it with Homy.</Text>
+        <Pressable style={{display:'flex',alignItems:'center',justifyContent:'center',marginTop:20}}  onPress={()=>router.push('/AboutUs')}>
+          <Text style={styles.bttn}>To Know More About Us ,Click me!</Text>
+        </Pressable>
+
       </ScrollView>
   </View>
 );
@@ -97,5 +104,14 @@ btn:{
   textAlign:'center',
   textAlignVertical:'center',
 },
+bttn:{
+  width:300,
+  height:45,
+  backgroundColor:'black',
+  borderRadius:20,
+  color:'white',
+  textAlign:'center',
+  textAlignVertical:'center'
+}
 
 });
