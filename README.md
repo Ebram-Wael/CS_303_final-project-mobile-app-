@@ -1,19 +1,23 @@
-# 📱 Student Housing App  
-The **Student Housing App** is a mobile application designed to help students find and rent rooms easily. Sellers can list available rooms for rent, while students can browse, view details, and book accommodations. The platform aims to simplify the housing search process and provide a user-friendly experience.  
+# 📱 Student Housing App
 
-## 🚀 Features  
-- **User Authentication** (Signup/Login)  
-- **Room Listings** (Sellers can post available rooms with details and images)  
-- **Search & Filters** (Students can search for rooms based on location, price, and amenities)  
-- **Booking System** (Students can request to book a room)  
-- **Real-Time Updates** (Listings update dynamically)  
-- **Chat System** (Optional: Buyers & sellers can communicate)  
+The **Student Housing App** is a mobile application designed to help students find and rent rooms easily. Sellers can list available rooms for rent, while students can browse, view details, and book accommodations. The platform aims to simplify the housing search process and provide a user-friendly experience.
 
-## 🛠️ Tech Stack  
-- **Frontend:** React Native  
-- **Backend:** Firebase (Firestore, Authentication, Storage)  
+## 🚀 Features
 
-## 👥 Team Members  
+- **User Authentication** (Signup/Login)
+- **Room Listings** (Sellers can post available rooms with details and images)
+- **Search & Filters** (Students can search for rooms based on location, price, and amenities)
+- **Booking System** (Students can request to book a room)
+- **Real-Time Updates** (Listings update dynamically)
+- **Chat System** (Optional: Buyers & sellers can communicate)
+
+## 🛠️ Tech Stack
+
+- **Frontend:** React Native
+- **Backend:** Firebase (Firestore, Authentication, Storage)
+
+## 👥 Team Members
+
 👤 [Malak Sobhy]()
 👤 [Abanoub Refaat](https://github.com/abanoub-refaat)
 👤 [Ebram Wael](https://github.com/Ebram-Wael)
