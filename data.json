@@ -1,0 +1,92 @@
+[
+  {
+    "title": "Cozy Single Room Near University",
+    "description": "A small yet comfortable room ideal for students. Comes with a bed, desk, and chair.",
+    "owner": "Ahmed Hassan",
+    "image": "https://via.placeholder.com/300x200.png?text=Room+1",
+    "price": 2500,
+    "numberOfRooms": 1,
+    "address": "5 Al Tahrir St, Giza, Egypt"
+  },
+  {
+    "title": "Spacious Apartment for Sharing",
+    "description": "A well-furnished apartment with multiple rooms available for sharing.",
+    "owner": "Sarah Youssef",
+    "image": "https://via.placeholder.com/300x200.png?text=Room+2",
+    "price": 5000,
+    "numberOfRooms": 3,
+    "address": "25B Nasr City, Cairo"
+  },
+  {
+    "title": "Studio Apartment (No Windows)",
+    "description": "A compact studio with all basic facilities but lacks natural light.",
+    "owner": "Mohamed Fathy",
+    "image": "https://via.placeholder.com/300x200.png?text=Room+3",
+    "price": 4000,
+    "numberOfRooms": 1,
+    "address": "12th Floor, No. 89, Dokki, Giza"
+  },
+  {
+    "title": "Luxury Penthouse with Rooftop View",
+    "description": "An expensive but spacious penthouse with a private terrace and breathtaking views.",
+    "owner": "Laila Ibrahim",
+    "image": "https://via.placeholder.com/300x200.png?text=Room+4",
+    "price": 20000,
+    "numberOfRooms": 4,
+    "address": "Zamalek Towers, Cairo"
+  },
+  {
+    "title": "Old Dorm Room (Needs Repairs)",
+    "description": "A cheap option for students on a budget. The room has minor issues with plumbing and electricity.",
+    "owner": "Mustafa Said",
+    "image": "https://via.placeholder.com/300x200.png?text=Room+5",
+    "price": 1500,
+    "numberOfRooms": 1,
+    "address": "Room 302, Building 10, Ain Shams University Dorms"
+  },
+  {
+    "title": "Shared Room with Three Beds",
+    "description": "A large room shared between three students, fully furnished.",
+    "owner": "Nourhan Kamal",
+    "image": "https://via.placeholder.com/300x200.png?text=Room+6",
+    "price": 1800,
+    "numberOfRooms": 1,
+    "address": "El Rehab Compound, New Cairo"
+  },
+  {
+    "title": "Underground Bunker Room",
+    "description": "A weird but secure room located underground, ideal for those who love silence.",
+    "owner": "Omar El-Masry",
+    "image": "https://via.placeholder.com/300x200.png?text=Room+7",
+    "price": 1200,
+    "numberOfRooms": 1,
+    "address": "Basement Level, 77 Maadi, Cairo"
+  },
+  {
+    "title": "Overpriced Tiny Room",
+    "description": "A very small room, barely fitting a bed, with an unrealistic price.",
+    "owner": "Ramy Farouk",
+    "image": "https://via.placeholder.com/300x200.png?text=Room+8",
+    "price": 12000,
+    "numberOfRooms": 1,
+    "address": "Downtown Cairo, near Talaat Harb Square"
+  },
+  {
+    "title": "Mansion with 10 Rooms (Too Expensive for Students)",
+    "description": "A massive villa that is clearly out of budget but still listed for students.",
+    "owner": "Hesham Adel",
+    "image": "https://via.placeholder.com/300x200.png?text=Room+9",
+    "price": 50000,
+    "numberOfRooms": 10,
+    "address": "Palm Hills, 6th of October City"
+  },
+  {
+    "title": "???",
+    "description": "",
+    "owner": "",
+    "image": "https://via.placeholder.com/300x200.png?text=Room+10",
+    "price": -500,
+    "numberOfRooms": 0,
+    "address": "Unknown Location"
+  }
+]
