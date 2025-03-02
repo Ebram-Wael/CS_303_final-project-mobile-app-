@@ -6,12 +6,13 @@ import {
   ScrollView,
   Image,
   Pressable,
-  Button,
+  SafeAreaView,
 } from "react-native";
-const pic1 = require("../../assets/images/homepic1.jpg");
-const pic2 = require("../../assets/images/homepic2.jpg");
-const pic3 = require("../../assets/images/homepic3.jpg");
-const pic4 = require("../../assets/images/homepic4.jpg");
+import pic1 from '@/assets/images/homepic1.jpg'
+import pic2 from '@/assets/images/homepic2.jpg'
+import pic3 from '@/assets/images/homepic3.jpg'
+import pic4 from '@/assets/images/homepic4.jpg'
+
 import { useRouter } from "expo-router";
 
 export default function index() {
@@ -26,63 +27,62 @@ export default function index() {
   }, [index]);
   const images = [pic1, pic2, pic3, pic4];
   return (
-    <View style={styles.cont}>
+    <SafeAreaView style={styles.cont}>
       <Text style={styles.text}>HOMY</Text>
       <ScrollView>
-        <Text style={styles.head}>
-          {" "}
-          Find the Perfect Apartment for Students
-        </Text>
-        <Image
-          source={images[index]}
-          style={{ width: 400, height: 400, marginBottom: 30 }}
-        />
+        <View>
+          <Text style={styles.head}>
+            {" "}
+            Find the Perfect Apartment for Students
+          </Text>
+        </View>
+        <View>
+          <Image
+            source={images[index]}
+            style={styles.img}
+          />
+        </View>
+        <View style={{padding:12}}>
+          <Text style={styles.txt}>
+            Looking for a comfortable and affordable place to stay? Homy makes
+            apartment hunting easy for students! Whether you need a shared space
+            or a private room, we connect you with the best housing options near
+            your university.
+          </Text>
+        </View>
+        <View style={{padding:12}}>
+          <Text style={styles.title}> Why Choose Homy?</Text>
+          <Text style={styles.s1}> 1: Student-Friendly Listings</Text>
+          <Text style={styles.s1}> 2: Smart Search Filters</Text>
+          <Text style={styles.s1}> 3: Roommate Matching </Text>
+          <Text style={styles.s1}> 4: Verified Listings</Text>
+          <Text style={styles.s1}> 5: Easy Communication </Text>
+        </View>
 
-        <Text style={styles.h2}>
-          Looking for a comfortable and affordable place to stay? Homy makes
-          apartment hunting easy for students! Whether you need a shared space
-          or a private room, we connect you with the best housing options near
-          your university.
-        </Text>
-        <Text style={styles.ss}> Why Choose Homy?</Text>
-        <Text style={styles.s1}> 1: Student-Friendly Listings</Text>
-        <Text style={styles.s1}> 2: Smart Search Filters</Text>
-        <Text style={styles.s1}> 3: Roommate Matching </Text>
-        <Text style={styles.s1}> 4: Verified Listings</Text>
-        <Text style={styles.s1}> 5: Easy Communication </Text>
-
-        <Text style={styles.ss}>Start Your Search Today!</Text>
-        <Text style={styles.h2}>
-          Join thousands of students who found their perfect home with Homy.
-          Sign up now and take the stress out of apartment hunting!
-        </Text>
-        <Pressable
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            marginTop: 20,
-          }}
-        >
+        <View style={{padding:12}}>
+          <Text style={styles.title}>Start Your Search Today!</Text>
+          <Text style={styles.txt}>
+            Join thousands of students who found their perfect home with Homy.
+            Sign up now and take the stress out of apartment hunting!
+          </Text>
+        </View>
+          <Pressable
+            style={styles.press}
+          >
           <Text style={styles.btn}>Sign up</Text>
-        </Pressable>
-        <Text style={styles.cta}>
-          {" "}
-          Your Home, Your Rules – Find it with Homy.
-        </Text>
-        <Pressable
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            marginTop: 20,
-          }}
-          onPress={() => router.push("./(tabs)/AboutUs")}
-        >
-          <Text style={styles.bttn}>To Know More About Us ,Click me!</Text>
-        </Pressable>
+          </Pressable>
+          <Text style={styles.cta}>
+            {" "}
+            Your Home, Your Rules – Find it with Homy.
+          </Text>
+          <Pressable
+            style={styles.press}
+            onPress={() => router.push("./(tabs)/AboutUs")}
+          >
+            <Text style={styles.bttn}>To Know More About Us ,Click me!</Text>
+          </Pressable>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -91,7 +91,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     backgroundColor: "#f0f0f0",
-    margin: 20,
+    marginVertical:30,
   },
   text: {
     fontWeight: "bold",
@@ -99,15 +99,16 @@ const styles = StyleSheet.create({
     textAlign: "center",
     color: "#333",
     marginBottom: 30,
+    padding:10,
   },
   head: {
     fontSize: 16,
     marginBottom: 20,
     fontWeight: "bold",
   },
-  h2: {
+  txt: {
     fontSize: 15,
-    marginBottom: 30,
+    marginBottom: 20,
   },
   cta: {
     fontSize: 18,
@@ -115,7 +116,7 @@ const styles = StyleSheet.create({
     marginTop: 15,
     textAlign: "center",
   },
-  ss: {
+  title: {
     fontSize: 20,
     fontWeight: "bold",
     marginBottom: 10,
@@ -128,18 +129,33 @@ const styles = StyleSheet.create({
     width: 85,
     height: 45,
     backgroundColor: "black",
-    borderRadius: 15,
     color: "white",
+    display:'flex',
     textAlign: "center",
-    textAlignVertical: "center",
+    justifyContent:'center',
+    alignItems:'center',
+    textAlignVertical:'center',
   },
   bttn: {
     width: 300,
     height: 45,
     backgroundColor: "black",
-    borderRadius: 20,
+    display:'flex',
     color: "white",
     textAlign: "center",
-    textAlignVertical: "center",
+    justifyContent:'center',
+    alignItems:'center',
+    textAlignVertical:'center',
   },
+  img :{
+    width:" 100%", 
+    height: 400,
+    marginBottom: 30, 
+  },
+  press:{
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 20,
+  }
 });
