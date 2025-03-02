@@ -6,10 +6,10 @@ import {
   BottomTabBarProps,
 } from "@react-navigation/bottom-tabs";
 import React from "react";
-import HouseIcon from "@/assets/icons/house.svg";
-import SearchIcon from "@/assets/icons/search.svg";
-import ExploreIcon from "@/assets/icons/explore.svg";
-import ProfileIcon from "@/assets/icons/profile.svg";
+import HouseIcon from "@/assets/icons/house-01-svgrepo-com.svg";
+import SearchIcon from "@/assets/icons/search-svgrepo-com.svg";
+import ExploreIcon from "@/assets/icons/explore-svgrepo-com.svg";
+import ProfileIcon from "@/assets/icons/profile-svgrepo-com.svg";
 
 export default function TabBar({
   state,
@@ -70,11 +70,11 @@ export default function TabBar({
             {icon[route.name as keyof typeof icon]({
               color: isFocused ? colors.primary : colors.text,
             })}
-            <Text style={{ color: isFocused ? colors.primary : colors.text }}>
+            <Text style={{ color: isFocused ? "#fff" : "#fff" }}>
               {typeof label === "function"
                 ? label({
                     focused: isFocused,
-                    color: isFocused ? colors.primary : colors.text,
+                    color: isFocused ? "#fff" : "#fff",
                     position: "below-icon",
                     children: "",
                   })
@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    backgroundColor: "#fff",
+    backgroundColor: "#352F44",
     paddingVertical: 15,
     shadowColor: "#000",
     shadowOffset: {
@@ -100,11 +100,13 @@ const styles = StyleSheet.create({
       height: 10,
     },
     shadowOpacity: 0.1,
+    shadowRadius: 10,
+    elevation: 10,
   },
   tabbarItem: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    gap: 5,
+    gap: 8,
   },
 });

@@ -1,7 +1,6 @@
 import { Tabs } from "expo-router";
 import React from "react";
 import TabBar from "@/components/TabBar";
-// import HouseList from "@/components/HouseList";
 
 const TabLayout = () => {
   return (
