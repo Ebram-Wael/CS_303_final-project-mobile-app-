@@ -6,6 +6,7 @@ import {
   ScrollView,
   Image,
   Pressable,
+  SafeAreaView,
   Button,
 } from "react-native";
 const pic1 = require("../../assets/images/homepic1.jpg");
@@ -77,7 +78,7 @@ export default function index() {
             justifyContent: "center",
             marginTop: 20,
           }}
-          onPress={() => router.push("./(tabs)/AboutUs")}
+          onPress={() => router.push("./AboutUs")}
         >
           <Text style={styles.bttn}>To Know More About Us ,Click me!</Text>
         </Pressable>

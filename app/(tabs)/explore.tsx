@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import HouseData from '@/data.json';
-import { View, Text, FlatList, Image, StyleSheet ,ScrollView } from 'react-native';
+import { View, Text, FlatList, Image, StyleSheet ,ScrollView, Pressable } from 'react-native';
 import { Link } from '@react-navigation/native';
 
 const defaultImage = "default.jpg";
@@ -10,7 +10,7 @@ const HouseItem = ({ house } ) => (
   <View style={styles.card}>
   <Text style={styles.title}>{house.title || 'No Title'}</Text>
   <Text style={styles.address}>{house.address || 'Unknown Address'}</Text>
-  <Text style={styles.owner}>Owner: <link href='#'>{house.owner || 'Unknown'}</link></Text>
+  <Text style={styles.owner}>Owner: <Pressable >{house.owner || 'Unknown'}</Pressable></Text>
   <Image source={{ uri: house.image || defaultImage }} style={styles.image} />
   <Text style={styles.description} numberOfLines={2} >Description: {house.description || 'No description available'}
   </Text>
