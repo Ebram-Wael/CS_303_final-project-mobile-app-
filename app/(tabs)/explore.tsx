@@ -8,10 +8,16 @@ import {
   StyleSheet,
   ScrollView,
 } from "react-native";
+import { useRouter } from "expo-router";
+
 
 const defaultImage = "default.jpg";
 
-const HouseItem = ({ house }) => (
+const HouseItem = ({ house }) => {
+  const router = useRouter();
+  return(
+  <Pressable onPress={() => router.push({ pathname: "/[moreview]", 
+      params: { moreview: house.id} })}>
   <View style={styles.card}>
     <Text style={styles.title}>{house.title || "No Title"}</Text>
     <Text style={styles.address}>{house.address || "Unknown Address"}</Text>
@@ -29,7 +35,8 @@ const HouseItem = ({ house }) => (
       Price: {house.price > 0 ? `${house.price}` : "Invalid Price"} EGP
     </Text>
   </View>
-);
+  </Pressable>
+)};
 
 export default function HouseList() {
   const [houses, setHouses] = useState([]);
@@ -55,7 +62,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: "#f0f0f0",
+    backgroundColor: '#f0f0f0',
   },
   header: {
     fontSize: 26,

@@ -21,6 +21,7 @@ The **Student Housing App** is a mobile application designed to help students fi
 👤 [Malak Sobhy](https://github.com/Malkah04)
 👤 [Abanoub Refaat](https://github.com/abanoub-refaat)
 👤 [Ebram Wael](https://github.com/Ebram-Wael)
+👤 [Julia Milad](https://github.com/Julia2227099)
 
 ## 🤝 Contribution Guide
 
