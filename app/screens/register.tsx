@@ -123,31 +123,32 @@ const Rgister = () => {
     return (
 
     <View style={styles.container}>
-            <View  >
-                <Text style={styles.header }>Create Account</Text>
-                <View style={styles.txt}>
-                    <Text >Create an Account So You Can Explore Our Apartment </Text> 
-                </View>
-                <View style={styles.select} >
-                    <RadioButton.Android
-                    value="buyer"
-                    status={selectRole === 'buyer'? 'checked' : 'unchecked'}
-                    onPress={()=>setSelectRole('buyer')}
-                    style={{flex:0.5}}
-                    />
-                    <Text style={styles.label} > I'm Buyer</Text>
-                </View>
+      <View  >
+          <Text style={styles.header }>Create Account</Text>
+          <View style={styles.txt}>
+              <Text >Create an Account So You Can Explore Our Apartment </Text> 
+          </View>
+          <View style={{display:'flex' ,flexDirection:'row' ,gap:100}}>
+          <View style={styles.select} >
+              <RadioButton.Android
+              value="buyer"
+              status={selectRole === 'buyer'? 'checked' : 'unchecked'}
+              onPress={()=>setSelectRole('buyer')}
+              style={{flex:0.5}}
+              />
+              <Text style={styles.label} > I'm Buyer</Text>
+          </View>
 
-                <View style={styles.select}>
-                    <RadioButton.Android
-                    value="seller"
-                    status={selectRole ==='seller'? 'checked' : 'unchecked'}
-                    onPress={()=>setSelectRole('seller')}
-                    
+          <View style={styles.select}>
+              <RadioButton.Android
+              value="seller"
+              status={selectRole ==='seller'? 'checked' : 'unchecked'}
+              onPress={()=>setSelectRole('seller')}
+              
 
-                    />
-                    <Text style={styles.label}  >I'm Seller</Text>
-                 
+              />
+            <Text style={styles.label}  >I'm Seller</Text>
+          </View>
                 </View>
                 <View>
                 <TextInput 
