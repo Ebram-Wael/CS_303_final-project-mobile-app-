@@ -71,7 +71,7 @@ export default function index() {
             Join thousands of students who found their perfect home with Homy.
             Sign up now and take the stress out of apartment hunting!
           </Text>
-          <Pressable style={styles.signupButton}>
+          <Pressable style={styles.signupButton}  onPress={()=>(router.push('../screens/register'))}>
             <Text style={{ color: "white" }}>Join Now</Text>
           </Pressable>
         </View>
