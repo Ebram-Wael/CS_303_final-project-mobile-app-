@@ -23,9 +23,9 @@ const HouseItem = ({ house }) => {
     <Text style={styles.address}>{house.address || "Unknown Address"}</Text>
     <Text style={styles.owner}>
       Owner:{" "}
-      <Pressable onPress={() => {}}>
-        <Text>{house.owner || "Unknown"}</Text>
-      </Pressable>
+      <Pressable onPress={() => router.push({ pathname: "/owner", params: { ownerName: house.owner } })}>
+  <Text style={{ color: "#007bff" }}>{house.owner || "Unknown"}</Text>
+</Pressable>
     </Text>
     <Image source={{ uri: house.image || defaultImage }} style={styles.image} />
     <Text style={styles.description} numberOfLines={2}>
