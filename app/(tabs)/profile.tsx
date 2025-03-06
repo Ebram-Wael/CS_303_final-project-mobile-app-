@@ -3,6 +3,12 @@ import React, { useState } from "react";
 import  auth  from '../../firebase'; 
 import {  doc, getDoc } from 'firebase/firestore';
 import {db} from '../../firebase'
+import { SafeAreaView } from "react-native-safe-area-context";
+
+interface ProfileProps {
+  name: string;
+  email: string;
+}
 
 
 const Profile = () => {
@@ -20,9 +26,9 @@ const Profile = () => {
     } )
   }
   return (
-    <View>
-      <Text>Profile</Text>
-    </View>
+    <SafeAreaView >
+      
+    </SafeAreaView>  
   );
 };
 
