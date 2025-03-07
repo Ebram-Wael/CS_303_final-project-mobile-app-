@@ -3,25 +3,42 @@ import { View, Text, Button, TextInput ,StyleSheet, Pressable, Alert } from "rea
 import { useRouter } from "expo-router";
 import  auth  from '../../firebase'; 
 import { signInWithEmailAndPassword } from "firebase/auth";
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { ActivityIndicator } from "react-native-paper";
+
 
 const Login = () => {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [borderColor, setBorderColor] = useState('#999999')
-  const [borderColor1, setBorderColor1] = useState('#999999')
+  const [borderColor, setBorderColor] = useState('#26326E')
+  const [borderColor1, setBorderColor1] = useState('#26326E')
+
+  const [showPassword, setShowPassword] = useState(true)
+  const [load ,setLoad]=useState(false)
+  
+  const ChangePassword= ()=>{
+    setShowPassword(!showPassword);
+  }
 
 
   const handleSignIN= async(e)=>{
-   e.preventDefault();
+   e.preventDefault();   
+    if(load)return;
+    setLoad(true)
     try{
       await signInWithEmailAndPassword(auth, email, password)
-      Alert.alert('you have signed in')
       setTimeout(() => router.push('/') ,2000)
 
     }
     catch(error){
-      Alert.alert(error.message)
+      if(error.code === 'auth/invalid-credential'){
+        Alert.alert('Invalid Password or email')
+      }
+      else if(error.code === 'auth/missing-password'){
+        Alert.alert('password is required')
+      }
+      else Alert.alert('email is required')
     }
     
   }
@@ -30,22 +47,44 @@ const Login = () => {
   <View style={styles.container}>
         <Text style={styles.header}>Login Here</Text>
       <View style={styles.txt}>
-        <Text >Welcome Back You've Been Missed!</Text>
+        <Text style={{color: "#26326E",}} >Welcome Back You've Been Missed!</Text>
       </View>
       <View>
-        <TextInput  onFocus={() => setBorderColor('#5C5470')} onBlur={() => setBorderColor('#999999')}  style={[styles.input ,{borderColor}]} placeholder="Email" onChangeText={(text)=>setEmail(text)}/>
-        <TextInput  onFocus={() => setBorderColor1('#5C5470')} onBlur={() => setBorderColor1('#999999')}  style={[styles.input ,{borderColor: borderColor1}]} secureTextEntry={true} placeholder="Password" onChangeText={(text)=>setPassword(text)}/>
+        <TextInput
+          onFocus={() => setBorderColor('#F36F27')} 
+          onBlur={() => setBorderColor('#26326E')}  
+          style={[styles.input ,{borderColor}]} 
+          placeholder="Email" 
+          onChangeText={(text)=>setEmail(text)}
+          />
+          <View  style={[styles.inputContainer,{borderColor:borderColor1 }]}>
+        <TextInput  
+          onFocus={() => setBorderColor1('#F36F27')} 
+          onBlur={() => setBorderColor1('#26326E')}  
+          style={[styles.inputField ]} 
+          secureTextEntry={showPassword} 
+          placeholder="Password" 
+          onChangeText={(text)=>setPassword(text)}
+          />
+        <MaterialCommunityIcons
+          name={showPassword ? 'eye-off' : 'eye'}
+          size={24}
+          color="#aaa"
+          onPress={ChangePassword}
+        /> 
+                </View>      
       </View>
     <Pressable style={styles.btn} onPress={handleSignIN}> 
-        <Text style={{color:'white', fontSize:18}} >Sign In Now</Text>
+      {load? (<ActivityIndicator color="white"/>):(
+        <Text style={{color:'white', fontSize:18}} >Sign In</Text>)}
     </Pressable>
 
      <View style={styles.join}>
-                    <Text> Create an Account?</Text>
-                    <Pressable  onPress={() => router.push('/screens/register')}>
-                      <Text style={{color: "#2A2438" ,textDecorationLine:'underline'}}> Sign Up </Text>
-                    </Pressable>
-                    </View>
+      <Text> Create an Account?</Text>
+      <Pressable  onPress={() => router.push('/screens/register')}>
+        <Text style={{color: "#2A2438" ,textDecorationLine:'underline'}}> Sign Up </Text>
+      </Pressable>
+      </View>
   </View>
   );
 }
@@ -70,16 +109,18 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 10,
-    color: "#2A2438",
+    color: "#F36F27",
   },
   txt:{
     flexDirection: 'row',
-    gap:10, alignItems: 'center',
+    gap:10,
+    alignItems: 'center',
     marginBottom:40,
-    fontSize:13
+    fontSize:13,
+    
   } ,
   btn :{
-    backgroundColor: "#5C5470",
+    backgroundColor: "#F36F27",
     padding: 10,
     borderRadius: 5,
     width: 250,
@@ -94,7 +135,22 @@ const styles = StyleSheet.create({
     display:'flex' ,alignItems:'center' ,
     justifyContent:'center' ,
     flexDirection:'row',
-  }
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    height: 50,
+    margin: 12,
+    borderWidth: 1,
+    backgroundColor: 'white',
+    width: 320,
+    borderRadius: 5,
+    paddingHorizontal: 10,
+  },
+  inputField: {
+    flex: 1, 
+    height: '100%',
+  },
 
 });
 

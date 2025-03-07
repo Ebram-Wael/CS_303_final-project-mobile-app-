@@ -5,7 +5,8 @@ import {createUserWithEmailAndPassword } from 'firebase/auth'
 import  auth  from '../../firebase'; 
 import {db} from '../../firebase'
 import { setDoc ,doc } from 'firebase/firestore';
-import { RadioButton } from 'react-native-paper';
+import { ActivityIndicator, RadioButton } from 'react-native-paper';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 
 const Rgister = () => {
@@ -24,16 +25,27 @@ const Rgister = () => {
     const [errorEm, setErrorEm] =useState('');
     const [errorPassword, setErrorPassword] = useState('')
 
+    const [showPassword, setShowPassword] = useState(true)
+    const [showConfirmPassword, setShowConfirmPassword] = useState(true);
+
+    const [load ,setLoad] = useState(false)
 
 
-    const [borderColor, setBorderColor] = useState('#999999')
-    const [borderColor1, setBorderColor1] = useState('#999999')
-    const [borderColor2, setBorderColor2] = useState('#999999')
-    const [borderColor3, setBorderColor3] = useState('#999999')
-    const [borderColor4, setBorderColor4] = useState('#999999')
-    const [borderColor5, setBorderColor5] = useState('#999999')
+
+    const [borderColor, setBorderColor] = useState('#F36F27')
+    const [borderColor1, setBorderColor1] = useState('#F36F27')
+    const [borderColor2, setBorderColor2] = useState('#F36F27')
+    const [borderColor3, setBorderColor3] = useState('#F36F27')
+    const [borderColor4, setBorderColor4] = useState('#F36F27')
+    const [borderColor5, setBorderColor5] = useState('#F36F27')
 
     const [selectRole , setSelectRole] = useState('buyer');
+    const ChangePassword= ()=>{
+      setShowPassword(!showPassword);
+    }
+    const ChangeStyleConfirmPassword= ()=>{
+      setShowConfirmPassword(!showConfirmPassword);
+    }
 
     
     
@@ -59,20 +71,34 @@ const Rgister = () => {
             setErrorEm("Email is required");
           isValid = false;
         }
+        else if (!/^\S+@\S+\.\S+$/.test(email)) { 
+          setErrorEm("Please enter a valid email address");
+          isValid = false;
+        }
+        
         if (!phone) {
           setErrorPhone("Phone number is required");
           isValid = false;
-        } else if (phone.length < 11) {
+        }
+        else if (phone.length < 11 || phone.length >=12) {
           setErrorPhone("Please enter a valid phone number");
           isValid = false;
         }
         if (!password) {
           setErrorPassword("Password is required");
           isValid = false;
-        } else if (password.length < 8) {
+        } else if (password.length < 8 ) {
           setErrorPassword("Password must be at least 8 characters");
           isValid = false;
         }
+        else if(!/[a-z]/.test(password)){
+          setErrorPassword("Password must contain at least one letter and one number");
+          isValid = false;
+        }
+        else  if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+          setErrorPassword("Password must contain at least one special character (!@#$%^&*)");
+          isValid = false;
+        }   
         if (!confirmPassword) {
           setErrorConfirmPassword("Confirm password is required");
           isValid = false;
@@ -85,14 +111,14 @@ const Rgister = () => {
       };
       
     
-    
-    
     const handleSignup = async (e) => {
         e.preventDefault();
         Keyboard.dismiss();
         if(!validateInputs()){
             return;
         }
+        if(load)return;
+        setLoad(true);
         try {
              await createUserWithEmailAndPassword(auth,email, password);
             const user =auth.currentUser;
@@ -115,7 +141,7 @@ const Rgister = () => {
                 setTimeout(() => router.push('/screens/login'), 2000);
                 Alert.alert('you already have an account');
             }else {
-            Alert.alert('The email address you entered is incorrect, try again.');
+                Alert.alert(error.message);            
             }
         }
     }
@@ -126,9 +152,9 @@ const Rgister = () => {
       <View  >
           <Text style={styles.header }>Create Account</Text>
           <View style={styles.txt}>
-              <Text >Create an Account So You Can Explore Our Apartment </Text> 
+              <Text style={{color:'#26326E'}} >Create an Account So You Can Explore Our Apartment </Text> 
           </View>
-          <View style={{display:'flex' ,flexDirection:'row' ,gap:100}}>
+          <View style={{display:'flex' ,flexDirection:'row' ,gap:80}}>
           <View style={styles.select} >
               <RadioButton.Android
               value="buyer"
@@ -136,7 +162,7 @@ const Rgister = () => {
               onPress={()=>setSelectRole('buyer')}
               style={{flex:0.5}}
               />
-              <Text style={styles.label} > I'm Buyer</Text>
+              <Text style={styles.label} >I'm Customer</Text>
           </View>
 
           <View style={styles.select}>
@@ -152,16 +178,16 @@ const Rgister = () => {
                 </View>
                 <View>
                 <TextInput 
-                onFocus={() => setBorderColor('#5C5470')}
-                onBlur={() => setBorderColor('#999999')} 
+                onFocus={() => setBorderColor('#26326E')}
+                onBlur={() => setBorderColor('#F36F27')} 
                 style={[styles.input ,{borderColor}]} 
                 placeholder="First Name" 
                 onChangeText={(text)=>{setName(text); }}
                 />
                 {errorName ? <Text style={styles.errorText}>{errorName}</Text> : null}
                 <TextInput 
-                onFocus={() => setBorderColor1('#5C5470')} 
-                onBlur={() => setBorderColor1('#999999')}  
+                onFocus={() => setBorderColor1('#26326E')} 
+                onBlur={() => setBorderColor1('#F36F27')}  
                 style={[styles.input ,{borderColor:borderColor1}]} 
                 placeholder="Last Name" 
                 onChangeText={(text)=>{setLast(text); }}
@@ -169,8 +195,8 @@ const Rgister = () => {
                 {errorLast ? <Text style={styles.errorText}>{errorLast}</Text> : null}
 
                 <TextInput 
-                onFocus={() => setBorderColor5('#5C5470')} 
-                onBlur={() => setBorderColor5('#999999')}  
+                onFocus={() => setBorderColor5('#26326E')} 
+                onBlur={() => setBorderColor5('#F36F27')}  
                 style={[styles.input ,{borderColor:borderColor5}]} 
                 placeholder="phone" 
                 onChangeText={(text)=>{setPhone(text); }}
@@ -181,31 +207,50 @@ const Rgister = () => {
                
 
                 <TextInput 
-                onFocus={() => setBorderColor2('#5C5470')} 
-                onBlur={() => setBorderColor2('#999999')}  
+                onFocus={() => setBorderColor2('#26326E')} 
+                onBlur={() => setBorderColor2('#F36F27')}  
                 style={[styles.input ,{borderColor:borderColor2}]} 
                 placeholder="Email" 
                 onChangeText={(text)=>{setEmail(text); }}
                 />
                 {errorEm ? <Text style={styles.errorText}>{errorEm}</Text> : null}
 
-
+             <View style={[styles.inputContainer,{borderColor: borderColor3}]}>
                 <TextInput  
-                onFocus={() => setBorderColor3('#5C5470')} 
-                onBlur={() => setBorderColor3('#999999')}  
-                style={[styles.input ,{borderColor: borderColor3}]} 
-                secureTextEntry={true} placeholder="Password" 
+                onFocus={() => setBorderColor3('#26326E')} 
+                onBlur={() => setBorderColor3('#F36F27')}  
+                style={[styles.inputField ]} 
+                secureTextEntry={showPassword} placeholder="Password" 
                 onChangeText={(text)=>{setPassword(text);}}
                 />
+                <MaterialCommunityIcons
+                    name={showPassword ? 'eye-off' : 'eye'}
+                    size={24}
+                    color="#aaa"
+                    onPress={ChangePassword}
+                    style={{}}
+                />                
+                </View >
                 {errorPassword ? <Text style={styles.errorText}>{errorPassword}</Text> : null}
 
-                <TextInput  
-                onFocus={() => setBorderColor4('#5C5470')} 
-                onBlur={() => setBorderColor4('#999999')}  
-                style={[styles.input ,{borderColor: borderColor4}]} 
-                secureTextEntry={true} placeholder="Confirm Password" 
-                onChangeText={(text)=>{setConfirmPassword(text);}}
-                />
+
+                <View style={[styles.inputContainer,{borderColor: borderColor4}]}>
+
+                  <TextInput  
+                    onFocus={() => setBorderColor4('#26326E')} 
+                    onBlur={() => setBorderColor4('#F36F27')}  
+                    style={[styles.inputField ]} 
+                    secureTextEntry={showConfirmPassword} placeholder="Confirm Password" 
+                    onChangeText={(text)=>{setConfirmPassword(text);}}
+                  />
+                  <MaterialCommunityIcons
+                      name={showConfirmPassword ? 'eye-off' : 'eye'}
+                      size={24}
+                      color="#aaa"
+                      onPress={ChangeStyleConfirmPassword}
+                      style={{}}
+                  />
+                </View>
                 {errorConfirmPassword ? <Text style={styles.errorText}>{errorConfirmPassword}</Text> : null}
 
                  
@@ -213,7 +258,9 @@ const Rgister = () => {
                     </View>
                 
                 <Pressable style={styles.btn} onPress={handleSignup}> 
-                    <Text style={{color:'white', fontSize:18}}> Sign Up</Text>
+                {load?(<ActivityIndicator color='white'/>):
+                    (<Text style={{color:'white', fontSize:18}}> Sign Up</Text>)
+                }
                 </Pressable>
 
                 <View style={styles.join}>
@@ -242,7 +289,7 @@ input: {
     borderRadius:5,
 },
 btn:{
-    backgroundColor: "#5C5470",
+    backgroundColor: '#26326E',
     padding: 10,
     borderRadius: 5,
     width: 250,
@@ -265,7 +312,7 @@ header:{
     fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 10,
-    color: "#2A2438",
+    color: "#26326E",
   },
   txt:{
     flexDirection: 'row',
@@ -309,7 +356,22 @@ join:{
 display:'flex' ,alignItems:'center' ,
 justifyContent:'center' ,
 flexDirection:'row',
-}
+},
+inputContainer: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  height: 50,
+  margin: 12,
+  borderWidth: 1,
+  backgroundColor: 'white',
+  width: 320,
+  borderRadius: 5,
+  paddingHorizontal: 10,
+},
+inputField: {
+  flex: 1, 
+  height: '100%',
+},
   
 })
 

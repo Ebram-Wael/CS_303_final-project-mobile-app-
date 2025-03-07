@@ -29,7 +29,7 @@ export default function index() {
   const images = [pic1, pic2, pic3, pic4];
   return (
     <SafeAreaView style={styles.cont}>
-      <StatusBar barStyle="light-content" backgroundColor={"#352F44"} />
+      <StatusBar barStyle="light-content" backgroundColor={"#26326E"} />
       <Text style={styles.mainHeading}>HOMY</Text>
       <ScrollView style={styles.content}>
         <View>
@@ -65,17 +65,6 @@ export default function index() {
           </Text>
         </View>
         <View>
-          <Text style={styles.title}>Sign Up</Text>
-          <View style={styles.underline} />
-          <Text style={styles.txt}>
-            Join thousands of students who found their perfect home with Homy.
-            Sign up now and take the stress out of apartment hunting!
-          </Text>
-          <Pressable style={styles.signupButton}  onPress={()=>(router.push('../screens/register'))}>
-            <Text style={{ color: "white" }}>Join Now</Text>
-          </Pressable>
-        </View>
-        <View>
           <Text style={styles.title}>
             Your Home, Your Rules – Find it with Homy.
           </Text>
@@ -99,14 +88,14 @@ const styles = StyleSheet.create({
   cont: {
     flex: 1,
     fontSize: 16,
-    backgroundColor: "#DBD8E3",
+    backgroundColor: "white",
   },
   mainHeading: {
     fontWeight: "bold",
     fontSize: 32,
     textAlign: "center",
     color: "#fff",
-    backgroundColor: "#352F44",
+    backgroundColor: "#26326E",
     marginBottom: 10,
     padding: 12,
   },
@@ -142,7 +131,7 @@ const styles = StyleSheet.create({
   btn: {
     width: 150,
     height: 45,
-    backgroundColor: "#5C5470",
+    backgroundColor: "#F36F27",
     textAlign: "center",
     justifyContent: "center",
     alignSelf: "center",
@@ -172,7 +161,7 @@ const styles = StyleSheet.create({
   underline: {
     width: 300,
     height: 5,
-    backgroundColor: "#2A2438",
+    backgroundColor: "#26326E",
     borderRadius: 5,
     alignSelf: "center",
     marginBottom: 20,
