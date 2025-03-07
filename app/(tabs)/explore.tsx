@@ -26,8 +26,8 @@ const HouseItem = ({ house }) => {
       <View style={styles.card}>
         <Text style={styles.title}>{house.title || "No Title"}</Text>
         <Text style={styles.address}>{house.address || "Unknown Address"}</Text>
-        <Text style={styles.owner}>
-          Owner:{" "}
+        <View style={styles.ownerContainer}>
+          <Text style={styles.owner}>Owner: </Text>
           <Pressable
             onPress={() =>
               router.push({
@@ -38,7 +38,7 @@ const HouseItem = ({ house }) => {
           >
             <Text style={{ color: "#007bff" }}>{house.owner || "Unknown"}</Text>
           </Pressable>
-        </Text>
+        </View>
         <Image
           source={{ uri: house.image || defaultImage }}
           style={styles.image}
@@ -125,6 +125,10 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     color: "#007bff",
+  },
+  ownerContainer: {
+    flexDirection: "row",
+    alignItems: "center",
   },
   address: {
     fontSize: 14,
