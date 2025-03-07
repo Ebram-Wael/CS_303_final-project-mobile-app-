@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import HouseData from "@/data.json";
+import HouseData from "@/services/data.json";
 import {
   View,
   Text,
@@ -10,33 +10,49 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 
-
 const defaultImage = "default.jpg";
 
 const HouseItem = ({ house }) => {
   const router = useRouter();
-  return(
-  <Pressable onPress={() => router.push({ pathname: "/[moreview]", 
-      params: { moreview: house.id} })}>
-  <View style={styles.card}>
-    <Text style={styles.title}>{house.title || "No Title"}</Text>
-    <Text style={styles.address}>{house.address || "Unknown Address"}</Text>
-    <Text style={styles.owner}>
-      Owner:{" "}
-      <Pressable onPress={() => router.push({ pathname: "/owner", params: { ownerName: house.owner } })}>
-  <Text style={{ color: "#007bff" }}>{house.owner || "Unknown"}</Text>
-</Pressable>
-    </Text>
-    <Image source={{ uri: house.image || defaultImage }} style={styles.image} />
-    <Text style={styles.description} numberOfLines={2}>
-      Description: {house.description || "No description available"}
-    </Text>
-    <Text style={styles.price}>
-      Price: {house.price > 0 ? `${house.price}` : "Invalid Price"} EGP
-    </Text>
-  </View>
-  </Pressable>
-)};
+  return (
+    <Pressable
+      onPress={() =>
+        router.push({
+          pathname: "/screens/[moreview]",
+          params: { moreview: house.id },
+        })
+      }
+    >
+      <View style={styles.card}>
+        <Text style={styles.title}>{house.title || "No Title"}</Text>
+        <Text style={styles.address}>{house.address || "Unknown Address"}</Text>
+        <Text style={styles.owner}>
+          Owner:{" "}
+          <Pressable
+            onPress={() =>
+              router.push({
+                pathname: "/screens/owner",
+                params: { ownerName: house.owner },
+              })
+            }
+          >
+            <Text style={{ color: "#007bff" }}>{house.owner || "Unknown"}</Text>
+          </Pressable>
+        </Text>
+        <Image
+          source={{ uri: house.image || defaultImage }}
+          style={styles.image}
+        />
+        <Text style={styles.description} numberOfLines={2}>
+          Description: {house.description || "No description available"}
+        </Text>
+        <Text style={styles.price}>
+          Price: {house.price > 0 ? `${house.price}` : "Invalid Price"} EGP
+        </Text>
+      </View>
+    </Pressable>
+  );
+};
 
 export default function HouseList() {
   const [houses, setHouses] = useState([]);
@@ -62,7 +78,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#f0f0f0',
+    backgroundColor: "#f0f0f0",
   },
   header: {
     fontSize: 26,
