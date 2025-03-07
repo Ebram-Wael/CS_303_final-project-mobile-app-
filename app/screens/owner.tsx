@@ -1,14 +1,23 @@
 import React from "react";
-import { View, Text, StyleSheet, ScrollView, Image,Pressable } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  Image,
+  Pressable,
+} from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import { useRouter } from "expo-router";
-import HouseData from "@/data.json";
+import HouseData from "@/services/data.json";
 import Icon from "react-native-vector-icons/FontAwesome";
 
 export default function OwnerDetails() {
   const { ownerName } = useLocalSearchParams<{ ownerName: string }>();
   const router = useRouter();
-  const owner = HouseData.find((house) => house.owner === ownerName)?.ownerDetails;
+  const owner = HouseData.find(
+    (house) => house.owner === ownerName
+  )?.ownerDetails;
   const ownedHouses = HouseData.filter((house) => house.owner === ownerName);
 
   return (
@@ -16,20 +25,33 @@ export default function OwnerDetails() {
       <Text style={styles.header}>Owner Details</Text>
       {owner ? (
         <View style={styles.card}>
-            {owner.owner_image && (
-            <Image source={{ uri: owner.owner_image }} style={styles.ownerImage} />
-            )}
-            <Text style={styles.name}>{owner.name}</Text>
-            <View style={styles.detailsContainer}>
-                <View style={styles.infoRow}>
-                    <Icon name="phone" size={20} color="#007bff" style={styles.icon} />
-                    <Text style={styles.info}>{owner.phone || "Not Available"}</Text>
-                </View>
-                <View style={styles.infoRow}>
-                    <Icon name="envelope" size={20} color="#007bff" style={styles.icon} />
-                    <Text style={styles.info}>{owner.email || "Not Available"}</Text>
-                </View>
+          {owner.owner_image && (
+            <Image
+              source={{ uri: owner.owner_image }}
+              style={styles.ownerImage}
+            />
+          )}
+          <Text style={styles.name}>{owner.name}</Text>
+          <View style={styles.detailsContainer}>
+            <View style={styles.infoRow}>
+              <Icon
+                name="phone"
+                size={20}
+                color="#007bff"
+                style={styles.icon}
+              />
+              <Text style={styles.info}>{owner.phone || "Not Available"}</Text>
             </View>
+            <View style={styles.infoRow}>
+              <Icon
+                name="envelope"
+                size={20}
+                color="#007bff"
+                style={styles.icon}
+              />
+              <Text style={styles.info}>{owner.email || "Not Available"}</Text>
+            </View>
+          </View>
         </View>
       ) : (
         <Text style={styles.errorText}>Owner details not found.</Text>
@@ -38,22 +60,29 @@ export default function OwnerDetails() {
       <Text style={styles.subHeader}>Properties Listed</Text>
       {ownedHouses.length > 0 ? (
         ownedHouses.map((house) => (
-            <Pressable
+          <Pressable
             key={house.id}
-            onPress={() => router.push({ pathname: "/[moreview]", params: { moreview: house.id } })}
-            >
+            onPress={() =>
+              router.push({
+                pathname: "/screens/[moreview]",
+                params: { moreview: house.id },
+              })
+            }
+          >
             <View key={house.id} style={styles.houseCard}>
-            <Image source={{ uri: house.image }} style={styles.image} />
-            <View style={styles.houseInfo}>
-            <Text style={styles.title}>{house.title}</Text>
-            <Text style={styles.address}>{house.address}</Text>
-            <Text style={styles.price}>{house.price} EGP</Text>
+              <Image source={{ uri: house.image }} style={styles.image} />
+              <View style={styles.houseInfo}>
+                <Text style={styles.title}>{house.title}</Text>
+                <Text style={styles.address}>{house.address}</Text>
+                <Text style={styles.price}>{house.price} EGP</Text>
+              </View>
             </View>
-            </View>
-            </Pressable>
+          </Pressable>
         ))
       ) : (
-        <Text style={styles.noHousesText}>No properties listed by this owner.</Text>
+        <Text style={styles.noHousesText}>
+          No properties listed by this owner.
+        </Text>
       )}
     </ScrollView>
   );
@@ -76,7 +105,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     padding: 20,
     borderRadius: 10,
-    alignItems: "center", 
+    alignItems: "center",
     shadowColor: "#000",
     shadowOpacity: 0.1,
     shadowOffset: { width: 0, height: 2 },
@@ -89,7 +118,7 @@ const styles = StyleSheet.create({
     height: 150,
     borderRadius: 100,
     marginBottom: 10,
-    borderWidth: 4, 
+    borderWidth: 4,
     borderColor: "black",
   },
   name: {

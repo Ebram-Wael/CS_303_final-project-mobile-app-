@@ -71,7 +71,10 @@ export default function index() {
             Join thousands of students who found their perfect home with Homy.
             Sign up now and take the stress out of apartment hunting!
           </Text>
-          <Pressable style={styles.signupButton}  onPress={()=>(router.push('../screens/register'))}>
+          <Pressable
+            style={styles.signupButton}
+            onPress={() => router.push("../screens/register")}
+          >
             <Text style={{ color: "white" }}>Join Now</Text>
           </Pressable>
         </View>
@@ -85,7 +88,7 @@ export default function index() {
           </Text>
           <Pressable
             style={styles.btn}
-            onPress={() => router.push("../../component/AboutUs")}
+            onPress={() => router.push("../screens/AboutUs")}
           >
             <Text style={{ color: "white" }}>Click me!</Text>
           </Pressable>
