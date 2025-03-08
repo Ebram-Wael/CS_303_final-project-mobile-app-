@@ -13,6 +13,7 @@ import { useNavigation } from "@react-navigation/native";
 import { useLocalSearchParams } from "expo-router";
 import HouseData from "@/services/data.json";
 import arrow from "@/assets/images/arrow.png";
+import arrowTop from "@/assets/images/arrowTop.png";
 
 const defaultImage = "https://via.placeholder.com/150";
 const windowWidth = Dimensions.get("window").width;
@@ -31,17 +32,19 @@ const HouseDesc = ({ house }) => {
 
   const handlePress = () => {
     setPress(!press);
+    setExpanded(!expanded);
+  };
+  useEffect(() => {
     Animated.timing(animatedValue, {
-      toValue: expanded ? 0 : 1,
+      toValue: expanded ? 1 : 0,
       duration: 500,
       useNativeDriver: true,
     }).start();
-    setExpanded(!expanded);
-  };
+  }, [expanded])
 
   const translateY = animatedValue.interpolate({
     inputRange: [0, 1],
-    outputRange: [windowHeight * 0.4, 0],
+    outputRange: [(windowHeight * 0.4), 0],
   });
 
   return (
@@ -51,7 +54,7 @@ const HouseDesc = ({ house }) => {
           source={{ uri: house?.imagesArr?.[0] || defaultImage }}
           style={{
             width: "100%",
-            height: press ? windowHeight / 5 : windowHeight / 3,
+            height: press ? windowHeight / 5 : windowHeight / 3.2,
             borderRadius: 8,
           }}
         />
@@ -59,7 +62,7 @@ const HouseDesc = ({ house }) => {
           source={{ uri: house?.imagesArr?.[1] || defaultImage }}
           style={{
             width: "100%",
-            height: press ? windowHeight / 5 : windowHeight / 3,
+            height: press ? windowHeight / 5 : windowHeight / 3.2,
             borderRadius: 8,
           }}
         />
@@ -67,7 +70,7 @@ const HouseDesc = ({ house }) => {
           source={{ uri: house?.imagesArr?.[2] || defaultImage }}
           style={{
             width: "100%",
-            height: press ? windowHeight / 5 : windowHeight / 5,
+            height: press ? windowHeight / 5 : windowHeight / 3.5,
             borderRadius: 8,
           }}
         />
@@ -96,7 +99,7 @@ const HouseDesc = ({ house }) => {
           </Animated.View>
         ) : (
           <View style={styles.moreDetails}>
-            {/* <Text style={styles.arrow}> ▲ </Text> */}
+            <Image source={arrowTop} style={styles.arrow} />
             <Text style={styles.moreDetailsText}>More Details</Text>
           </View>
         )}
@@ -194,7 +197,7 @@ const styles = StyleSheet.create({
     color: "#352F44",
   },
   arrow: {
-    width: windowWidth / 6,
+    width: windowWidth / 9,
     height: windowHeight / 40,
   },
 });

@@ -119,7 +119,7 @@ const styles = StyleSheet.create({
     borderRadius: 100,
     marginBottom: 10,
     borderWidth: 4,
-    borderColor: "black",
+    borderColor: "#26326E",
   },
   name: {
     fontSize: 18,
