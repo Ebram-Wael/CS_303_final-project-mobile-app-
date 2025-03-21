@@ -12,7 +12,10 @@ import React, { useEffect, useState, useRef, useLayoutEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { useLocalSearchParams } from "expo-router";
 import HouseData from "@/services/data.json";
-import arrow from "@/assets/images/arrow.png";
+import Heart from "@/assets/icons/heart-svgrepo-com.svg";
+import RedHeart from "@/assets/icons/heart-svgrepo-com (1).svg";
+import TopArrow from "@/assets/icons/top-arrow-5-svgrepo-com.svg";
+import DownArrow from "@/assets/icons/down-arrow-5-svgrepo-com.svg";
 
 const defaultImage = "https://via.placeholder.com/150";
 const windowWidth = Dimensions.get("window").width;
@@ -26,18 +29,26 @@ const HouseDesc = ({ house }) => {
   }, [navigation]);
 
   const [press, setPress] = useState(false);
+  const [pressHeart, setPressHeart] = useState(false);
   const animatedValue = useRef(new Animated.Value(0)).current;
   const [expanded, setExpanded] = useState(false);
 
   const handlePress = () => {
     setPress(!press);
-    Animated.timing(animatedValue, {
-      toValue: expanded ? 0 : 1,
-      duration: 500,
-      useNativeDriver: true,
-    }).start();
     setExpanded(!expanded);
   };
+
+  const handlePressOnHeart = () => {
+    setPressHeart(!pressHeart);
+  };
+
+  useEffect(() => {
+    Animated.timing(animatedValue, {
+      toValue: expanded ? 1 : 0,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+  }, [expanded])
 
   const translateY = animatedValue.interpolate({
     inputRange: [0, 1],
@@ -45,13 +56,13 @@ const HouseDesc = ({ house }) => {
   });
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.imageContainer}>
+    <View style={styles.container}>
+      <ScrollView style={styles.imageContainer}>
         <Image
           source={{ uri: house?.imagesArr?.[0] || defaultImage }}
           style={{
             width: "100%",
-            height: press ? windowHeight / 5 : windowHeight / 3,
+            height: press ? windowHeight / 3 : windowHeight / 2,
             borderRadius: 8,
           }}
         />
@@ -59,7 +70,7 @@ const HouseDesc = ({ house }) => {
           source={{ uri: house?.imagesArr?.[1] || defaultImage }}
           style={{
             width: "100%",
-            height: press ? windowHeight / 5 : windowHeight / 3,
+            height: press ? windowHeight / 3 : windowHeight / 2,
             borderRadius: 8,
           }}
         />
@@ -67,17 +78,17 @@ const HouseDesc = ({ house }) => {
           source={{ uri: house?.imagesArr?.[2] || defaultImage }}
           style={{
             width: "100%",
-            height: press ? windowHeight / 5 : windowHeight / 5,
+            height: press ? windowHeight / 3 : windowHeight / 2,
             borderRadius: 8,
           }}
         />
-      </View>
-      <Pressable onPress={handlePress}>
+      </ScrollView>
+      <Pressable onPress={handlePress} style={styles.pressableContainer}>
         {press ? (
           <Animated.View
             style={[styles.detailed, { transform: [{ translateY }] }]}
           >
-            <Image source={arrow} style={styles.arrow} />
+            <DownArrow width={50} height={50}/>
             <Text style={styles.price}>
               {house.price > 0 ? `${house.price}` : "Invalid Price"} EGP
             </Text>
@@ -93,15 +104,24 @@ const HouseDesc = ({ house }) => {
               {house.numberOfRooms || "Unknown Number Of Rooms"}
             </Text>
             <Text style={styles.owner}>Contact: {house.owner}</Text>
+            <View style={styles.buyNowStyles}>
+              <Pressable onPress={handlePressOnHeart}>
+               { pressHeart ? <RedHeart width={30} height={30} />
+               : <Heart width={30} height={30}/>}
+              </Pressable>
+              <Pressable style={styles.buyNowView}>
+                <Text style={styles.buyNowText}>Buy Now!</Text>
+              </Pressable>
+            </View>
           </Animated.View>
         ) : (
           <View style={styles.moreDetails}>
-            {/* <Text style={styles.arrow}> ▲ </Text> */}
+            <TopArrow width={30} height={30}/>
             <Text style={styles.moreDetailsText}>More Details</Text>
           </View>
         )}
       </Pressable>
-    </ScrollView>
+    </View>
   );
 };
 
@@ -130,11 +150,10 @@ const styles = StyleSheet.create({
     backgroundColor: "#DBD8E3",
   },
   imageContainer: {
-    alignItems: "center",
-    marginVertical: 5,
-    rowGap: 3,
+    flexGrow: 1,
   },
   scrollStyle: {
+    flex: 1,
     backgroundColor: "#DBD8E3",
   },
   detailed: {
@@ -186,7 +205,8 @@ const styles = StyleSheet.create({
   moreDetails: {
     backgroundColor: "white",
     alignItems: "center",
-    padding: 4,
+    borderTopLeftRadius: 15,
+    borderTopRightRadius: 15,
   },
   moreDetailsText: {
     fontSize: 20,
@@ -196,5 +216,26 @@ const styles = StyleSheet.create({
   arrow: {
     width: windowWidth / 6,
     height: windowHeight / 40,
+  },
+  pressableContainer: {
+    position: "absolute",
+    bottom: 0,
+    width: "100%",
+  },
+  buyNowStyles: {
+    flexDirection: "row",
+    columnGap: 10,
+    marginTop: 5,
+  },
+  buyNowView: {
+    flex: 2,
+    alignItems: 'center',
+    borderRadius: 8,
+    backgroundColor: "#352F44",
+  },
+  buyNowText: {
+    fontSize: 17,
+    fontWeight: "bold",
+    color: "white",
   },
 });
