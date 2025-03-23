@@ -20,6 +20,7 @@ import DownArrow from "@/assets/icons/down-arrow-5-svgrepo-com.svg";
 const defaultImage = "https://via.placeholder.com/150";
 const windowWidth = Dimensions.get("window").width;
 const windowHeight = Dimensions.get("window").height;
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const HouseDesc = ({ house }) => {
   const navigation = useNavigation();
@@ -33,13 +34,45 @@ const HouseDesc = ({ house }) => {
   const animatedValue = useRef(new Animated.Value(0)).current;
   const [expanded, setExpanded] = useState(false);
 
+  useEffect(() => {
+    const checkFavorite = async () => {
+      try {
+        const favorites = await AsyncStorage.getItem('favorites');
+        if (favorites) {
+          const favoritesArray = JSON.parse(favorites);
+          if (favoritesArray.includes(house.id)) {
+            setPressHeart(true);
+          }
+        }
+      } catch (error) {
+        console.error('Failed to load favorites', error);
+      }
+    };
+
+    checkFavorite();
+  }, [house.id]);
+
   const handlePress = () => {
     setPress(!press);
     setExpanded(!expanded);
   };
 
-  const handlePressOnHeart = () => {
-    setPressHeart(!pressHeart);
+  const handlePressOnHeart = async () => {
+    try {
+      const favorites = await AsyncStorage.getItem('favorites');
+      let favoritesArray = favorites ? JSON.parse(favorites) : [];
+
+      if (pressHeart) {
+        favoritesArray = favoritesArray.filter(id => id !== house.id);
+      } else {
+        favoritesArray.push(house.id);
+      }
+
+      await AsyncStorage.setItem('favorites', JSON.stringify(favoritesArray));
+      setPressHeart(!pressHeart);
+    } catch (error) {
+      console.error('Failed to update favorites', error);
+    }
   };
 
   useEffect(() => {
@@ -106,8 +139,8 @@ const HouseDesc = ({ house }) => {
             <Text style={styles.owner}>Contact: {house.owner}</Text>
             <View style={styles.buyNowStyles}>
               <Pressable onPress={handlePressOnHeart}>
-               { pressHeart ? <RedHeart width={30} height={30} />
-               : <Heart width={30} height={30}/>}
+              { pressHeart ? <RedHeart width={30} height={30} />
+              : <Heart width={30} height={30}/>}
               </Pressable>
               <Pressable style={styles.buyNowView}>
                 <Text style={styles.buyNowText}>Buy Now!</Text>
