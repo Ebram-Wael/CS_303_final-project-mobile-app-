@@ -16,9 +16,9 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import auth from "../../services/firebase";
 import { db } from "../../services/firebase";
 import { setDoc, doc } from "firebase/firestore";
-import { ActivityIndicator, RadioButton } from 'react-native-paper';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { ActivityIndicator, RadioButton } from "react-native-paper";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Register = () => {
   const navigation = useNavigation();
@@ -27,42 +27,40 @@ const Register = () => {
     navigation.setOptions({ headerShown: false });
   }, [navigation]);
   const router = useRouter();
-  const [name, setName] = useState('');
-  const [last, setLast] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [phone, setPhone] = useState('');
+  const [name, setName] = useState("");
+  const [last, setLast] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [phone, setPhone] = useState("");
 
-  const [errorName, setErrorName] = useState('');
-  const [errorLast, setErrorLast] = useState('');
-  const [errorPhone, setErrorPhone] = useState('');
-  const [errorConfirmPassword, setErrorConfirmPassword] = useState('');
-  const [errorEm, setErrorEm] = useState('');
-  const [errorPassword, setErrorPassword] = useState('')
+  const [errorName, setErrorName] = useState("");
+  const [errorLast, setErrorLast] = useState("");
+  const [errorPhone, setErrorPhone] = useState("");
+  const [errorConfirmPassword, setErrorConfirmPassword] = useState("");
+  const [errorEm, setErrorEm] = useState("");
+  const [errorPassword, setErrorPassword] = useState("");
 
-  const [showPassword, setShowPassword] = useState(true)
+  const [showPassword, setShowPassword] = useState(true);
   const [showConfirmPassword, setShowConfirmPassword] = useState(true);
 
-  const [load, setLoad] = useState(false)
+  const [load, setLoad] = useState(false);
 
+  const [borderColor, setBorderColor] = useState("#F36F27");
+  const [borderColor1, setBorderColor1] = useState("#F36F27");
+  const [borderColor2, setBorderColor2] = useState("#F36F27");
+  const [borderColor3, setBorderColor3] = useState("#F36F27");
+  const [borderColor4, setBorderColor4] = useState("#F36F27");
+  const [borderColor5, setBorderColor5] = useState("#F36F27");
 
-
-  const [borderColor, setBorderColor] = useState('#F36F27')
-  const [borderColor1, setBorderColor1] = useState('#F36F27')
-  const [borderColor2, setBorderColor2] = useState('#F36F27')
-  const [borderColor3, setBorderColor3] = useState('#F36F27')
-  const [borderColor4, setBorderColor4] = useState('#F36F27')
-  const [borderColor5, setBorderColor5] = useState('#F36F27')
-
-  const [selectRole, setSelectRole] = useState('buyer');
+  const [selectRole, setSelectRole] = useState("buyer");
 
   const ChangePassword = () => {
     setShowPassword(!showPassword);
-  }
+  };
   const ChangeStyleConfirmPassword = () => {
     setShowConfirmPassword(!showConfirmPassword);
-  }
+  };
 
   const validateInputs = () => {
     let isValid = true;
@@ -85,8 +83,7 @@ const Register = () => {
     if (!email) {
       setErrorEm("Email is required");
       isValid = false;
-    }
-    else if (!/^\S+@\S+\.\S+$/.test(email)) {
+    } else if (!/^\S+@\S+\.\S+$/.test(email)) {
       setErrorEm("Please enter a valid email address");
       isValid = false;
     }
@@ -94,8 +91,7 @@ const Register = () => {
     if (!phone) {
       setErrorPhone("Phone number is required");
       isValid = false;
-    }
-    else if (phone.length < 11 || phone.length >= 12) {
+    } else if (phone.length < 11 || phone.length >= 12) {
       setErrorPhone("Please enter a valid phone number");
       isValid = false;
     }
@@ -105,13 +101,15 @@ const Register = () => {
     } else if (password.length < 8) {
       setErrorPassword("Password must be at least 8 characters");
       isValid = false;
-    }
-    else if (!/[a-z]/.test(password)) {
-      setErrorPassword("Password must contain at least one letter and one number");
+    } else if (!/[a-z]/.test(password)) {
+      setErrorPassword(
+        "Password must contain at least one letter and one number"
+      );
       isValid = false;
-    }
-    else if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
-      setErrorPassword("Password must contain at least one special character (!@#$%^&*)");
+    } else if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+      setErrorPassword(
+        "Password must contain at least one special character (!@#$%^&*)"
+      );
       isValid = false;
     }
     if (!confirmPassword) {
@@ -143,10 +141,13 @@ const Register = () => {
           role: selectRole,
         });
         Alert.alert("Your account has been created");
-        await AsyncStorage.setItem("userData", JSON.stringify({
-          uid: user.uid,
-          email: user.email,
-        }));
+        await AsyncStorage.setItem(
+          "userData",
+          JSON.stringify({
+            uid: user.uid,
+            email: user.email,
+          })
+        );
         setTimeout(() => router.push("/(tabs)/profile"), 2000);
       }
     } catch (error) {
@@ -161,119 +162,141 @@ const Register = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View >
+      <View>
         <Text style={styles.header}>Create Account</Text>
         <View style={styles.txt}>
-          <Text style={{ color: '#26326E' }} >Create an Account So You Can Explore Our Apartment </Text>
+          <Text style={{ color: "#26326E" }}>
+            Create an Account So You Can Explore Our Apartment{" "}
+          </Text>
         </View>
-        <View style={{ display: 'flex', flexDirection: 'row', gap: 80 }}>
-          <View style={styles.select} >
+        <View style={{ display: "flex", flexDirection: "row", gap: 80 }}>
+          <View style={styles.select}>
             <RadioButton.Android
               value="buyer"
-              status={selectRole === 'buyer' ? 'checked' : 'unchecked'}
-              onPress={() => setSelectRole('buyer')}
+              status={selectRole === "buyer" ? "checked" : "unchecked"}
+              onPress={() => setSelectRole("buyer")}
               style={{ flex: 0.5 }}
             />
-            <Text style={styles.label} >I'm Customer</Text>
+            <Text style={styles.label}>I'm Customer</Text>
           </View>
 
           <View style={styles.select}>
             <RadioButton.Android
               value="seller"
-              status={selectRole === 'seller' ? 'checked' : 'unchecked'}
-              onPress={() => setSelectRole('seller')}
+              status={selectRole === "seller" ? "checked" : "unchecked"}
+              onPress={() => setSelectRole("seller")}
             />
-            <Text style={styles.label}  >I'm Seller</Text>
+            <Text style={styles.label}>I'm Seller</Text>
           </View>
         </View>
         <View>
           <TextInput
-            onFocus={() => setBorderColor('#26326E')}
-            onBlur={() => setBorderColor('#F36F27')}
+            onFocus={() => setBorderColor("#26326E")}
+            onBlur={() => setBorderColor("#F36F27")}
             style={[styles.input, { borderColor }]}
             placeholder="First Name"
-            onChangeText={(text) => { setName(text); }}
+            onChangeText={(text) => {
+              setName(text);
+            }}
           />
           {errorName ? <Text style={styles.errorText}>{errorName}</Text> : null}
           <TextInput
-            onFocus={() => setBorderColor1('#26326E')}
-            onBlur={() => setBorderColor1('#F36F27')}
+            onFocus={() => setBorderColor1("#26326E")}
+            onBlur={() => setBorderColor1("#F36F27")}
             style={[styles.input, { borderColor: borderColor1 }]}
             placeholder="Last Name"
-            onChangeText={(text) => { setLast(text); }}
+            onChangeText={(text) => {
+              setLast(text);
+            }}
           />
           {errorLast ? <Text style={styles.errorText}>{errorLast}</Text> : null}
 
           <TextInput
-            onFocus={() => setBorderColor5('#26326E')}
-            onBlur={() => setBorderColor5('#F36F27')}
+            onFocus={() => setBorderColor5("#26326E")}
+            onBlur={() => setBorderColor5("#F36F27")}
             style={[styles.input, { borderColor: borderColor5 }]}
             placeholder="phone"
-            onChangeText={(text) => { setPhone(text); }}
-            keyboardType='numeric'
+            onChangeText={(text) => {
+              setPhone(text);
+            }}
+            keyboardType="numeric"
           />
-          {errorPhone ? <Text style={styles.errorText}>{errorPhone}</Text> : null}
+          {errorPhone ? (
+            <Text style={styles.errorText}>{errorPhone}</Text>
+          ) : null}
 
           <TextInput
-            onFocus={() => setBorderColor2('#26326E')}
-            onBlur={() => setBorderColor2('#F36F27')}
+            onFocus={() => setBorderColor2("#26326E")}
+            onBlur={() => setBorderColor2("#F36F27")}
             style={[styles.input, { borderColor: borderColor2 }]}
             placeholder="Email"
-            onChangeText={(text) => { setEmail(text); }}
+            onChangeText={(text) => {
+              setEmail(text);
+            }}
           />
           {errorEm ? <Text style={styles.errorText}>{errorEm}</Text> : null}
 
           <View style={[styles.inputContainer, { borderColor: borderColor3 }]}>
             <TextInput
-              onFocus={() => setBorderColor3('#26326E')}
-              onBlur={() => setBorderColor3('#F36F27')}
+              onFocus={() => setBorderColor3("#26326E")}
+              onBlur={() => setBorderColor3("#F36F27")}
               style={[styles.inputField]}
-              secureTextEntry={showPassword} placeholder="Password"
-              onChangeText={(text) => { setPassword(text); }}
+              secureTextEntry={showPassword}
+              placeholder="Password"
+              onChangeText={(text) => {
+                setPassword(text);
+              }}
             />
             <MaterialCommunityIcons
-              name={showPassword ? 'eye-off' : 'eye'}
+              name={showPassword ? "eye-off" : "eye"}
               size={24}
               color="#aaa"
               onPress={ChangePassword}
               style={{}}
             />
-          </View >
-          {errorPassword ? <Text style={styles.errorText}>{errorPassword}</Text> : null}
-
+          </View>
+          {errorPassword ? (
+            <Text style={styles.errorText}>{errorPassword}</Text>
+          ) : null}
 
           <View style={[styles.inputContainer, { borderColor: borderColor4 }]}>
-
             <TextInput
-              onFocus={() => setBorderColor4('#26326E')}
-              onBlur={() => setBorderColor4('#F36F27')}
+              onFocus={() => setBorderColor4("#26326E")}
+              onBlur={() => setBorderColor4("#F36F27")}
               style={[styles.inputField]}
-              secureTextEntry={showConfirmPassword} placeholder="Confirm Password"
-              onChangeText={(text) => { setConfirmPassword(text); }}
+              secureTextEntry={showConfirmPassword}
+              placeholder="Confirm Password"
+              onChangeText={(text) => {
+                setConfirmPassword(text);
+              }}
             />
             <MaterialCommunityIcons
-              name={showConfirmPassword ? 'eye-off' : 'eye'}
+              name={showConfirmPassword ? "eye-off" : "eye"}
               size={24}
               color="#aaa"
               onPress={ChangeStyleConfirmPassword}
             />
           </View>
-          {errorConfirmPassword ? <Text style={styles.errorText}>{errorConfirmPassword}</Text> : null}
-
-
-
+          {errorConfirmPassword ? (
+            <Text style={styles.errorText}>{errorConfirmPassword}</Text>
+          ) : null}
         </View>
 
         <Pressable style={styles.btn} onPress={handleSignup}>
-          {load ? (<ActivityIndicator color='white' />) :
-            (<Text style={{ color: 'white', fontSize: 18 }}> Sign Up</Text>)
-          }
+          {load ? (
+            <ActivityIndicator color="white" />
+          ) : (
+            <Text style={{ color: "white", fontSize: 18 }}> Sign Up</Text>
+          )}
         </Pressable>
 
         <View style={styles.join}>
           <Text> Already Have an Account?</Text>
-          <Pressable onPress={() => router.push('/screens/login')}>
-            <Text style={{ color: "#2A2438", textDecorationLine: 'underline' }}> Sign In </Text>
+          <Pressable onPress={() => router.push("/screens/login")}>
+            <Text style={{ color: "#2A2438", textDecorationLine: "underline" }}>
+              {" "}
+              Sign In{" "}
+            </Text>
           </Pressable>
         </View>
       </View>
@@ -286,57 +309,55 @@ const styles = StyleSheet.create({
     height: 50,
     margin: 12,
     borderWidth: 1,
-    backgroundColor: 'white',
+    backgroundColor: "white",
     width: 320,
     borderRadius: 5,
   },
   btn: {
-    backgroundColor: '#26326E',
+    backgroundColor: "#26326E",
     padding: 10,
     borderRadius: 5,
     width: 250,
     marginTop: 20,
     marginBottom: 30,
-    alignItems: 'center',
-    justifyContent: 'center',
-    display: 'flex',
-    alignSelf: 'center',
-
+    alignItems: "center",
+    justifyContent: "center",
+    display: "flex",
+    alignSelf: "center",
   },
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center",
   },
   header: {
     fontSize: 30,
-    fontWeight: 'bold',
-    textAlign: 'center',
+    fontWeight: "bold",
+    textAlign: "center",
     marginBottom: 10,
     color: "#26326E",
   },
   txt: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 10,
-    alignItems: 'center',
+    alignItems: "center",
     marginBottom: 40,
-    justifyContent: 'center',
-    fontSize: 13
-
+    justifyContent: "center",
+    fontSize: 13,
   },
   screen: {
-    display: 'none',
+    display: "none",
     width: 300,
     height: 300,
     zIndex: 1,
     borderWidth: 1,
     borderRadius: 10,
-    borderColor: 'gray',
-    position: 'absolute',
+    borderColor: "gray",
+    position: "absolute",
     bottom: 20,
 
-    backgroundColor: 'white',
+    backgroundColor: "white",
   },
   errorText: {
     color: "red",
@@ -349,30 +370,31 @@ const styles = StyleSheet.create({
     marginLeft: 5,
   },
   select: {
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-    textAlignVertical: 'center',
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    textAlignVertical: "center",
   },
   join: {
-    display: 'flex', alignItems: 'center',
-    justifyContent: 'center',
-    flexDirection: 'row',
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    flexDirection: "row",
   },
   inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     height: 50,
     margin: 12,
     borderWidth: 1,
-    backgroundColor: 'white',
+    backgroundColor: "white",
     width: 320,
     borderRadius: 5,
     paddingHorizontal: 10,
   },
   inputField: {
     flex: 1,
-    height: '100%',
+    height: "100%",
   },
 });
 

@@ -32,7 +32,7 @@ const Profile = () => {
         }
       } catch (error) {
         console.error("Error retrieving user data:", error);
-      } 
+      }
     };
     getUserDetails();
     getUser();
