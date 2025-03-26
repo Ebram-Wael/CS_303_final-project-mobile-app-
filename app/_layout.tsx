@@ -1,19 +1,30 @@
-import React from "react";
-import { Redirect, Stack } from "expo-router";
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { Drawer } from 'expo-router/drawer';
+import { Ionicons } from '@expo/vector-icons';
 
-const _layout = () => {
+export default function Layout() {
   return (
-    <>
-      {/* <Redirect href="/screens/firstpage" /> */}
-      <Stack>
-        <Stack.Screen
-          name="firstpage"
-          options={{ title: "firstpage", headerShown: false }}
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <Drawer>
+        <Drawer.Screen
+          name="(tabs)"
+          options={{
+            drawerLabel: 'Home',
+            drawerIcon: ({ size, color }) => (
+                <Ionicons name='home-outline' size={size} color={color} />
+            ),
+          }}
         />
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-      </Stack>
-    </>
+        <Drawer.Screen
+          name="screens/FavoritesScreen" 
+          options={{
+            drawerLabel: 'Favorites',
+            drawerIcon: ({ size, color }) => (
+                <Ionicons name='heart-outline' size={size} color={color} />
+            ),
+          }}
+        />
+      </Drawer>
+    </GestureHandlerRootView>
   );
-};
-
-export default _layout;
+}
