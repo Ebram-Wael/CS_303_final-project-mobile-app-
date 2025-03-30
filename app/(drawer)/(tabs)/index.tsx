@@ -13,6 +13,7 @@ import pic1 from "@/assets/images/homepic1.jpg";
 import pic2 from "@/assets/images/homepic2.jpg";
 import pic3 from "@/assets/images/homepic3.jpg";
 import pic4 from "@/assets/images/homepic4.jpg";
+import FloatingMenuButton from "@/components/FloatingMenuButton";
 
 import { useRouter } from "expo-router";
 
@@ -30,6 +31,7 @@ export default function index() {
   return (
     <SafeAreaView style={styles.cont}>
       <StatusBar barStyle="light-content" backgroundColor={"#26326E"} />
+      <FloatingMenuButton/>
       <Text style={styles.mainHeading}>HOMY</Text>
       <ScrollView style={styles.content}>
         <View>
@@ -74,7 +76,7 @@ export default function index() {
           </Text>
           <Pressable
             style={styles.btn}
-            onPress={() => router.push("../screens/AboutUs")}
+            onPress={() => router.push("/(drawer)/AboutUs")}
           >
             <Text style={{ color: "white" }}>Click me!</Text>
           </Pressable>

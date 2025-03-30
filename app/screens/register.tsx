@@ -148,7 +148,7 @@ const Register = () => {
             email: user.email,
           })
         );
-        setTimeout(() => router.push("/(tabs)/profile"), 2000);
+        setTimeout(() => router.push("/(drawer)/(tabs)/profile"), 2000);
       }
     } catch (error) {
       if (error.code === "auth/email-already-in-use") {

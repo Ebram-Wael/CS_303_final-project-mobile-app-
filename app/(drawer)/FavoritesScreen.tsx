@@ -1,5 +1,14 @@
+import {
+    View,
+    Text,
+    FlatList,
+    StyleSheet, 
+    Image, 
+    TouchableOpacity, 
+    SafeAreaView,
+    Alert
+    } from "react-native";
 import React, { useState, useEffect } from "react";
-import { View, Text, FlatList, StyleSheet, Image, TouchableOpacity, SafeAreaView } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useIsFocused } from '@react-navigation/native';
 import HouseData from "@/services/data.json";
@@ -32,6 +41,7 @@ const FavoritesScreen = () => {
                 favoriteIds = favoriteIds.filter(id => id !== itemId);
                 await AsyncStorage.setItem("favorites", JSON.stringify(favoriteIds));
                 loadFavorites();
+                Alert.alert("Favorites", "Item removed from favorites."); 
             }
         } catch (error) {
             console.error("Failed to remove from favorites", error);
@@ -52,7 +62,7 @@ const FavoritesScreen = () => {
                 <Text style={styles.title}>{item.title}</Text>
                 <Text style={styles.price}>{item.price} EGP</Text>
             </View>
-            <TouchableOpacity onPress={() => removeFromFavorites(item.id)} style={styles.heartButton}>
+            <TouchableOpacity onPress={() => removeFromFavorites(item.id) } style={styles.heartButton}>
                 <Icon size={30} color={"red"} name={"heart"} />
             </TouchableOpacity>
         </View>
