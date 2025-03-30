@@ -46,7 +46,7 @@ const Login = () => {
           email: user.email,
         })
       );
-      setTimeout(() => router.push("/(tabs)/explore"), 2000);
+      setTimeout(() => router.push("/(drawer)/(tabs)/explore"), 2000);
       setLoad(false);
     } catch (error) {
       if (error.code === "auth/invalid-credential") {

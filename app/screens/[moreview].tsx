@@ -7,6 +7,7 @@ import {
   ScrollView,
   Pressable,
   Animated,
+  Alert,
 } from "react-native";
 import React, { useEffect, useState, useRef, useLayoutEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
@@ -61,15 +62,18 @@ const HouseDesc = ({ house }) => {
     try {
       const favorites = await AsyncStorage.getItem('favorites');
       let favoritesArray = favorites ? JSON.parse(favorites) : [];
-
+      let message = "";
       if (pressHeart) {
         favoritesArray = favoritesArray.filter(id => id !== house.id);
+        message =  "Item removed from favorites.";
       } else {
         favoritesArray.push(house.id);
+        message =   "Item added to favorites.";
       }
 
       await AsyncStorage.setItem('favorites', JSON.stringify(favoritesArray));
       setPressHeart(!pressHeart);
+      Alert.alert("Favorites", message);
     } catch (error) {
       console.error('Failed to update favorites', error);
     }
