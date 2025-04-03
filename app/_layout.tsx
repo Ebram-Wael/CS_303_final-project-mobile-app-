@@ -1,30 +1,34 @@
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { Drawer } from 'expo-router/drawer';
-import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Redirect, Stack, useRouter } from "expo-router";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { useEffect } from "react";
+export default function RootLayout() {
+    const router = useRouter();
+    const auth = getAuth();
+    useEffect(() => {
+        const checkUser = async () => {
+            const seenFirstPage = await AsyncStorage.getItem("userData"); 
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    router.replace("/(drawer)/(tabs)");
+                } else if (seenFirstPage !== "true") {
+                    await AsyncStorage.setItem("userData", "true");
+                    router.replace("/screens/firstpage");
+                } else {
+                    router.replace("/screens/firstpage");
+                }
+            });
+        };
 
-export default function Layout() {
-  return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <Drawer>
-        <Drawer.Screen
-          name="(tabs)"
-          options={{
-            drawerLabel: 'Home',
-            drawerIcon: ({ size, color }) => (
-                <Ionicons name='home-outline' size={size} color={color} />
-            ),
-          }}
-        />
-        <Drawer.Screen
-          name="screens/FavoritesScreen" 
-          options={{
-            drawerLabel: 'Favorites',
-            drawerIcon: ({ size, color }) => (
-                <Ionicons name='heart-outline' size={size} color={color} />
-            ),
-          }}
-        />
-      </Drawer>
-    </GestureHandlerRootView>
-  );
+        checkUser();
+    }, []);
+    return(
+        <>
+        {/* <Redirect href="/screens/firstpage" /> */}
+        <Stack screenOptions={{headerShown: false}}>
+            <Stack.Screen name="(drawer)"  />        
+        </Stack>
+        </>
+        
+    )
 }
