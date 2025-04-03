@@ -9,6 +9,10 @@ import {
   Pressable,
   Keyboard,
   Alert,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView
 } from "react-native";
 import { useRouter } from "expo-router";
 import { createUserWithEmailAndPassword } from "firebase/auth";
@@ -19,6 +23,7 @@ import { setDoc, doc } from "firebase/firestore";
 import { ActivityIndicator, RadioButton } from "react-native-paper";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+const reg = require('../../assets/images/join.jpg');
 
 const Register = () => {
   const navigation = useNavigation();
@@ -162,13 +167,20 @@ const Register = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View>
+       <KeyboardAvoidingView 
+            behavior={Platform.OS === "ios" ? "padding" : "height"} 
+            style={{ flex: 1 }}
+          >
+       <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }} 
+       keyboardShouldPersistTaps="handled"
+       showsVerticalScrollIndicator={false} >
         <Text style={styles.header}>Create Account</Text>
         <View style={styles.txt}>
           <Text style={{ color: "#26326E" }}>
             Create an Account So You Can Explore Our Apartment{" "}
           </Text>
         </View>
+        <Image style={{width:200 ,height:200 ,alignSelf:'center'}} source={reg}/>
         <View style={{ display: "flex", flexDirection: "row", gap: 80 }}>
           <View style={styles.select}>
             <RadioButton.Android
@@ -299,7 +311,8 @@ const Register = () => {
             </Text>
           </Pressable>
         </View>
-      </View>
+        </ScrollView>
+        </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
@@ -330,6 +343,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center",
+    paddingTop: 20,
+    paddingBottom: 20,
+
   },
   header: {
     fontSize: 30,
