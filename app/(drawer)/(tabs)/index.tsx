@@ -31,7 +31,7 @@ export default function index() {
   return (
     <SafeAreaView style={styles.cont}>
       <StatusBar barStyle="light-content" backgroundColor={"#26326E"} />
-      <FloatingMenuButton/>
+      <FloatingMenuButton />
       <Text style={styles.mainHeading}>HOMY</Text>
       <ScrollView style={styles.content}>
         <View>

@@ -18,7 +18,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { ActivityIndicator } from "react-native-paper";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-const log =require('../../assets/images/login.jpg')
+const log = require("../../assets/images/login.jpg");
 
 const Login = () => {
   const router = useRouter();
@@ -29,14 +29,14 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(true);
   const [load, setLoad] = useState(false);
   const [errorEmail, setErrorEmail] = useState("");
-  const [errorPassword, setErrorPassword] = useState(""); 
+  const [errorPassword, setErrorPassword] = useState("");
 
   const ChangePassword = () => {
     setShowPassword(!showPassword);
   };
 
-  const validInput =()=>{
-    let isValid =true
+  const validInput = () => {
+    let isValid = true;
     if (!email.trim()) {
       setErrorEmail("Validation Error ,Email cannot be empty.");
       return false;
@@ -46,7 +46,7 @@ const Login = () => {
       return false;
     }
     return isValid;
-  }
+  };
 
   const handleLogIN = async (e) => {
     e.preventDefault();
@@ -67,7 +67,7 @@ const Login = () => {
           email: user.email,
         })
       );
-      setTimeout(() => router.push("/(drawer)/(tabs)/explore"), 100);
+      setTimeout(() => router.push("./(drawer)/(tabs)/explore"), 100);
       setLoad(false);
     } catch (error) {
       if (error.code === "auth/invalid-credential") {
@@ -80,70 +80,82 @@ const Login = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-    <KeyboardAvoidingView 
-      behavior={Platform.OS === "ios" ? "padding" : "height"} 
-      style={{ flex: 1 }}
-    >
-      <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }}
-       keyboardShouldPersistTaps="handled"
-       showsVerticalScrollIndicator={false}
-       >
-        <Text style={styles.header}>Login Here</Text>
-        <View style={styles.txt}>
-          <Text style={{ color: "#26326E" }}>
-            Welcome Back You've Been Missed!
-          </Text>
-        </View>
-        <View>
-          <Image style={{ width: 250, height: 250, alignSelf: "center" }}  source={log} />
-          <TextInput
-            onFocus={() => setBorderColor("#F36F27")}
-            onBlur={() => setBorderColor("#26326E")}
-            style={[styles.input, { borderColor }]}
-            placeholder="Email"
-            onChangeText={(text) => setEmail(text)}
-          />
-          {errorEmail ? <Text  style={styles.errorText}> {errorEmail} </Text> : null}
-
-          <View style={[styles.inputContainer, { borderColor: borderColor1 }]}>
-            <TextInput
-              onFocus={() => setBorderColor1("#F36F27")}
-              onBlur={() => setBorderColor1("#26326E")}
-              style={[styles.inputField]}
-              secureTextEntry={showPassword}
-              placeholder="Password"
-              onChangeText={(text) => setPassword(text)}
-            />
-            <MaterialCommunityIcons
-              name={showPassword ? "eye-off" : "eye"}
-              size={24}
-              color="#aaa"
-              onPress={ChangePassword}
-            />
-          </View>
-          {errorPassword ? <Text  style={styles.errorText}> {errorPassword} </Text> : null}
-        </View>
-
-        <Pressable style={styles.btn} onPress={handleLogIN}>
-          {load ? (
-            <ActivityIndicator color="white" />
-          ) : (
-            <Text style={{ color: "white", fontSize: 18 }}>Sign In</Text>
-          )}
-        </Pressable>
-
-        <View style={styles.join}>
-          <Text> Create an Account?</Text>
-          <Pressable onPress={() => router.push("/screens/register")}>
-            <Text style={{ color: "#2A2438", textDecorationLine: "underline" }}>
-              {" "}
-              Sign Up{" "}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={{ flex: 1 }}
+      >
+        <ScrollView
+          contentContainerStyle={{ flexGrow: 1, justifyContent: "center" }}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          <Text style={styles.header}>Login Here</Text>
+          <View style={styles.txt}>
+            <Text style={{ color: "#26326E" }}>
+              Welcome Back You've Been Missed!
             </Text>
+          </View>
+          <View>
+            <Image
+              style={{ width: 250, height: 250, alignSelf: "center" }}
+              source={log}
+            />
+            <TextInput
+              onFocus={() => setBorderColor("#F36F27")}
+              onBlur={() => setBorderColor("#26326E")}
+              style={[styles.input, { borderColor }]}
+              placeholder="Email"
+              onChangeText={(text) => setEmail(text)}
+            />
+            {errorEmail ? (
+              <Text style={styles.errorText}> {errorEmail} </Text>
+            ) : null}
+
+            <View
+              style={[styles.inputContainer, { borderColor: borderColor1 }]}
+            >
+              <TextInput
+                onFocus={() => setBorderColor1("#F36F27")}
+                onBlur={() => setBorderColor1("#26326E")}
+                style={[styles.inputField]}
+                secureTextEntry={showPassword}
+                placeholder="Password"
+                onChangeText={(text) => setPassword(text)}
+              />
+              <MaterialCommunityIcons
+                name={showPassword ? "eye-off" : "eye"}
+                size={24}
+                color="#aaa"
+                onPress={ChangePassword}
+              />
+            </View>
+            {errorPassword ? (
+              <Text style={styles.errorText}> {errorPassword} </Text>
+            ) : null}
+          </View>
+
+          <Pressable style={styles.btn} onPress={handleLogIN}>
+            {load ? (
+              <ActivityIndicator color="white" />
+            ) : (
+              <Text style={{ color: "white", fontSize: 18 }}>Sign In</Text>
+            )}
           </Pressable>
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
-  </SafeAreaView>
+
+          <View style={styles.join}>
+            <Text> Create an Account?</Text>
+            <Pressable onPress={() => router.push("/screens/register")}>
+              <Text
+                style={{ color: "#2A2438", textDecorationLine: "underline" }}
+              >
+                {" "}
+                Sign Up{" "}
+              </Text>
+            </Pressable>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 };
 const styles = StyleSheet.create({

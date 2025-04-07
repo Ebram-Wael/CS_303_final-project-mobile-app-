@@ -1,38 +1,34 @@
-import { Drawer } from 'expo-router/drawer';
-import { Ionicons } from '@expo/vector-icons';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { TouchableOpacity, View } from 'react-native';
-import { DrawerItemList } from '@react-navigation/drawer';
-import { useEffect, useState } from 'react';
-import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
-import { db } from '@/services/firebase';
+import { Drawer } from "expo-router/drawer";
+import { Ionicons } from "@expo/vector-icons";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { TouchableOpacity, View } from "react-native";
+import { DrawerItemList } from "@react-navigation/drawer";
+import { useEffect, useState } from "react";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "@/services/firebase";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
-
 
 export default function Layout() {
   const [seller, setSeller] = useState(false);
   const [userDetails, setUserDetails] = useState(null);
   const auth = getAuth();
 
-  
-    useEffect(() => {
-      const getUserDetails = async () => {
-        try {
-          const storedUserData = await AsyncStorage.getItem("userData");
-          if (storedUserData) {
-            const userData = JSON.parse(storedUserData);
-            setUserDetails(userData);
-          }
-        } catch (error) {
-          console.error("Error retrieving user data:", error);
+  useEffect(() => {
+    const getUserDetails = async () => {
+      try {
+        const storedUserData = await AsyncStorage.getItem("userData");
+        if (storedUserData) {
+          const userData = JSON.parse(storedUserData);
+          setUserDetails(userData);
         }
-      };
-      getUserDetails();
-      getUser();
-
-    }, []);
+      } catch (error) {
+        console.error("Error retrieving user data:", error);
+      }
+    };
+    getUserDetails();
+    getUser();
+  }, []);
   const getUser = async () => {
     auth.onAuthStateChanged(async (user) => {
       if (user) {
@@ -40,30 +36,28 @@ export default function Layout() {
         const userDoc = await getDoc(userDocRef);
 
         if (userDoc.exists()) {
-          setSeller(userDoc.data().role ==='seller');
+          setSeller(userDoc.data().role === "seller");
         }
-          setSeller((prevSeller) => {
-            const newSeller = userDoc.data().role === 'seller';
-            return newSeller;
-          });
+        setSeller((prevSeller) => {
+          const newSeller = userDoc.data().role === "seller";
+          return newSeller;
+        });
       }
     });
   };
-  
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <Drawer
         screenOptions={({ navigation }) => ({
           drawerPosition: "left",
-          drawerStyle: { width: 250, paddingTop:20 },
+          drawerStyle: { width: 250, paddingTop: 20 },
           headerShown: false,
           headerLeft: () => (
             <TouchableOpacity
               onPress={() => navigation.toggleDrawer()}
-            >
-            </TouchableOpacity>
+            ></TouchableOpacity>
           ),
-
         })}
         drawerContent={(props) => {
           const filteredProps = {
@@ -71,7 +65,10 @@ export default function Layout() {
             state: {
               ...props.state,
               routes: props.state.routes.filter(
-                (route) => !(seller? route.name==='FavoritesScreen' : route.name==='addApartment')
+                (route) =>
+                  !(seller
+                    ? route.name === "FavoritesScreen"
+                    : route.name === "addApartment")
               ),
             },
           };
@@ -80,14 +77,12 @@ export default function Layout() {
               <DrawerItemList {...filteredProps} />
             </View>
           );
-        }
-      }
-        
+        }}
       >
         <Drawer.Screen
           name="(tabs)"
           options={{
-            drawerLabel: 'Home',
+            drawerLabel: "Home",
             drawerIcon: ({ color, size }) => (
               <Ionicons name="home-outline" size={size} color={color} />
             ),
@@ -107,12 +102,14 @@ export default function Layout() {
           options={{
             drawerLabel: "About Us",
             drawerIcon: ({ size, color }) => (
-              <Ionicons name="information-circle-outline" size={size} color={color} />
+              <Ionicons
+                name="information-circle-outline"
+                size={size}
+                color={color}
+              />
             ),
           }}
         />
-        
-         
 
         {seller ? (
           <Drawer.Screen
@@ -135,13 +132,6 @@ export default function Layout() {
             }}
           />
         )}
-
-        
-       
-        
-
-
-        
       </Drawer>
     </GestureHandlerRootView>
   );
