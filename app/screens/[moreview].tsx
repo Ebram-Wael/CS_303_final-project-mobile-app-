@@ -12,11 +12,13 @@ import {
 import React, { useEffect, useState, useRef, useLayoutEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { useLocalSearchParams } from "expo-router";
-import HouseData from "@/services/data.json";
+import {db} from "@/services/firebase"
+import {doc ,getDoc} from "firebase/firestore";
 import Heart from "@/assets/icons/heart-svgrepo-com.svg";
 import RedHeart from "@/assets/icons/heart-svgrepo-com (1).svg";
 import TopArrow from "@/assets/icons/top-arrow-5-svgrepo-com.svg";
 import DownArrow from "@/assets/icons/down-arrow-5-svgrepo-com.svg";
+import colors from '@/components/colors';
 
 const defaultImage = "https://via.placeholder.com/150";
 const windowWidth = Dimensions.get("window").width;
@@ -25,6 +27,30 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const HouseDesc = ({ house }) => {
   const navigation = useNavigation();
+  const [owner, setOwner] = useState("");
+  
+  useEffect(() => {
+    const fetchOwner = async () => {
+      if (house.seller_id) {
+        try {
+          const userDocRef = doc(db, "Users", house.seller_id);
+          const userDoc = await getDoc(userDocRef);
+          if (userDoc.exists()) {
+            setOwner(userDoc.data().name);
+          } else {
+            setOwner("Unknown");
+          }
+        } catch (error) {
+          console.error("Error fetching owner:", error);
+          setOwner("Error");
+        }
+      } else {
+        setOwner("No seller");
+      }
+    };
+
+    fetchOwner();
+  }, [house.seller_id]);
 
   useLayoutEffect(() => {
     navigation.setOptions({ headerShown: false });
@@ -95,30 +121,27 @@ const HouseDesc = ({ house }) => {
   return (
     <View style={styles.container}>
       <ScrollView style={styles.imageContainer}>
+      {house.image.length === 1 ? (
         <Image
-          source={{ uri: house?.imagesArr?.[0] || defaultImage }}
+          source={{ uri: house.image[0] }}
           style={{
             width: "100%",
-            height: press ? windowHeight / 3 : windowHeight / 2,
-            borderRadius: 8,
+            height: windowHeight - 80 ,
           }}
         />
-        <Image
-          source={{ uri: house?.imagesArr?.[1] || defaultImage }}
-          style={{
-            width: "100%",
-            height: press ? windowHeight / 3 : windowHeight / 2,
-            borderRadius: 8,
-          }}
-        />
-        <Image
-          source={{ uri: house?.imagesArr?.[2] || defaultImage }}
-          style={{
-            width: "100%",
-            height: press ? windowHeight / 3 : windowHeight / 2,
-            borderRadius: 8,
-          }}
-        />
+      ) : (
+        house.image.map((img, index) => (
+          <Image
+            key={index}
+            source={{ uri: img }}
+            style={{
+              width: "100%",
+              height: press ? windowHeight / 3 : windowHeight / 2,
+              borderRadius: 8,
+            }}
+          />
+        ))
+      )}
       </ScrollView>
       <Pressable onPress={handlePress} style={styles.pressableContainer}>
         {press ? (
@@ -126,21 +149,29 @@ const HouseDesc = ({ house }) => {
             style={[styles.detailed, { transform: [{ translateY }] }]}
           >
             <DownArrow width={50} height={50}/>
+            <Text style={styles.status}>
+              {house.availability_status }
+              </Text>
             <Text style={styles.price}>
-              {house.price > 0 ? `${house.price}` : "Invalid Price"} EGP
+              {house.rent > 0 ? `${house.rent}` : "Invalid Price"} EGP
             </Text>
             <Text style={styles.address}>
-              {house.address || "Unknown Address"}
+              {house.location || "Unknown Address"}
             </Text>
-            <Text style={styles.title}>{house.title || "No Title"}</Text>
+            <Text style={styles.title}>
+               Floor: {house.floor }
+              </Text>
+            <Text style={styles.title}>
+              The Number of the unit: {house.unit_number }
+              </Text>
             <Text style={styles.description}>
-              Description: {house.description || "No description available"}
+              Description: {house.features || "No description available"}
             </Text>
             <Text style={styles.NoOfRooms}>
               Number of rooms:{" "}
-              {house.numberOfRooms || "Unknown Number Of Rooms"}
+              {house.num_bedrooms || "Unknown Number Of Rooms"}
             </Text>
-            <Text style={styles.owner}>Contact: {house.owner}</Text>
+            <Text style={styles.owner}>Contact: {owner}</Text>
             <View style={styles.buyNowStyles}>
               <Pressable onPress={handlePressOnHeart}>
               { pressHeart ? <RedHeart width={30} height={30} />
@@ -164,12 +195,26 @@ const HouseDesc = ({ house }) => {
 
 export default function moreView() {
   const moreview = useLocalSearchParams<{ moreview: string }>();
-  const houseId = Number(moreview?.moreview) || 0;
+  const houseId = moreview?.moreview;
   const [houses, setHouses] = useState([]);
 
   useEffect(() => {
-    const houseWithid = HouseData.find((e) => Number(e.id) === houseId);
-    setHouses(houseWithid ? [houseWithid] : []);
+    const fetchHouse = async () => {
+      try {
+        const docRef = doc(db, "Apartments", houseId);
+        const docSnap = await getDoc(docRef);
+  
+        if (docSnap.exists()) {
+          setHouses([{ id: docSnap.id, ...docSnap.data() }]);
+        } else {
+          console.log("No such document!");
+        }
+      } catch (error) {
+        console.error("Error fetching house: ", error);
+      }
+    };
+  
+    fetchHouse();
   }, [houseId]);
 
   return (
@@ -184,71 +229,82 @@ export default function moreView() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#DBD8E3",
+    backgroundColor: colors.background,
   },
   imageContainer: {
     flexGrow: 1,
   },
   scrollStyle: {
-    flex: 1,
-    backgroundColor: "#DBD8E3",
+    flexGrow: 1,
+    backgroundColor: colors.background,
   },
   detailed: {
     padding: 20,
-    backgroundColor: "white",
-    borderTopLeftRadius: 15,
-    borderTopRightRadius: 15,
+    backgroundColor: colors.white,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
     shadowColor: "#000",
-    shadowOpacity: 0.15,
-    shadowOffset: { width: 0, height: 4 },
-    shadowRadius: 8,
-    elevation: 3,
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: -4 },
+    shadowRadius: 6,
+    elevation: 5,
     rowGap: 5,
     alignItems: "center",
   },
   title: {
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: "bold",
-    color: "#333",
+    color: colors.black,
     marginBottom: 5,
   },
+  status: {
+    fontSize: 22,
+    fontWeight: "700",
+    color: colors.black,
+  },
   price: {
-    fontSize: 25,
+    fontSize: 24,
     fontWeight: "bold",
-    color: "#28a745",
+    color: colors.green,
   },
   description: {
-    fontSize: 20,
-    color: "#555",
-    marginTop: 5,
+    fontSize: 16,
+    color: colors.black,
+    textAlign: "center",
   },
   owner: {
-    fontSize: 20,
+    fontSize: 17,
     fontWeight: "500",
-    color: "#007AFF",
+    color: colors.blue,
     marginTop: 5,
   },
   NoOfRooms: {
-    fontSize: 20,
-    color: "#444",
-    marginTop: 5,
+    fontSize: 16,
+    color: colors.black,
   },
   address: {
-    fontSize: 23,
-    fontWeight: "bold",
-    color: "#222",
-    marginBottom: 5,
+    fontSize: 18,
+    fontWeight: "600",
+    color: colors.black,
+    textAlign: "center",
   },
   moreDetails: {
     backgroundColor: "white",
     alignItems: "center",
-    borderTopLeftRadius: 15,
-    borderTopRightRadius: 15,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    paddingVertical: 12,
+    shadowColor: "#000",
+    shadowOpacity: 0.05,
+    shadowOffset: { width: 0, height: -2 },
+    shadowRadius: 4,
+    elevation: 3,
   },
   moreDetailsText: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#352F44",
+    fontSize: 18,
+    fontWeight: "600",
+    color: colors.black,
+    marginTop: 5,
   },
   arrow: {
     width: windowWidth / 6,
@@ -261,18 +317,23 @@ const styles = StyleSheet.create({
   },
   buyNowStyles: {
     flexDirection: "row",
-    columnGap: 10,
-    marginTop: 5,
+    alignItems: "center",
+    justifyContent: "center",
+    columnGap: 15,
+    marginTop: 10,
   },
   buyNowView: {
-    flex: 2,
-    alignItems: 'center',
+    flex: 1,
+    backgroundColor: colors.black,
+    paddingVertical: 10,
+    paddingHorizontal: 25,
     borderRadius: 8,
-    backgroundColor: "#352F44",
+    alignItems: "center",
+    justifyContent: "center",
   },
   buyNowText: {
-    fontSize: 17,
+    fontSize: 16,
     fontWeight: "bold",
-    color: "white",
+    color: colors.white,
   },
 });

@@ -13,6 +13,7 @@ import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "@/services/firebase";
 import { SafeAreaView } from "react-native-safe-area-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import colors from '@/components/colors';
 
 const Profile = () => {
   const [userDetails, setUserDetails] = useState(null);
@@ -143,6 +144,7 @@ const styles = StyleSheet.create({
     padding: 20,
     alignItems: "center",
     justifyContent: "center",
+    backgroundColor: colors.background,
   },
   role: {
     fontWeight: "bold",
@@ -162,7 +164,7 @@ const styles = StyleSheet.create({
   input: {
     width: 300,
     borderWidth: 1,
-    borderColor: "gray",
+    borderColor: colors.gray,
     padding: 10,
     borderRadius: 5,
     marginBottom: 10,
@@ -182,7 +184,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   buttonText: {
-    color: "white",
+    color: colors.white,
     fontSize: 16,
     fontWeight: "bold",
   },

@@ -14,7 +14,7 @@ import pic2 from "@/assets/images/homepic2.jpg";
 import pic3 from "@/assets/images/homepic3.jpg";
 import pic4 from "@/assets/images/homepic4.jpg";
 import FloatingMenuButton from "@/components/FloatingMenuButton";
-
+import colors from '@/components/colors';
 import { useRouter } from "expo-router";
 
 export default function index() {
@@ -30,7 +30,7 @@ export default function index() {
   const images = [pic1, pic2, pic3, pic4];
   return (
     <SafeAreaView style={styles.cont}>
-      <StatusBar barStyle="light-content" backgroundColor={"#26326E"} />
+      <StatusBar barStyle="light-content" backgroundColor={colors.darkblue} />
       <FloatingMenuButton />
       <Text style={styles.mainHeading}>HOMY</Text>
       <ScrollView style={styles.content}>
@@ -90,14 +90,14 @@ const styles = StyleSheet.create({
   cont: {
     flex: 1,
     fontSize: 16,
-    backgroundColor: "#white",
+    backgroundColor: colors.background,
   },
   mainHeading: {
     fontWeight: "bold",
     fontSize: 32,
     textAlign: "center",
-    color: "#fff",
-    backgroundColor: "#26326E",
+    color: colors.white,
+    backgroundColor: colors.darkblue,
     marginBottom: 10,
     padding: 12,
   },
@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
     marginBottom: 25,
     fontWeight: "bold",
     textAlign: "center",
-    color: "#2A2438",
+    color: colors.black,
   },
   txt: {
     fontSize: 15,
@@ -123,7 +123,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginTop: 20,
     padding: 12,
-    color: "#2A2438",
+    color: colors.black,
   },
   listText: {
     fontSize: 16,
@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
   btn: {
     width: 150,
     height: 45,
-    backgroundColor: "#F36F27",
+    backgroundColor: colors.orange,
     textAlign: "center",
     justifyContent: "center",
     alignSelf: "center",
@@ -163,7 +163,7 @@ const styles = StyleSheet.create({
   underline: {
     width: 300,
     height: 5,
-    backgroundColor: "#26326E",
+    backgroundColor: colors.darkblue,
     borderRadius: 5,
     alignSelf: "center",
     marginBottom: 20,

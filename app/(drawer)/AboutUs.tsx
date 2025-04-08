@@ -1,4 +1,5 @@
 import { View, Text, StyleSheet, ScrollView } from "react-native";
+import colors from '@/components/colors';
 
 export default function AboutUs() {
   return (
@@ -46,13 +47,13 @@ export default function AboutUs() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f4f4f4",
+    backgroundColor: colors.background,
     padding: 10,
   },
   content: {
     marginVertical: 15,
     padding: 20,
-    backgroundColor: "#fff",
+    backgroundColor: colors.white,
     borderRadius: 10,
     shadowColor: "#000",
     shadowOpacity: 0.1,
