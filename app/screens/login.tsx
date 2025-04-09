@@ -18,6 +18,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { ActivityIndicator } from "react-native-paper";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import colors from '@/components/colors';
+
 const log = require("../../assets/images/login.jpg");
 
 const Login = () => {
@@ -91,7 +93,7 @@ const Login = () => {
         >
           <Text style={styles.header}>Login Here</Text>
           <View style={styles.txt}>
-            <Text style={{ color: "#26326E" }}>
+            <Text style={{ color: colors.darkblue }}>
               Welcome Back You've Been Missed!
             </Text>
           </View>
@@ -101,8 +103,8 @@ const Login = () => {
               source={log}
             />
             <TextInput
-              onFocus={() => setBorderColor("#F36F27")}
-              onBlur={() => setBorderColor("#26326E")}
+              onFocus={() => setBorderColor(colors.orange)}
+              onBlur={() => setBorderColor(colors.darkblue)}
               style={[styles.input, { borderColor }]}
               placeholder="Email"
               onChangeText={(text) => setEmail(text)}
@@ -115,8 +117,8 @@ const Login = () => {
               style={[styles.inputContainer, { borderColor: borderColor1 }]}
             >
               <TextInput
-                onFocus={() => setBorderColor1("#F36F27")}
-                onBlur={() => setBorderColor1("#26326E")}
+                onFocus={() => setBorderColor1(colors.orange)}
+                onBlur={() => setBorderColor1(colors.darkblue)}
                 style={[styles.inputField]}
                 secureTextEntry={showPassword}
                 placeholder="Password"
@@ -125,7 +127,7 @@ const Login = () => {
               <MaterialCommunityIcons
                 name={showPassword ? "eye-off" : "eye"}
                 size={24}
-                color="#aaa"
+                color={colors.gray}
                 onPress={ChangePassword}
               />
             </View>
@@ -138,7 +140,7 @@ const Login = () => {
             {load ? (
               <ActivityIndicator color="white" />
             ) : (
-              <Text style={{ color: "white", fontSize: 18 }}>Sign In</Text>
+              <Text style={{ color: colors.white, fontSize: 18 }}>Sign In</Text>
             )}
           </Pressable>
 
@@ -146,7 +148,7 @@ const Login = () => {
             <Text> Create an Account?</Text>
             <Pressable onPress={() => router.push("/screens/register")}>
               <Text
-                style={{ color: "#2A2438", textDecorationLine: "underline" }}
+                style={{ color:colors.blue, textDecorationLine: "underline" }}
               >
                 {" "}
                 Sign Up{" "}
@@ -161,7 +163,7 @@ const Login = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: colors.background,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -169,7 +171,7 @@ const styles = StyleSheet.create({
     height: 50,
     margin: 12,
     borderWidth: 1,
-    backgroundColor: "white",
+    backgroundColor: colors.white,
     width: 320,
     borderRadius: 5,
     borderColor: "#FFFE91",
@@ -179,7 +181,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textAlign: "center",
     marginBottom: 10,
-    color: "#F36F27",
+    color: colors.orange,
   },
   txt: {
     flexDirection: "row",
@@ -190,7 +192,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   btn: {
-    backgroundColor: "#F36F27",
+    backgroundColor: colors.orange,
     padding: 10,
     borderRadius: 5,
     width: 250,
@@ -213,7 +215,7 @@ const styles = StyleSheet.create({
     height: 50,
     margin: 12,
     borderWidth: 1,
-    backgroundColor: "white",
+    backgroundColor: colors.white,
     width: 320,
     borderRadius: 5,
     paddingHorizontal: 10,
@@ -223,7 +225,7 @@ const styles = StyleSheet.create({
     height: "100%",
   },
   errorText: {
-    color: "red",
+    color: colors.red,
     marginLeft: 12,
     marginBottom: 5,
   },

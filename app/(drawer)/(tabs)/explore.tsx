@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import HouseData from "@/services/data.json";
 import {
   View,
   Text,
@@ -9,11 +8,39 @@ import {
   ScrollView,
 } from "react-native";
 import { useRouter } from "expo-router";
+import {db} from "@/services/firebase"
+import {collection, onSnapshot, doc ,getDoc} from "firebase/firestore";
+import colors from '@/components/colors' 
 
 const defaultImage = "default.jpg";
 
 const HouseItem = ({ house }) => {
   const router = useRouter();
+  const [owner, setOwner] = useState("");
+  
+  useEffect(() => {
+    const fetchOwner = async () => {
+      if (house.seller_id) {
+        try {
+          const userDocRef = doc(db, "Users", house.seller_id);
+          const userDoc = await getDoc(userDocRef);
+          if (userDoc.exists()) {
+            setOwner(userDoc.data().name);
+          } else {
+            setOwner("Unknown");
+          }
+        } catch (error) {
+          console.error("Error fetching owner:", error);
+          setOwner("Error");
+        }
+      } else {
+        setOwner("No seller");
+      }
+    };
+
+    fetchOwner();
+  }, [house.seller_id]);
+
   return (
     <Pressable
       onPress={() =>
@@ -24,30 +51,30 @@ const HouseItem = ({ house }) => {
       }
     >
       <View style={styles.card}>
-        <Text style={styles.title}>{house.title || "No Title"}</Text>
-        <Text style={styles.address}>{house.address || "Unknown Address"}</Text>
+        <Text style={styles.title}>{house.availability_status || "No Title"}</Text>
+        <Text style={styles.address}>{house.location || "Unknown Location"}</Text>
         <View style={styles.ownerContainer}>
           <Text style={styles.owner}>Owner: </Text>
           <Pressable
             onPress={() =>
               router.push({
                 pathname: "/screens/owner",
-                params: { ownerName: house.owner },
+                params: { ownerName: owner },
               })
             }
           >
-            <Text style={{ color: "#007bff" }}>{house.owner || "Unknown"}</Text>
+            <Text style={{ color: colors.blue }}>{owner || "Unknown"}</Text>
           </Pressable>
         </View>
         <Image
-          source={{ uri: house.image || defaultImage }}
+          source={{ uri: house.image[0] || defaultImage }}
           style={styles.image}
         />
         <Text style={styles.description} numberOfLines={2}>
-          Description: {house.description || "No description available"}
+          Description: {house.features || "No description available"}
         </Text>
         <Text style={styles.price}>
-          Price: {house.price > 0 ? `${house.price}` : "Invalid Price"} EGP
+          Price: {house.rent > 0 ? `${house.rent}` : "Invalid Price"} EGP
         </Text>
       </View>
     </Pressable>
@@ -58,7 +85,15 @@ export default function HouseList() {
   const [houses, setHouses] = useState([]);
 
   useEffect(() => {
-    setHouses(HouseData);
+    const colRef = collection(db,"Apartments");
+    const fetchHouses = onSnapshot(colRef ,(snapshot)=> {
+      const houseList = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setHouses(houseList);
+    })
+    return () => fetchHouses();
   }, []);
 
   return (
@@ -66,7 +101,7 @@ export default function HouseList() {
       <View style={styles.container}>
         <Text style={styles.header}>Houses</Text>
         {houses.length > 0 ? (
-          houses.map((house) => <HouseItem key={house.title} house={house} />)
+          houses.map((house) => <HouseItem key={house.id} house={house} />)
         ) : (
           <Text>Loading...</Text>
         )}
@@ -78,17 +113,17 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: "#f0f0f0",
+    backgroundColor: colors.background,
   },
   header: {
     fontSize: 26,
     fontWeight: "bold",
     textAlign: "center",
     marginBottom: 20,
-    color: "#333",
+    color: colors.black,
   },
   card: {
-    backgroundColor: "#fff",
+    backgroundColor: colors.white,
     padding: 15,
     marginBottom: 15,
     borderRadius: 16,
@@ -108,23 +143,23 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 17,
     fontWeight: "bold",
-    color: "#222",
+    color: colors.black,
     marginBottom: 5,
   },
   owner: {
     fontSize: 14,
-    color: "#555",
+    color: colors.black,
     marginBottom: 5,
   },
   description: {
     fontSize: 14,
-    color: "#777",
+    color: colors.gray,
     marginBottom: 10,
   },
   price: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "#007bff",
+    color: colors.blue,
   },
   ownerContainer: {
     flexDirection: "row",
@@ -132,13 +167,13 @@ const styles = StyleSheet.create({
   },
   address: {
     fontSize: 14,
-    color: "#666",
+    color: colors.gray,
     marginTop: 5,
   },
   loadingText: {
     textAlign: "center",
     fontSize: 16,
-    color: "#999",
+    color: colors.gray,
     marginTop: 20,
   },
 });

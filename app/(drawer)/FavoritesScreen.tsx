@@ -13,6 +13,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useIsFocused } from "@react-navigation/native";
 import HouseData from "@/services/data.json";
 import Icon from "react-native-vector-icons/FontAwesome";
+import colors from '@/components/colors';
 
 const FavoritesScreen = () => {
   const [favorites, setFavorites] = useState([]);
@@ -92,7 +93,7 @@ const FavoritesScreen = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#f5f5f5",
+    backgroundColor: colors.background,
   },
   container: {
     flex: 1,
@@ -101,7 +102,7 @@ const styles = StyleSheet.create({
   },
   itemContainer: {
     flexDirection: "row",
-    backgroundColor: "white",
+    backgroundColor: colors.white,
     borderRadius: 8,
     padding: 10,
     margin: 8,
@@ -125,11 +126,11 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 16,
     fontWeight: "bold",
-    color: "#333",
+    color: colors.black,
   },
   price: {
     fontSize: 16,
-    color: "#28a745",
+    color: colors.lightGreen,
     marginVertical: 5,
   },
   emptyText: {

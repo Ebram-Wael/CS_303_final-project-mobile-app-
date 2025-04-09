@@ -11,6 +11,7 @@ import { useLocalSearchParams } from "expo-router";
 import { useRouter } from "expo-router";
 import HouseData from "@/services/data.json";
 import Icon from "react-native-vector-icons/FontAwesome";
+import colors from '@/components/colors';
 
 export default function OwnerDetails() {
   const { ownerName } = useLocalSearchParams<{ ownerName: string }>();
@@ -37,7 +38,7 @@ export default function OwnerDetails() {
               <Icon
                 name="phone"
                 size={20}
-                color="#007bff"
+                color={colors.blue}
                 style={styles.icon}
               />
               <Text style={styles.info}>{owner.phone || "Not Available"}</Text>
@@ -46,7 +47,7 @@ export default function OwnerDetails() {
               <Icon
                 name="envelope"
                 size={20}
-                color="#007bff"
+                color={colors.blue}
                 style={styles.icon}
               />
               <Text style={styles.info}>{owner.email || "Not Available"}</Text>
@@ -92,17 +93,17 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: "#f0f0f0",
+    backgroundColor: colors.background,
   },
   header: {
     fontSize: 26,
     fontWeight: "bold",
     textAlign: "center",
     marginBottom: 20,
-    color: "#333",
+    color: colors.black,
   },
   card: {
-    backgroundColor: "#fff",
+    backgroundColor: colors.white,
     padding: 20,
     borderRadius: 10,
     alignItems: "center",
@@ -119,7 +120,7 @@ const styles = StyleSheet.create({
     borderRadius: 100,
     marginBottom: 10,
     borderWidth: 4,
-    borderColor: "black",
+    borderColor: colors.black,
   },
   name: {
     fontSize: 18,
@@ -154,11 +155,11 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginTop: 20,
     marginBottom: 10,
-    color: "#333",
+    color: colors.black,
   },
   houseCard: {
     flexDirection: "row",
-    backgroundColor: "#fff",
+    backgroundColor: colors.white,
     padding: 10,
     borderRadius: 10,
     shadowColor: "#000",
@@ -191,7 +192,7 @@ const styles = StyleSheet.create({
   price: {
     fontSize: 16,
     fontWeight: "bold",
-    color: "#007bff",
+    color: colors.blue,
   },
   noHousesText: {
     fontSize: 16,
