@@ -10,7 +10,7 @@ export default function RootLayout() {
       const seenFirstPage = await AsyncStorage.getItem("userData");
       onAuthStateChanged(auth, async (user) => {
         if (user) {
-          router.replace("./(drawer)/(tabs)");
+          router.replace('/(drawer)/(tabs)/profile');
         } else if (seenFirstPage !== "true") {
           await AsyncStorage.setItem("userData", "true");
           router.replace("/screens/firstpage");

@@ -29,32 +29,13 @@ const Login = () => {
   const [borderColor, setBorderColor] = useState("#26326E");
   const [borderColor1, setBorderColor1] = useState("#26326E");
   const [showPassword, setShowPassword] = useState(true);
-  const [load, setLoad] = useState(false);
-  const [errorEmail, setErrorEmail] = useState("");
-  const [errorPassword, setErrorPassword] = useState("");
-
+''
   const ChangePassword = () => {
     setShowPassword(!showPassword);
   };
-
-  const validInput = () => {
-    let isValid = true;
-    if (!email.trim()) {
-      setErrorEmail("Validation Error ,Email cannot be empty.");
-      return false;
-    }
-    if (!password.trim()) {
-      setErrorPassword("Validation Error ,Password cannot be empty.");
-      return false;
-    }
-    return isValid;
-  };
-
+  const isValid = email.includes('@') && password.length >= 8;
   const handleLogIN = async (e) => {
     e.preventDefault();
-    if (!validInput()) return;
-    if (load) return;
-    setLoad(true);
     try {
       const cardinality = await signInWithEmailAndPassword(
         auth,
@@ -69,11 +50,11 @@ const Login = () => {
           email: user.email,
         })
       );
-      setTimeout(() => router.push("./(drawer)/(tabs)/explore"), 100);
-      setLoad(false);
+      setTimeout(() => router.replace('/(drawer)/(tabs)/profile'), 100);
     } catch (error) {
       if (error.code === "auth/invalid-credential") {
         Alert.alert("Invalid Password or email");
+        console.log("Invalid Password or email");
       } else if (error.code === "auth/missing-password") {
         Alert.alert("password is required");
       } else Alert.alert("email is required");
@@ -109,10 +90,6 @@ const Login = () => {
               placeholder="Email"
               onChangeText={(text) => setEmail(text)}
             />
-            {errorEmail ? (
-              <Text style={styles.errorText}> {errorEmail} </Text>
-            ) : null}
-
             <View
               style={[styles.inputContainer, { borderColor: borderColor1 }]}
             >
@@ -131,17 +108,12 @@ const Login = () => {
                 onPress={ChangePassword}
               />
             </View>
-            {errorPassword ? (
-              <Text style={styles.errorText}> {errorPassword} </Text>
-            ) : null}
           </View>
 
-          <Pressable style={styles.btn} onPress={handleLogIN}>
-            {load ? (
-              <ActivityIndicator color="white" />
-            ) : (
-              <Text style={{ color: colors.white, fontSize: 18 }}>Sign In</Text>
-            )}
+          <Pressable style={[styles.btn , {opacity: isValid ? 1:0.5 } ]} onPress={handleLogIN} disabled={!isValid} >
+            
+            <Text style={{ color: colors.white, fontSize: 18 }}>Sign In</Text>
+            
           </Pressable>
 
           <View style={styles.join}>
