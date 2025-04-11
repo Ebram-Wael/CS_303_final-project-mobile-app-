@@ -23,13 +23,13 @@ const Firstpage = () => {
       <View style={{ height: 300 }}>
         <Pressable
           style={styles.btn}
-          onPress={() => router.push("/screens/login")}
+          onPress={() => router.replace("/screens/login")}
         >
           <Text style={{ color: "white" }}>Login</Text>
         </Pressable>
         <Pressable
           style={styles.btnRegister}
-          onPress={() => router.push("/screens/register")}
+          onPress={() => router.replace("/screens/register")}
         >
           <Text style={{ color: "white" }}>Register</Text>
         </Pressable>

@@ -12,7 +12,8 @@ import {
   Image,
   KeyboardAvoidingView,
   Platform,
-  ScrollView
+  ScrollView,
+  TouchableOpacity
 } from "react-native";
 import { useRouter } from "expo-router";
 import { createUserWithEmailAndPassword } from "firebase/auth";
@@ -35,15 +36,16 @@ const Register = () => {
   }, [navigation]);
   const router = useRouter();
   const [name, setName] = useState("");
-  const [last, setLast] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [phone, setPhone] = useState("");
+  const [phone, setPhone] = useState(""); 
+  const [image ,setImage] = useState(""); 
+  const [university, setUniversity] = useState("");
+  
 
   const [errorName, setErrorName] = useState("");
-  const [errorLast, setErrorLast] = useState("");
-  const [errorPhone, setErrorPhone] = useState("");
+  // const [errorPhone, setErrorPhone] = useState("");
   const [errorConfirmPassword, setErrorConfirmPassword] = useState("");
   const [errorEm, setErrorEm] = useState("");
   const [errorPassword, setErrorPassword] = useState("");
@@ -59,6 +61,7 @@ const Register = () => {
   const [borderColor3, setBorderColor3] = useState(colors.orange);
   const [borderColor4, setBorderColor4] = useState(colors.orange);
   const [borderColor5, setBorderColor5] = useState(colors.orange);
+  const [valid, setValid] = useState(false);
 
   const [selectRole, setSelectRole] = useState("buyer");
 
@@ -69,41 +72,37 @@ const Register = () => {
     setShowConfirmPassword(!showConfirmPassword);
   };
 
+  useEffect(() => {
+    if(validateInputs()){
+      setValid(true);
+  }
+    else{
+      setValid(false);
+    }
+  },[ name, email, password, confirmPassword, selectRole]); 
+
   const validateInputs = () => {
     let isValid = true;
 
     setErrorName("");
-    setErrorLast("");
     setErrorEm("");
-    setErrorPhone("");
+    // setErrorPhone("");
     setErrorPassword("");
     setErrorConfirmPassword("");
 
     if (!name) {
-      setErrorName("First name is required");
-      isValid = false;
-    }
-    if (!last) {
-      setErrorLast("Last name is required");
+      // setErrorName("First name is required");
       isValid = false;
     }
     if (!email) {
-      setErrorEm("Email is required");
+      // setErrorEm("Email is required");
       isValid = false;
     } else if (!/^\S+@\S+\.\S+$/.test(email)) {
       setErrorEm("Please enter a valid email address");
       isValid = false;
     }
-
-    if (!phone) {
-      setErrorPhone("Phone number is required");
-      isValid = false;
-    } else if (phone.length < 11 || phone.length >= 12) {
-      setErrorPhone("Please enter a valid phone number");
-      isValid = false;
-    }
     if (!password) {
-      setErrorPassword("Password is required");
+      // setErrorPassword("Password is required");
       isValid = false;
     } else if (password.length < 8) {
       setErrorPassword("Password must be at least 8 characters");
@@ -119,21 +118,17 @@ const Register = () => {
       );
       isValid = false;
     }
-    if (!confirmPassword) {
-      setErrorConfirmPassword("Confirm password is required");
-      isValid = false;
-    } else if (password !== confirmPassword) {
+     else if (password !== confirmPassword) {
       setErrorConfirmPassword("Passwords do not match");
       isValid = false;
     }
 
     return isValid;
   };
-
   const handleSignup = async (e) => {
     e.preventDefault();
     Keyboard.dismiss();
-    if (!validateInputs()) return;
+    // if (!validateInputs()) return;
 
     if (load) return;
     setLoad(true);
@@ -141,12 +136,21 @@ const Register = () => {
       await createUserWithEmailAndPassword(auth, email, password);
       const user = auth.currentUser;
       if (user) {
-        await setDoc(doc(db, "Users", user.uid), {
+        const userData = {
           email: user.email,
-          name: `${name} ${last}`,
+          name: name,
           phone: phone,
           role: selectRole,
-        });
+          image: image,
+          university: null,
+        };
+      
+        if (selectRole === "buyer") {
+          userData.university = university;
+        }
+      
+        await setDoc(doc(db, "Users", user.uid), userData);
+      }
         Alert.alert("Your account has been created");
         await AsyncStorage.setItem(
           "userData",
@@ -155,11 +159,12 @@ const Register = () => {
             email: user.email,
           })
         );
-        setTimeout(() => router.push("/(drawer)/(tabs)/profile"), 2000);
-      }
+        setTimeout(() => router.replace("/(drawer)/(tabs)/profile"), 2000);
+      
     } catch (error) {
       if (error.code === "auth/email-already-in-use") {
         setTimeout(() => router.push("/screens/login"), 2000);
+        console.log(error.code);
         Alert.alert("you already have an account");
       } else {
         Alert.alert("The email address you entered is incorrect, try again.");
@@ -208,36 +213,13 @@ const Register = () => {
             onFocus={() => setBorderColor(colors.background)}
             onBlur={() => setBorderColor(colors.orange)}
             style={[styles.input, { borderColor }]}
-            placeholder="First Name"
+            placeholder="Full Name"
             onChangeText={(text) => {
               setName(text);
             }}
           />
           {errorName ? <Text style={styles.errorText}>{errorName}</Text> : null}
-          <TextInput
-            onFocus={() => setBorderColor1(colors.background)}
-            onBlur={() => setBorderColor1(colors.orange)}
-            style={[styles.input, { borderColor: borderColor1 }]}
-            placeholder="Last Name"
-            onChangeText={(text) => {
-              setLast(text);
-            }}
-          />
-          {errorLast ? <Text style={styles.errorText}>{errorLast}</Text> : null}
-
-          <TextInput
-            onFocus={() => setBorderColor5(colors.background)}
-            onBlur={() => setBorderColor5(colors.orange)}
-            style={[styles.input, { borderColor: borderColor5 }]}
-            placeholder="phone"
-            onChangeText={(text) => {
-              setPhone(text);
-            }}
-            keyboardType="numeric"
-          />
-          {errorPhone ? (
-            <Text style={styles.errorText}>{errorPhone}</Text>
-          ) : null}
+          
 
           <TextInput
             onFocus={() => setBorderColor2(colors.background)}
@@ -295,8 +277,7 @@ const Register = () => {
             <Text style={styles.errorText}>{errorConfirmPassword}</Text>
           ) : null}
         </View>
-
-        <Pressable style={styles.btn} onPress={handleSignup}>
+        <Pressable style={[styles.btn , {opacity: valid ? 1:0.5 } ]} onPress={handleSignup} disabled={!valid}>
           {load ? (
             <ActivityIndicator color={colors.white} />
           ) : (
@@ -329,7 +310,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   btn: {
-    backgroundColor: colors.background,
+    backgroundColor: colors.blue,
     padding: 10,
     borderRadius: 5,
     width: 250,

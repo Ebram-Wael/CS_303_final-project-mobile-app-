@@ -94,13 +94,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#26326E",
     paddingVertical: 15,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 10,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 10,
+    // shadowColor: "#000",
+    // shadowOffset: {
+    //   width: 0,
+    //   height: 10,
+    // },
+    // shadowOpacity: 0.1,
+    // shadowRadius: 10,
     elevation: 10,
   },
   tabbarItem: {
