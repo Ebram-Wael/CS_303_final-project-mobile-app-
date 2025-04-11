@@ -91,18 +91,15 @@ const Register = () => {
     setErrorConfirmPassword("");
 
     if (!name) {
-      // setErrorName("First name is required");
       isValid = false;
     }
     if (!email) {
-      // setErrorEm("Email is required");
       isValid = false;
     } else if (!/^\S+@\S+\.\S+$/.test(email)) {
       setErrorEm("Please enter a valid email address");
       isValid = false;
     }
     if (!password) {
-      // setErrorPassword("Password is required");
       isValid = false;
     } else if (password.length < 8) {
       setErrorPassword("Password must be at least 8 characters");
@@ -128,7 +125,6 @@ const Register = () => {
   const handleSignup = async (e) => {
     e.preventDefault();
     Keyboard.dismiss();
-    // if (!validateInputs()) return;
 
     if (load) return;
     setLoad(true);
