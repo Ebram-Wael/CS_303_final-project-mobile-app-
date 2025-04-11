@@ -39,11 +39,12 @@ export default function Layout() {
           setSeller(userDoc.data().role === "seller");
         }
         setSeller((prevSeller) => {
-          const newSeller = userDoc.data().role === "seller";
+          const userData = userDoc.data();
+          const newSeller = userData?.role === "seller";
           return newSeller;
         });
-      }
-    });
+      }})
+    
   };
 
   return (
@@ -136,3 +137,4 @@ export default function Layout() {
     </GestureHandlerRootView>
   );
 }
+    

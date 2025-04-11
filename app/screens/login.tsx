@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -29,35 +29,44 @@ const Login = () => {
   const [borderColor, setBorderColor] = useState("#26326E");
   const [borderColor1, setBorderColor1] = useState("#26326E");
   const [showPassword, setShowPassword] = useState(true);
-''
+  const [loading, setLoading] = useState(false);
+  const [isValid, setIsValid] = useState(false);
+
   const ChangePassword = () => {
     setShowPassword(!showPassword);
   };
-  const isValid = email.includes('@') && password.length >= 8;
+
+  // Validation logic
+  useEffect(() => {
+    const isEmailValid = email.includes('@');
+    const isPasswordValid = password.length >= 8;
+    setIsValid(isEmailValid && isPasswordValid);
+  }, [email, password]); // Will run on changes to email or password
+
   const handleLogIN = async (e) => {
     e.preventDefault();
+    if(loading) return;
+    setLoading(true);
     try {
-      const cardinality = await signInWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
+      const cardinality = await signInWithEmailAndPassword(auth, email, password);
       const user = cardinality.user;
-      await AsyncStorage.setItem(
-        "userData",
-        JSON.stringify({
-          uid: user.uid,
-          email: user.email,
-        })
-      );
+      await AsyncStorage.setItem("userData", JSON.stringify({
+        uid: user.uid,
+        email: user.email,
+      }));
       setTimeout(() => router.replace('/(drawer)/(tabs)/profile'), 100);
     } catch (error) {
       if (error.code === "auth/invalid-credential") {
         Alert.alert("Invalid Password or email");
         console.log("Invalid Password or email");
+        setLoading(false);
+        setEmail("");
+        setPassword("");
       } else if (error.code === "auth/missing-password") {
-        Alert.alert("password is required");
-      } else Alert.alert("email is required");
+        Alert.alert("Password is required");
+      } else {
+        Alert.alert("Email is required");
+      }
     }
   };
 
@@ -89,10 +98,9 @@ const Login = () => {
               style={[styles.input, { borderColor }]}
               placeholder="Email"
               onChangeText={(text) => setEmail(text)}
+              value={email}
             />
-            <View
-              style={[styles.inputContainer, { borderColor: borderColor1 }]}
-            >
+            <View style={[styles.inputContainer, { borderColor: borderColor1 }]}>
               <TextInput
                 onFocus={() => setBorderColor1(colors.orange)}
                 onBlur={() => setBorderColor1(colors.darkblue)}
@@ -100,6 +108,7 @@ const Login = () => {
                 secureTextEntry={showPassword}
                 placeholder="Password"
                 onChangeText={(text) => setPassword(text)}
+                value={password}
               />
               <MaterialCommunityIcons
                 name={showPassword ? "eye-off" : "eye"}
@@ -110,20 +119,23 @@ const Login = () => {
             </View>
           </View>
 
-          <Pressable style={[styles.btn , {opacity: isValid ? 1:0.5 } ]} onPress={handleLogIN} disabled={!isValid} >
-            
-            <Text style={{ color: colors.white, fontSize: 18 }}>Sign In</Text>
-            
+          <Pressable
+            style={[styles.btn, { opacity: isValid ? 1 : 0.5 }]}
+            onPress={handleLogIN}
+            disabled={!isValid}
+          >
+            {loading ? (
+              <ActivityIndicator size="small" color={colors.white} />
+            ) : (
+              <Text style={{ color: colors.white, fontSize: 18 }}>Login</Text>
+            )}
           </Pressable>
 
           <View style={styles.join}>
             <Text> Create an Account?</Text>
             <Pressable onPress={() => router.push("/screens/register")}>
-              <Text
-                style={{ color:colors.blue, textDecorationLine: "underline" }}
-              >
-                {" "}
-                Sign Up{" "}
+              <Text style={{ color: colors.blue, textDecorationLine: "underline" }}>
+                Sign Up
               </Text>
             </Pressable>
           </View>
@@ -132,6 +144,7 @@ const Login = () => {
     </SafeAreaView>
   );
 };
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
