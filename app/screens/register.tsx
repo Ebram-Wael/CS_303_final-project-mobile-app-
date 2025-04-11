@@ -12,7 +12,8 @@ import {
   Image,
   KeyboardAvoidingView,
   Platform,
-  ScrollView
+  ScrollView,
+  TouchableOpacity
 } from "react-native";
 import { useRouter } from "expo-router";
 import { createUserWithEmailAndPassword } from "firebase/auth";
@@ -23,6 +24,8 @@ import { setDoc, doc } from "firebase/firestore";
 import { ActivityIndicator, RadioButton } from "react-native-paper";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import colors from '@/components/colors';
+
 const reg = require('../../assets/images/join.jpg');
 
 const Register = () => {
@@ -33,15 +36,16 @@ const Register = () => {
   }, [navigation]);
   const router = useRouter();
   const [name, setName] = useState("");
-  const [last, setLast] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [phone, setPhone] = useState("");
+  const [phone, setPhone] = useState(""); 
+  const [image ,setImage] = useState(""); 
+  const [university, setUniversity] = useState("");
+  
 
   const [errorName, setErrorName] = useState("");
-  const [errorLast, setErrorLast] = useState("");
-  const [errorPhone, setErrorPhone] = useState("");
+  // const [errorPhone, setErrorPhone] = useState("");
   const [errorConfirmPassword, setErrorConfirmPassword] = useState("");
   const [errorEm, setErrorEm] = useState("");
   const [errorPassword, setErrorPassword] = useState("");
@@ -51,12 +55,13 @@ const Register = () => {
 
   const [load, setLoad] = useState(false);
 
-  const [borderColor, setBorderColor] = useState("#F36F27");
-  const [borderColor1, setBorderColor1] = useState("#F36F27");
-  const [borderColor2, setBorderColor2] = useState("#F36F27");
-  const [borderColor3, setBorderColor3] = useState("#F36F27");
-  const [borderColor4, setBorderColor4] = useState("#F36F27");
-  const [borderColor5, setBorderColor5] = useState("#F36F27");
+  const [borderColor, setBorderColor] = useState(colors.orange);
+  const [borderColor1, setBorderColor1] = useState(colors.orange);
+  const [borderColor2, setBorderColor2] = useState(colors.orange);
+  const [borderColor3, setBorderColor3] = useState(colors.orange);
+  const [borderColor4, setBorderColor4] = useState(colors.orange);
+  const [borderColor5, setBorderColor5] = useState(colors.orange);
+  const [valid, setValid] = useState(false);
 
   const [selectRole, setSelectRole] = useState("buyer");
 
@@ -67,41 +72,34 @@ const Register = () => {
     setShowConfirmPassword(!showConfirmPassword);
   };
 
+  useEffect(() => {
+    if(validateInputs()){
+      setValid(true);
+  }
+    else{
+      setValid(false);
+    }
+  },[ name, email, password, confirmPassword, selectRole]); 
+
   const validateInputs = () => {
     let isValid = true;
 
     setErrorName("");
-    setErrorLast("");
     setErrorEm("");
-    setErrorPhone("");
+    // setErrorPhone("");
     setErrorPassword("");
     setErrorConfirmPassword("");
 
     if (!name) {
-      setErrorName("First name is required");
-      isValid = false;
-    }
-    if (!last) {
-      setErrorLast("Last name is required");
       isValid = false;
     }
     if (!email) {
-      setErrorEm("Email is required");
       isValid = false;
     } else if (!/^\S+@\S+\.\S+$/.test(email)) {
       setErrorEm("Please enter a valid email address");
       isValid = false;
     }
-
-    if (!phone) {
-      setErrorPhone("Phone number is required");
-      isValid = false;
-    } else if (phone.length < 11 || phone.length >= 12) {
-      setErrorPhone("Please enter a valid phone number");
-      isValid = false;
-    }
     if (!password) {
-      setErrorPassword("Password is required");
       isValid = false;
     } else if (password.length < 8) {
       setErrorPassword("Password must be at least 8 characters");
@@ -117,21 +115,16 @@ const Register = () => {
       );
       isValid = false;
     }
-    if (!confirmPassword) {
-      setErrorConfirmPassword("Confirm password is required");
-      isValid = false;
-    } else if (password !== confirmPassword) {
+     else if (password !== confirmPassword) {
       setErrorConfirmPassword("Passwords do not match");
       isValid = false;
     }
 
     return isValid;
   };
-
   const handleSignup = async (e) => {
     e.preventDefault();
     Keyboard.dismiss();
-    if (!validateInputs()) return;
 
     if (load) return;
     setLoad(true);
@@ -139,12 +132,21 @@ const Register = () => {
       await createUserWithEmailAndPassword(auth, email, password);
       const user = auth.currentUser;
       if (user) {
-        await setDoc(doc(db, "Users", user.uid), {
+        const userData = {
           email: user.email,
-          name: `${name} ${last}`,
+          name: name,
           phone: phone,
           role: selectRole,
-        });
+          image: image,
+          university: null,
+        };
+      
+        if (selectRole === "buyer") {
+          userData.university = university;
+        }
+      
+        await setDoc(doc(db, "Users", user.uid), userData);
+      }
         Alert.alert("Your account has been created");
         await AsyncStorage.setItem(
           "userData",
@@ -153,11 +155,12 @@ const Register = () => {
             email: user.email,
           })
         );
-        setTimeout(() => router.push("/(drawer)/(tabs)/profile"), 2000);
-      }
+        setTimeout(() => router.replace("/(drawer)/(tabs)/profile"), 2000);
+      
     } catch (error) {
       if (error.code === "auth/email-already-in-use") {
         setTimeout(() => router.push("/screens/login"), 2000);
+        console.log(error.code);
         Alert.alert("you already have an account");
       } else {
         Alert.alert("The email address you entered is incorrect, try again.");
@@ -176,7 +179,7 @@ const Register = () => {
        showsVerticalScrollIndicator={false} >
         <Text style={styles.header}>Create Account</Text>
         <View style={styles.txt}>
-          <Text style={{ color: "#26326E" }}>
+          <Text style={{ color: colors.background }}>
             Create an Account So You Can Explore Our Apartment{" "}
           </Text>
         </View>
@@ -203,43 +206,20 @@ const Register = () => {
         </View>
         <View>
           <TextInput
-            onFocus={() => setBorderColor("#26326E")}
-            onBlur={() => setBorderColor("#F36F27")}
+            onFocus={() => setBorderColor(colors.background)}
+            onBlur={() => setBorderColor(colors.orange)}
             style={[styles.input, { borderColor }]}
-            placeholder="First Name"
+            placeholder="Full Name"
             onChangeText={(text) => {
               setName(text);
             }}
           />
           {errorName ? <Text style={styles.errorText}>{errorName}</Text> : null}
-          <TextInput
-            onFocus={() => setBorderColor1("#26326E")}
-            onBlur={() => setBorderColor1("#F36F27")}
-            style={[styles.input, { borderColor: borderColor1 }]}
-            placeholder="Last Name"
-            onChangeText={(text) => {
-              setLast(text);
-            }}
-          />
-          {errorLast ? <Text style={styles.errorText}>{errorLast}</Text> : null}
+          
 
           <TextInput
-            onFocus={() => setBorderColor5("#26326E")}
-            onBlur={() => setBorderColor5("#F36F27")}
-            style={[styles.input, { borderColor: borderColor5 }]}
-            placeholder="phone"
-            onChangeText={(text) => {
-              setPhone(text);
-            }}
-            keyboardType="numeric"
-          />
-          {errorPhone ? (
-            <Text style={styles.errorText}>{errorPhone}</Text>
-          ) : null}
-
-          <TextInput
-            onFocus={() => setBorderColor2("#26326E")}
-            onBlur={() => setBorderColor2("#F36F27")}
+            onFocus={() => setBorderColor2(colors.background)}
+            onBlur={() => setBorderColor2(colors.orange)}
             style={[styles.input, { borderColor: borderColor2 }]}
             placeholder="Email"
             onChangeText={(text) => {
@@ -250,8 +230,8 @@ const Register = () => {
 
           <View style={[styles.inputContainer, { borderColor: borderColor3 }]}>
             <TextInput
-              onFocus={() => setBorderColor3("#26326E")}
-              onBlur={() => setBorderColor3("#F36F27")}
+              onFocus={() => setBorderColor3(colors.background)}
+              onBlur={() => setBorderColor3(colors.orange)}
               style={[styles.inputField]}
               secureTextEntry={showPassword}
               placeholder="Password"
@@ -262,7 +242,7 @@ const Register = () => {
             <MaterialCommunityIcons
               name={showPassword ? "eye-off" : "eye"}
               size={24}
-              color="#aaa"
+              color={colors.gray}
               onPress={ChangePassword}
               style={{}}
             />
@@ -273,8 +253,8 @@ const Register = () => {
 
           <View style={[styles.inputContainer, { borderColor: borderColor4 }]}>
             <TextInput
-              onFocus={() => setBorderColor4("#26326E")}
-              onBlur={() => setBorderColor4("#F36F27")}
+              onFocus={() => setBorderColor4(colors.background)}
+              onBlur={() => setBorderColor4(colors.orange)}
               style={[styles.inputField]}
               secureTextEntry={showConfirmPassword}
               placeholder="Confirm Password"
@@ -285,7 +265,7 @@ const Register = () => {
             <MaterialCommunityIcons
               name={showConfirmPassword ? "eye-off" : "eye"}
               size={24}
-              color="#aaa"
+              color={colors.gray}
               onPress={ChangeStyleConfirmPassword}
             />
           </View>
@@ -293,19 +273,18 @@ const Register = () => {
             <Text style={styles.errorText}>{errorConfirmPassword}</Text>
           ) : null}
         </View>
-
-        <Pressable style={styles.btn} onPress={handleSignup}>
+        <Pressable style={[styles.btn , {opacity: valid ? 1:0.5 } ]} onPress={handleSignup} disabled={!valid}>
           {load ? (
-            <ActivityIndicator color="white" />
+            <ActivityIndicator color={colors.white} />
           ) : (
-            <Text style={{ color: "white", fontSize: 18 }}> Sign Up</Text>
+            <Text style={{ color: colors.white, fontSize: 18 }}> Sign Up</Text>
           )}
         </Pressable>
 
         <View style={styles.join}>
           <Text> Already Have an Account?</Text>
           <Pressable onPress={() => router.push("/screens/login")}>
-            <Text style={{ color: "#2A2438", textDecorationLine: "underline" }}>
+            <Text style={{ color: colors.black, textDecorationLine: "underline" }}>
               {" "}
               Sign In{" "}
             </Text>
@@ -322,12 +301,12 @@ const styles = StyleSheet.create({
     height: 50,
     margin: 12,
     borderWidth: 1,
-    backgroundColor: "white",
+    backgroundColor: colors.background,
     width: 320,
     borderRadius: 5,
   },
   btn: {
-    backgroundColor: "#26326E",
+    backgroundColor: colors.blue,
     padding: 10,
     borderRadius: 5,
     width: 250,
@@ -340,7 +319,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: colors.white,
     alignItems: "center",
     justifyContent: "center",
     paddingTop: 20,
@@ -352,7 +331,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textAlign: "center",
     marginBottom: 10,
-    color: "#26326E",
+    color: colors.background,
   },
   txt: {
     flexDirection: "row",
@@ -373,15 +352,15 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 20,
 
-    backgroundColor: "white",
+    backgroundColor: colors.white,
   },
   errorText: {
-    color: "red",
+    color: colors.red,
     marginLeft: 12,
     marginBottom: 5,
   },
   label: {
-    color: "#2A2438",
+    color: colors.black,
     fontSize: 16,
     marginLeft: 5,
   },
@@ -403,7 +382,7 @@ const styles = StyleSheet.create({
     height: 50,
     margin: 12,
     borderWidth: 1,
-    backgroundColor: "white",
+    backgroundColor: colors.white,
     width: 320,
     borderRadius: 5,
     paddingHorizontal: 10,

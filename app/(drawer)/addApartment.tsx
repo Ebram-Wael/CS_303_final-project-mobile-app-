@@ -16,6 +16,8 @@ import { db } from "@/services/firebase";
 import * as ImagePicker from "expo-image-picker";
 import { getAuth } from "firebase/auth";
 import { useRouter } from "expo-router";
+import colors from '@/components/colors';
+
 export default function AddApartment() {
   const [unitNum, setunitNum] = useState("");
   const [sellerId, setSellerId] = useState("");
@@ -211,7 +213,7 @@ export default function AddApartment() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: colors.background,
     alignItems: "center",
     justifyContent: "center",
     paddingTop: 30,
@@ -220,12 +222,12 @@ const styles = StyleSheet.create({
     height: 50,
     margin: 12,
     borderWidth: 1,
-    backgroundColor: "white",
+    backgroundColor: colors.white ,
     width: 320,
     borderRadius: 5,
   },
   btn: {
-    backgroundColor: "#F36F27",
+    backgroundColor:colors.orange ,
     width: 200,
     height: 50,
     paddingVertical: 12,
@@ -260,7 +262,7 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   error: {
-    color: "red",
+    color: colors.red,
     fontSize: 12,
     marginLeft: 12,
     marginBottom: 10,

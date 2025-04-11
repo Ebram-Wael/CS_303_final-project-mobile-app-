@@ -4,6 +4,7 @@ import { useRouter } from "expo-router";
 import { useNavigation } from "@react-navigation/native";
 import { useLayoutEffect } from "react";
 import logo from "../../assets/images/homeStudent.jpg";
+import colors from '@/components/colors';
 
 const Firstpage = () => {
   const router = useRouter();
@@ -22,13 +23,13 @@ const Firstpage = () => {
       <View style={{ height: 300 }}>
         <Pressable
           style={styles.btn}
-          onPress={() => router.push("/screens/login")}
+          onPress={() => router.replace("/screens/login")}
         >
           <Text style={{ color: "white" }}>Login</Text>
         </Pressable>
         <Pressable
           style={styles.btnRegister}
-          onPress={() => router.push("/screens/register")}
+          onPress={() => router.replace("/screens/register")}
         >
           <Text style={{ color: "white" }}>Register</Text>
         </Pressable>
@@ -43,7 +44,7 @@ const styles = StyleSheet.create({
     height: 500,
   },
   cont: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.white,
     padding: 20,
     justifyContent: "center",
     alignItems: "center",
@@ -51,7 +52,7 @@ const styles = StyleSheet.create({
   },
   btn: {
     display: "flex",
-    backgroundColor: "#F36F27",
+    backgroundColor: colors.orange,
     width: 250,
     height: 50,
     justifyContent: "center",
@@ -64,18 +65,18 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: "bold",
-    color: "#26326E",
+    color: colors.darkblue,
     marginBottom: 20,
     marginTop: -70,
   },
   txt: {
     fontWeight: "bold",
-    color: "#26326E",
+    color: colors.darkblue,
     marginBottom: 20,
   },
   btnRegister: {
     display: "flex",
-    backgroundColor: "#26326E",
+    backgroundColor: colors.darkblue,
     width: 250,
     height: 50,
     justifyContent: "center",

@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -6,21 +7,24 @@ import {
   Pressable,
   Alert,
   ActivityIndicator,
+  Image,
 } from "react-native";
-import React, { useState, useEffect } from "react";
+import { SafeAreaView } from "react-native-safe-area-context";
 import auth from "@/services/firebase";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "@/services/firebase";
-import { SafeAreaView } from "react-native-safe-area-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as ImagePicker from "expo-image-picker";
+import { Camera } from "expo-camera";
 
-const Profile = () => {
-  const [userDetails, setUserDetails] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [editing, setEditing] = useState(false);
-  const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [email, setEmail] = useState("");
+const Profile: React.FC = () => {
+  const [userDetails, setUserDetails] = useState<any>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [editing, setEditing] = useState<boolean>(false);
+  const [name, setName] = useState<string>("");
+  const [phone, setPhone] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
+  const [imageurl, setImageUrl] = useState<string | null>(null);
 
   useEffect(() => {
     const getUserDetails = async () => {
@@ -36,6 +40,7 @@ const Profile = () => {
     };
     getUserDetails();
     getUser();
+    requestPermissions();
   }, []);
 
   const getUser = async () => {
@@ -45,14 +50,24 @@ const Profile = () => {
         const userDoc = await getDoc(userDocRef);
 
         if (userDoc.exists()) {
-          setUserDetails(userDoc.data());
-          setName(userDoc.data().name);
-          setPhone(userDoc.data().phone);
-          setEmail(userDoc.data().email);
+          const data = userDoc.data();
+          setUserDetails(data);
+          setName(data.name);
+          setPhone(data.phone);
+          setEmail(data.email);
+          setImageUrl(data.imageurl);
           setLoading(false);
         }
       }
     });
+  };
+
+  const requestPermissions = async () => {
+    const { status: cameraStatus } = await Camera.requestCameraPermissionsAsync();
+    const { status: mediaStatus } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (cameraStatus !== "granted" || mediaStatus !== "granted") {
+      alert("You need to enable camera and media permissions.");
+    }
   };
 
   const validateInputs = () => {
@@ -74,14 +89,15 @@ const Profile = () => {
   const handleUpdate = async () => {
     if (!userDetails || !validateInputs()) return;
     try {
-      const userDocRef = doc(db, "Users", auth.currentUser.uid);
+      const userDocRef = doc(db, "Users", auth.currentUser?.uid || "");
       await updateDoc(userDocRef, {
         name,
         phone,
         email,
+        imageurl,
       });
       Alert.alert("Success", "Profile updated successfully!");
-      setUserDetails({ ...userDetails, name, phone, email });
+      setUserDetails({ ...userDetails, name, phone, email, imageurl });
       setEditing(false);
     } catch (error) {
       console.error("Error updating profile:", error);
@@ -89,13 +105,81 @@ const Profile = () => {
     }
   };
 
+  const selectImage = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.canceled && result.assets.length > 0) {
+      setImageUrl(result.assets[0].uri);
+    }
+  };
+
+  const takePhoto = async () => {
+    const result = await ImagePicker.launchCameraAsync({
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.canceled && result.assets.length > 0) {
+      setImageUrl(result.assets[0].uri);
+    }
+  };
+
+  const deleteImage = async () => {
+    Alert.alert("Delete Profile Picture", "Are you sure you want to delete the profile picture?", [
+      {
+        text: "Cancel",
+        style: "cancel",
+      },
+      {
+        text: "Delete",
+        onPress: async () => {
+          setImageUrl(null); 
+          try {
+            const userDocRef = doc(db, "Users", auth.currentUser?.uid || "");
+            await updateDoc(userDocRef, {
+              imageurl: null, 
+            });
+            Alert.alert("Success", "Profile picture deleted successfully!");
+          } catch (error) {
+            console.error("Error deleting image:", error);
+            Alert.alert("Error", "Failed to delete profile picture.");
+          }
+        },
+      },
+    ]);
+  };
+
+  const onImagePress = () => {
+    Alert.alert("Change Profile Picture", "Select an option", [
+      { text: "Choose from Gallery", onPress: selectImage },
+      { text: "Take a Photo", onPress: takePhoto },
+      { text: "Delete Photo", onPress: deleteImage },
+      { text: "Cancel", style: "cancel" },
+    ]);
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       {loading ? (
         <ActivityIndicator size="large" color="#0000ff" />
       ) : (
-        <View>
-          <Text style={styles.role}>{userDetails?.role}</Text>
+        <View style={{ alignItems: "center" }}>
+          <Pressable onPress={onImagePress}>
+            {imageurl ? (
+              <Image source={{ uri: imageurl }} style={styles.profileImage} />
+            ) : (
+              <View style={[styles.profileImage, styles.placeholder]}>
+                <Text style={{ color: "#aaa" }}>Add Photo</Text>
+              </View>
+            )}
+          </Pressable>
+
           <Text style={styles.label}>Name:</Text>
           <TextInput
             style={styles.input}
@@ -127,7 +211,7 @@ const Profile = () => {
               <Text style={styles.buttonText}>Save Changes</Text>
             </Pressable>
           ) : (
-            <Pressable style={styles.button1} onPress={() => setEditing(true)}>
+            <Pressable style={styles.button} onPress={() => setEditing(true)}>
               <Text style={styles.buttonText}>Edit Profile</Text>
             </Pressable>
           )}
@@ -141,23 +225,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    alignItems: "center",
     justifyContent: "center",
-  },
-  role: {
-    fontWeight: "bold",
-    fontSize: 25,
-    marginBottom: 10,
   },
   label: {
     width: 300,
     fontSize: 16,
     fontWeight: "bold",
     marginTop: 10,
-  },
-  text: {
-    fontSize: 16,
-    marginBottom: 10,
   },
   input: {
     width: 300,
@@ -168,23 +242,28 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   button: {
-    backgroundColor: "green",
-    padding: 10,
-    borderRadius: 5,
-    alignItems: "center",
-    marginTop: 10,
-  },
-  button1: {
     backgroundColor: "rgb(8 50 106)",
     padding: 10,
     borderRadius: 5,
     alignItems: "center",
     marginTop: 10,
+    width: 300,
   },
   buttonText: {
     color: "white",
     fontSize: 16,
     fontWeight: "bold",
+  },
+  profileImage: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    marginBottom: 50,
+  },
+  placeholder: {
+    backgroundColor: "#eee",
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
 
