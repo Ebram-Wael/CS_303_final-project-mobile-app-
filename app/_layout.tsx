@@ -37,7 +37,7 @@ export default function RootLayout() {
   return (
     <>
       <Stack screenOptions={{ headerShown: false }}>
-        {!user ? <Stack.Screen name="screens"/> : <Stack.Screen name="(drawer)" />}
+        {!user ? <Stack.Screen name="screens/firstpage"/> : <Stack.Screen name="(drawer)" />}
       </Stack>
     </>
   );
