@@ -7,7 +7,7 @@ import {
 } from "@react-navigation/bottom-tabs";
 import React from "react";
 import HouseIcon from "@/assets/icons/house-01-svgrepo-com.svg";
-import SearchIcon from "@/assets/icons/search-svgrepo-com.svg";
+import CartIcon from "@/assets/icons/cart-svgrepo-com.svg";
 import ExploreIcon from "@/assets/icons/explore-svgrepo-com.svg";
 import ProfileIcon from "@/assets/icons/profile-svgrepo-com.svg";
 
@@ -20,7 +20,7 @@ export default function TabBar({
   const { buildHref } = useLinkBuilder();
   const icon = {
     index: (props: any) => <HouseIcon width={30} height={30} {...props} />,
-    cart: (props: any) => <SearchIcon width={30} height={30} {...props} />,
+    cart: (props: any) => <CartIcon width={30} height={30} {...props} />,
     explore: (props: any) => <ExploreIcon width={30} height={30} {...props} />,
     profile: (props: any) => <ProfileIcon width={30} height={30} {...props} />,
   };
