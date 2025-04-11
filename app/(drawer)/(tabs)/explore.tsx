@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   View,
   Text,
@@ -6,11 +6,14 @@ import {
   Image,
   StyleSheet,
   ScrollView,
+  TextInput,
+  ActivityIndicator,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { db } from "@/services/firebase";
 import { collection, onSnapshot, doc, getDoc } from "firebase/firestore";
 import colors from "@/components/colors";
+import { debounce } from "lodash";
 
 const defaultImage = "default.jpg";
 
@@ -71,7 +74,9 @@ const HouseItem = ({ house }) => {
           </Pressable>
         </View>
         <Image
-          source={{ uri: house.image[0] || defaultImage }}
+          source={{
+            uri: house.image && house.image[0] ? house.image[0] : defaultImage,
+          }}
           style={styles.image}
         />
         <Text style={styles.description} numberOfLines={2}>
@@ -86,7 +91,10 @@ const HouseItem = ({ house }) => {
 };
 
 export default function HouseList() {
-  const [houses, setHouses] = useState([]);
+  const [allHouses, setAllHouses] = useState([]);
+  const [filteredHouses, setFilteredHouses] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     const colRef = collection(db, "Apartments");
@@ -95,19 +103,79 @@ export default function HouseList() {
         id: doc.id,
         ...doc.data(),
       }));
-      setHouses(houseList);
+      setAllHouses(houseList);
+      setFilteredHouses(houseList);
+      setIsLoading(false);
     });
     return () => fetchHouses();
   }, []);
+
+  const handleSearch = useCallback(
+    debounce((query) => {
+      if (query === "") {
+        setFilteredHouses(allHouses);
+        return;
+      }
+
+      const searchTerms = query.toLowerCase().trim().split(/\s+/);
+
+      const filtered = allHouses.filter((house) => {
+        return searchTerms.some((term) => {
+          return (
+            (house.location?.toLowerCase() || "").includes(term) ||
+            (house.features?.toLowerCase() || "").includes(term) ||
+            (house.num_bedrooms || "").includes(term) ||
+            (term.startsWith("under-") &&
+              parseInt(house.rent || "0") <= parseInt(term.substring(6))) ||
+            house.rent === term ||
+            (house.availability_status?.toLowerCase() || "").includes(term) ||
+            (house.floor || "").includes(term) ||
+            (Array.isArray(house.keywords) &&
+              house.keywords.some((keyword) =>
+                (keyword || "").toLowerCase().includes(term)
+              ))
+          );
+        });
+      });
+
+      setFilteredHouses(filtered);
+    }, 300),
+    [allHouses]
+  );
+
+  const onChangeText = (query) => {
+    setSearchQuery(query);
+    handleSearch(query);
+  };
 
   return (
     <ScrollView style={styles.container}>
       <View style={styles.container}>
         <Text style={styles.header}>Houses</Text>
-        {houses.length > 0 ? (
-          houses.map((house) => <HouseItem key={house.id} house={house} />)
+
+        {/* Search bar */}
+        <View style={styles.searchContainer}>
+          <TextInput
+            placeholder="Search location, features, price..."
+            clearButtonMode="always"
+            style={styles.searchBox}
+            autoCapitalize="none"
+            autoCorrect={false}
+            value={searchQuery}
+            onChangeText={onChangeText}
+          />
+        </View>
+
+        {isLoading ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color={colors.blue} />
+          </View>
+        ) : filteredHouses.length > 0 ? (
+          filteredHouses.map((house) => (
+            <HouseItem key={house.id} house={house} />
+          ))
         ) : (
-          <Text>Loading...</Text>
+          <Text style={styles.loadingText}>No houses found</Text>
         )}
       </View>
     </ScrollView>
@@ -115,6 +183,7 @@ export default function HouseList() {
 }
 
 const styles = StyleSheet.create({
+  // Your existing styles
   container: {
     flex: 1,
     padding: 20,
@@ -132,10 +201,6 @@ const styles = StyleSheet.create({
     padding: 15,
     marginBottom: 15,
     borderRadius: 16,
-    // shadowColor: "#000",
-    // shadowOpacity: 0.1,
-    // shadowOffset: { width: 0, height: 3 },
-    // shadowRadius: 5,
     elevation: 4,
   },
   image: {
@@ -180,5 +245,27 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: colors.gray,
     marginTop: 20,
+  },
+
+  // New styles for search
+  searchContainer: {
+    marginBottom: 15,
+    backgroundColor: colors.white,
+    borderRadius: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  searchBox: {
+    paddingHorizontal: 15,
+    paddingVertical: 12,
+    borderRadius: 16,
+    fontSize: 16,
+  },
+  loadingContainer: {
+    paddingVertical: 20,
+    alignItems: "center",
   },
 });
