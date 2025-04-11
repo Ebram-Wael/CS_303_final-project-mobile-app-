@@ -65,6 +65,11 @@ const Register = () => {
 
   const [selectRole, setSelectRole] = useState("buyer");
 
+  const [touchMail, setTouchMail] = useState(false);
+  const [touchPass, setTouchPass] = useState(false);
+  const [touchconf , setTouchConf] = useState(false);
+
+
   const ChangePassword = () => {
     setShowPassword(!showPassword);
   };
@@ -73,12 +78,7 @@ const Register = () => {
   };
 
   useEffect(() => {
-    if(validateInputs()){
-      setValid(true);
-  }
-    else{
-      setValid(false);
-    }
+   setValid(validateInputs());
   },[ name, email, password, confirmPassword, selectRole]); 
 
   const validateInputs = () => {
@@ -207,31 +207,37 @@ const Register = () => {
         <View>
           <TextInput
             onFocus={() => setBorderColor(colors.background)}
-            onBlur={() => setBorderColor(colors.orange)}
+            onBlur={() => setBorderColor(colors.orange) }
             style={[styles.input, { borderColor }]}
             placeholder="Full Name"
             onChangeText={(text) => {
               setName(text);
             }}
+
           />
-          {errorName ? <Text style={styles.errorText}>{errorName}</Text> : null}
+          {touchMail &&errorName ? <Text style={styles.errorText}>{errorName}</Text> : null}
           
 
           <TextInput
-            onFocus={() => setBorderColor2(colors.background)}
-            onBlur={() => setBorderColor2(colors.orange)}
+            onFocus={() => {setBorderColor2(colors.background) ;setTouchMail(true)}}
+            onBlur={() => setBorderColor2(colors.orange) }
             style={[styles.input, { borderColor: borderColor2 }]}
             placeholder="Email"
             onChangeText={(text) => {
               setEmail(text);
             }}
           />
-          {errorEm ? <Text style={styles.errorText}>{errorEm}</Text> : null}
+          {touchPass&&errorEm ? <Text style={styles.errorText}>{errorEm}</Text> : null}
 
           <View style={[styles.inputContainer, { borderColor: borderColor3 }]}>
             <TextInput
-              onFocus={() => setBorderColor3(colors.background)}
-              onBlur={() => setBorderColor3(colors.orange)}
+              onFocus={() => {setBorderColor3(colors.background)
+                setTouchPass(true); 
+
+              }}
+              onBlur={() => {
+                setBorderColor3(colors.orange); 
+              }}
               style={[styles.inputField]}
               secureTextEntry={showPassword}
               placeholder="Password"
@@ -247,14 +253,17 @@ const Register = () => {
               style={{}}
             />
           </View>
-          {errorPassword ? (
+          {touchconf&&errorPassword ? (
             <Text style={styles.errorText}>{errorPassword}</Text>
           ) : null}
 
           <View style={[styles.inputContainer, { borderColor: borderColor4 }]}>
             <TextInput
-              onFocus={() => setBorderColor4(colors.background)}
-              onBlur={() => setBorderColor4(colors.orange)}
+              onFocus={() => {setBorderColor4(colors.background) ;
+                setTouchConf(true) }}
+              onBlur={() => {
+                setBorderColor4(colors.orange); 
+              }}
               style={[styles.inputField]}
               secureTextEntry={showConfirmPassword}
               placeholder="Confirm Password"
