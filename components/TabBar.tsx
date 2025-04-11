@@ -20,7 +20,7 @@ export default function TabBar({
   const { buildHref } = useLinkBuilder();
   const icon = {
     index: (props: any) => <HouseIcon width={30} height={30} {...props} />,
-    search: (props: any) => <SearchIcon width={30} height={30} {...props} />,
+    cart: (props: any) => <SearchIcon width={30} height={30} {...props} />,
     explore: (props: any) => <ExploreIcon width={30} height={30} {...props} />,
     profile: (props: any) => <ProfileIcon width={30} height={30} {...props} />,
   };
