@@ -16,6 +16,7 @@ import { db } from "@/services/firebase";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as ImagePicker from "expo-image-picker";
 import { Camera } from "expo-camera";
+import { set } from "lodash";
 
 const Profile: React.FC = () => {
   const [userDetails, setUserDetails] = useState<any>(null);
@@ -89,6 +90,7 @@ const Profile: React.FC = () => {
   const handleUpdate = async () => {
     if (!userDetails || !validateInputs()) return;
     try {
+      setLoading(true);
       const userDocRef = doc(db, "Users", auth.currentUser?.uid || "");
       await updateDoc(userDocRef, {
         name,
@@ -99,6 +101,7 @@ const Profile: React.FC = () => {
       Alert.alert("Success", "Profile updated successfully!");
       setUserDetails({ ...userDetails, name, phone, email, imageurl });
       setEditing(false);
+      setLoading(false);
     } catch (error) {
       console.error("Error updating profile:", error);
       Alert.alert("Error", "Failed to update profile.");
