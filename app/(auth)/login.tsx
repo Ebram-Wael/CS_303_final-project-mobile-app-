@@ -133,7 +133,7 @@ const Login = () => {
 
           <View style={styles.join}>
             <Text> Create an Account?</Text>
-            <Pressable onPress={() => router.push("/screens/register")}>
+            <Pressable onPress={() => router.push("/register")}>
               <Text style={{ color: colors.blue, textDecorationLine: "underline" }}>
                 Sign Up
               </Text>

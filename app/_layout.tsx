@@ -1,44 +1,36 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Redirect, Stack, useRouter, useSegments } from "expo-router";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { useEffect, useState } from "react";
+import { Slot, useRouter } from "expo-router";
 import { View, ActivityIndicator } from "react-native";
+import { useEffect, useState } from "react";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 export default function RootLayout() {
-  const router = useRouter();
-  const auth = getAuth();
+  const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
-  const segments = useSegments();
-  const [check, setCheck] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
-    const checked = onAuthStateChanged(auth, async (cur) => {
-      setUser(cur);
-      if(!check) {
-        setCheck(true);
-      }
+    const unsubscribe = onAuthStateChanged(getAuth(), (u) => {
+      setUser(u);
+      setLoading(false);
     });
-    return () => checked();
-  }, [auth]);
 
+    return unsubscribe;
+  }, []);
 
   useEffect(() => {
-    if (!check) return;
     
-    const inScreen=segments[0]==="screens";
-    
-    if (!user && !inScreen) {
-      router.replace("/screens/firstpage");
-    } else if (user && inScreen) {
-      router.replace("/(drawer)/(tabs)/profile");
+    if (!loading && !user) {
+      router.replace("/(auth)/firstpage");
     }
-  }, [user, segments, check]);
+  }, [loading, user]);
 
-  return (
-    <>
-      <Stack screenOptions={{ headerShown: false }}>
-        {!user ? <Stack.Screen name="screens/firstpage"/> : <Stack.Screen name="(drawer)" />}
-      </Stack>
-    </>
-  );
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
+
+  return <Slot />;
 }

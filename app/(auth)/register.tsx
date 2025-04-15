@@ -159,7 +159,7 @@ const Register = () => {
       
     } catch (error) {
       if (error.code === "auth/email-already-in-use") {
-        setTimeout(() => router.push("/screens/login"), 2000);
+        setTimeout(() => router.push("/login"), 2000);
         console.log(error.code);
         Alert.alert("you already have an account");
       } else {
@@ -292,7 +292,7 @@ const Register = () => {
 
         <View style={styles.join}>
           <Text> Already Have an Account?</Text>
-          <Pressable onPress={() => router.push("/screens/login")}>
+          <Pressable onPress={() => router.push("/login")}>
             <Text style={{ color: colors.black, textDecorationLine: "underline" }}>
               {" "}
               Sign In{" "}

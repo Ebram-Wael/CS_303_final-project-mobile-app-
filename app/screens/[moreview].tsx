@@ -9,11 +9,12 @@ import {
   Animated,
   Alert,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useEffect, useState, useRef, useLayoutEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { useLocalSearchParams } from "expo-router";
-import {db} from "@/services/firebase"
-import {doc ,getDoc} from "firebase/firestore";
+import { db } from "@/services/firebase"
+import { doc, getDoc } from "firebase/firestore";
 import Heart from "@/assets/icons/heart-svgrepo-com.svg";
 import RedHeart from "@/assets/icons/heart-svgrepo-com (1).svg";
 import TopArrow from "@/assets/icons/top-arrow-5-svgrepo-com.svg";
@@ -28,7 +29,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 const HouseDesc = ({ house }) => {
   const navigation = useNavigation();
   const [owner, setOwner] = useState("");
-  
+
   useEffect(() => {
     const fetchOwner = async () => {
       if (house.seller_id) {
@@ -91,10 +92,10 @@ const HouseDesc = ({ house }) => {
       let message = "";
       if (pressHeart) {
         favoritesArray = favoritesArray.filter(id => id !== house.id);
-        message =  "Item removed from favorites.";
+        message = "Item removed from favorites.";
       } else {
         favoritesArray.push(house.id);
-        message =   "Item added to favorites.";
+        message = "Item added to favorites.";
       }
 
       await AsyncStorage.setItem('favorites', JSON.stringify(favoritesArray));
@@ -119,77 +120,79 @@ const HouseDesc = ({ house }) => {
   });
 
   return (
-    <View style={styles.container}>
-      <ScrollView style={styles.imageContainer}>
-      {house.image.length === 1 ? (
-        <Image
-          source={{ uri: house.image[0] }}
-          style={{
-            width: "100%",
-            height: windowHeight - 80 ,
-          }}
-        />
-      ) : (
-        house.image.map((img, index) => (
-          <Image
-            key={index}
-            source={{ uri: img }}
-            style={{
-              width: "100%",
-              height: press ? windowHeight / 3 : windowHeight / 2,
-              borderRadius: 8,
-            }}
-          />
-        ))
-      )}
-      </ScrollView>
-      <Pressable onPress={handlePress} style={styles.pressableContainer}>
-        {press ? (
-          <Animated.View
-            style={[styles.detailed, { transform: [{ translateY }] }]}
-          >
-            <DownArrow width={50} height={50}/>
-            <Text style={styles.status}>
-              {house.availability_status }
+    <SafeAreaView>
+      <View style={styles.container}>
+        <ScrollView style={styles.imageContainer}>
+          {house.image.length === 1 ? (
+            <Image
+              source={{ uri: house.image[0] }}
+              style={{
+                width: "100%",
+                height: windowHeight - 80,
+              }}
+            />
+          ) : (
+            house.image.map((img, index) => (
+              <Image
+                key={index}
+                source={{ uri: img }}
+                style={{
+                  width: "100%",
+                  height: press ? windowHeight / 3 : windowHeight / 2,
+                  borderRadius: 8,
+                }}
+              />
+            ))
+          )}
+        </ScrollView>
+        <Pressable onPress={handlePress} style={styles.pressableContainer}>
+          {press ? (
+            <Animated.View
+              style={[styles.detailed, { transform: [{ translateY }] }]}
+            >
+              <DownArrow width={50} height={50} />
+              <Text style={styles.status}>
+                {house.availability_status}
               </Text>
-            <Text style={styles.price}>
-              {house.rent > 0 ? `${house.rent}` : "Invalid Price"} EGP
-            </Text>
-            <Text style={styles.address}>
-              {house.location || "Unknown Address"}
-            </Text>
-            <Text style={styles.title}>
-               Floor: {house.floor }
+              <Text style={styles.price}>
+                {house.rent > 0 ? `${house.rent}` : "Invalid Price"} EGP
               </Text>
-            <Text style={styles.title}>
-              The Number of the unit: {house.unit_number }
+              <Text style={styles.address}>
+                {house.location || "Unknown Address"}
               </Text>
-            <Text style={styles.description}>
-              Description: {house.features || "No description available"}
-            </Text>
-            <Text style={styles.NoOfRooms}>
-              Number of rooms:{" "}
-              {house.num_bedrooms || "Unknown Number Of Rooms"}
-            </Text>
-            <Text style={styles.owner}>Contact: {owner}</Text>
-            <View style={styles.buyNowStyles}>
-              <Pressable onPress={handlePressOnHeart}>
-              { pressHeart ? <RedHeart width={30} height={30} />
-              : <Heart width={30} height={30}/>}
-              </Pressable>
-              <Pressable style={styles.buyNowView}>
-                <Text style={styles.buyNowText}>Buy Now!</Text>
-              </Pressable>
+              <Text style={styles.title}>
+                Floor: {house.floor}
+              </Text>
+              <Text style={styles.title}>
+                The Number of the unit: {house.unit_number}
+              </Text>
+              <Text style={styles.description}>
+                Description: {house.features || "No description available"}
+              </Text>
+              <Text style={styles.NoOfRooms}>
+                Number of rooms:{" "}
+                {house.num_bedrooms || "Unknown Number Of Rooms"}
+              </Text>
+              <Text style={styles.owner}>Contact: {owner}</Text>
+              <View style={styles.buyNowStyles}>
+                <Pressable onPress={handlePressOnHeart}>
+                  {pressHeart ? <RedHeart width={30} height={30} />
+                    : <Heart width={30} height={30} />}
+                </Pressable>
+                <Pressable style={styles.buyNowView}>
+                  <Text style={styles.buyNowText}>Buy Now!</Text>
+                </Pressable>
+              </View>
+            </Animated.View>
+          ) : (
+            <View style={styles.moreDetails}>
+              <TopArrow width={30} height={30} />
+              <Text style={styles.moreDetailsText}>More Details</Text>
             </View>
-          </Animated.View>
-        ) : (
-          <View style={styles.moreDetails}>
-            <TopArrow width={30} height={30}/>
-            <Text style={styles.moreDetailsText}>More Details</Text>
-          </View>
-        )}
-      </Pressable>
-    </View>
+          )}
+        </Pressable>
+      </View>
+    </SafeAreaView>
   );
 };
 
@@ -203,7 +206,7 @@ export default function moreView() {
       try {
         const docRef = doc(db, "Apartments", houseId);
         const docSnap = await getDoc(docRef);
-  
+
         if (docSnap.exists()) {
           setHouses([{ id: docSnap.id, ...docSnap.data() }]);
         } else {
@@ -213,7 +216,7 @@ export default function moreView() {
         console.error("Error fetching house: ", error);
       }
     };
-  
+
     fetchHouse();
   }, [houseId]);
 

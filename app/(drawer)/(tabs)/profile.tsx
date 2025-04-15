@@ -16,7 +16,7 @@ import { db } from "@/services/firebase";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as ImagePicker from "expo-image-picker";
 import { Camera } from "expo-camera";
-import { set } from "lodash";
+
 
 const Profile: React.FC = () => {
   const [userDetails, setUserDetails] = useState<any>(null);
@@ -172,6 +172,7 @@ const Profile: React.FC = () => {
       {loading ? (
         <ActivityIndicator size="large" color="#0000ff" />
       ) : (
+        
         <View style={{ alignItems: "center" }}>
           <Pressable onPress={onImagePress}>
             {imageurl ? (

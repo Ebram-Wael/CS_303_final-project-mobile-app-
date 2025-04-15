@@ -9,6 +9,7 @@ import {
   TextInput,
   ActivityIndicator,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { db } from "@/services/firebase";
 import { collection, onSnapshot, doc, getDoc } from "firebase/firestore";
@@ -45,48 +46,50 @@ const HouseItem = ({ house }) => {
   }, [house.seller_id]);
 
   return (
-    <Pressable
-      onPress={() =>
-        router.push({
-          pathname: "/screens/[moreview]",
-          params: { moreview: house.id },
-        })
-      }
-    >
-      <View style={styles.card}>
-        <Text style={styles.title}>
-          {house.availability_status || "No Title"}
-        </Text>
-        <Text style={styles.address}>
-          {house.location || "Unknown Location"}
-        </Text>
-        <View style={styles.ownerContainer}>
-          <Text style={styles.owner}>Owner: </Text>
-          <Pressable
-            onPress={() =>
-              router.push({
-                pathname: "/screens/owner",
-                params: { ownerName: owner },
-              })
-            }
-          >
-            <Text style={{ color: colors.blue }}>{owner || "Unknown"}</Text>
-          </Pressable>
+    <SafeAreaView>
+      <Pressable
+        onPress={() =>
+          router.push({
+            pathname: "/screens/[moreview]",
+            params: { moreview: house.id },
+          })
+        }
+      >
+        <View style={styles.card}>
+          <Text style={styles.title}>
+            {house.availability_status || "No Title"}
+          </Text>
+          <Text style={styles.address}>
+            {house.location || "Unknown Location"}
+          </Text>
+          <View style={styles.ownerContainer}>
+            <Text style={styles.owner}>Owner: </Text>
+            <Pressable
+              onPress={() =>
+                router.push({
+                  pathname: "/screens/owner",
+                  params: { ownerName: owner },
+                })
+              }
+            >
+              <Text style={{ color: colors.blue }}>{owner || "Unknown"}</Text>
+            </Pressable>
+          </View>
+          <Image
+            source={{
+              uri: house.image && house.image[0] ? house.image[0] : defaultImage,
+            }}
+            style={styles.image}
+          />
+          <Text style={styles.description} numberOfLines={2}>
+            Description: {house.features || "No description available"}
+          </Text>
+          <Text style={styles.price}>
+            Price: {house.rent > 0 ? `${house.rent}` : "Invalid Price"} EGP
+          </Text>
         </View>
-        <Image
-          source={{
-            uri: house.image && house.image[0] ? house.image[0] : defaultImage,
-          }}
-          style={styles.image}
-        />
-        <Text style={styles.description} numberOfLines={2}>
-          Description: {house.features || "No description available"}
-        </Text>
-        <Text style={styles.price}>
-          Price: {house.rent > 0 ? `${house.rent}` : "Invalid Price"} EGP
-        </Text>
-      </View>
-    </Pressable>
+      </Pressable>
+    </SafeAreaView>
   );
 };
 
