@@ -20,6 +20,7 @@ export default function Layout() {
         const storedUserData = await AsyncStorage.getItem("userData");
         if (storedUserData) {
           const userData = JSON.parse(storedUserData);
+          setSeller(userData.role=="seller");
           setUserDetails(userData);
         }
       } catch (error) {
@@ -38,11 +39,6 @@ export default function Layout() {
         if (userDoc.exists()) {
           setSeller(userDoc.data().role === "seller");
         }
-        setSeller((prevSeller) => {
-          const userData = userDoc.data();
-          const newSeller = userData?.role === "seller";
-          return newSeller;
-        });
       }})
     
   };
