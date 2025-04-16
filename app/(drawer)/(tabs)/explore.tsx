@@ -15,6 +15,7 @@ import { db } from "@/services/firebase";
 import { collection, onSnapshot, doc, getDoc } from "firebase/firestore";
 import colors from "@/components/colors";
 import { debounce } from "lodash";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const defaultImage = "default.jpg";
 
@@ -26,16 +27,23 @@ const HouseItem = ({ house }) => {
     const fetchOwner = async () => {
       if (house.seller_id) {
         try {
-          const userDocRef = doc(db, "Users", house.seller_id);
+          const userDocRef = doc(db, "Users",  house.seller_id);
           const userDoc = await getDoc(userDocRef);
           if (userDoc.exists()) {
             setOwner(userDoc.data().name);
+            await AsyncStorage.setItem("owner" , JSON.stringify({name:userDoc.data().name}))
           } else {
             setOwner("Unknown");
           }
         } catch (error) {
           console.error("Error fetching owner:", error);
           setOwner("Error");
+          const data = await AsyncStorage.getItem("owner")
+          if(data){
+            const parseData =JSON.parse(data)
+            setOwner(parseData.name)
+
+          }
         }
       } else {
         setOwner("No seller");
@@ -101,16 +109,38 @@ export default function HouseList() {
 
   useEffect(() => {
     const colRef = collection(db, "Apartments");
-    const fetchHouses = onSnapshot(colRef, (snapshot) => {
-      const houseList = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      setAllHouses(houseList);
-      setFilteredHouses(houseList);
-      setIsLoading(false);
-    });
-    return () => fetchHouses();
+    const fetchData= async()=>{
+    try{
+        const fetchHouses = onSnapshot(colRef, async (snapshot) => {
+          const houseList = snapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
+          setAllHouses(houseList);
+          setFilteredHouses(houseList);
+          setIsLoading(false);
+          await AsyncStorage.setItem("apartmentData",JSON.stringify({houseList})
+          )
+        });
+        return fetchHouses;
+      }
+      catch(Error){
+        const data = await AsyncStorage.getItem("apartmentData")
+        if(data){
+          const parseData =JSON.parse(data);
+          setAllHouses(parseData);
+          setFilteredHouses(parseData);
+          setIsLoading(false);
+        }
+        else{
+          console.log("no data in local storage");
+        }
+    }
+  }
+    const unsubscribe =fetchData ();
+    return ()=>{
+      if(unsubscribe)unsubscribe.then(unsub=>unsub());
+    } 
   }, []);
 
   const handleSearch = useCallback(

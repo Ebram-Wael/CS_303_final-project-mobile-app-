@@ -26,10 +26,43 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import colors from '@/components/colors';
 
+import * as Notifications from 'expo-notifications';
+
 const reg = require('../../assets/images/join.jpg');
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: true,
+  }),
+});
+
 
 const Register = () => {
   const navigation = useNavigation();
+
+  async function requestNotificationPermissions() {
+    const { status } = await Notifications.requestPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Notification permissions not granted');
+    }
+  }
+
+  useEffect(()=>{
+    requestNotificationPermissions();
+  },[])
+
+  async function sendWelcomeNotification(username) {
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: "Registration Successful! ",
+        body: `Welcome to Homy, ${username}! Your account has been created.`,
+        data: { screen: 'Home' },
+      },
+      trigger: null,
+    });
+  }
 
   useLayoutEffect(() => {
     navigation.setOptions({ headerShown: false });
@@ -146,16 +179,24 @@ const Register = () => {
         }
       
         await setDoc(doc(db, "Users", user.uid), userData);
-      }
-        Alert.alert("Your account has been created");
         await AsyncStorage.setItem(
           "userData",
           JSON.stringify({
             uid: user.uid,
             email: user.email,
+            name:userData.name,
+            phone:userData.phone,
+            role:userData.phone,
+            image:userData.image,
+            university:userData.university,
           })
         );
+      }
+        Alert.alert("Your account has been created");
+        sendWelcomeNotification(name);
+       
         setTimeout(() => router.replace("/(drawer)/(tabs)/profile"), 2000);
+        sendWelcomeNotification(name);
       
     } catch (error) {
       if (error.code === "auth/email-already-in-use") {

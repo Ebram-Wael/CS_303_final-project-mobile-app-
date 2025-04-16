@@ -41,6 +41,7 @@ const Profile: React.FC = () => {
     };
     getUserDetails();
     getUser();
+    getUserFromStorge();
     requestPermissions();
   }, []);
 
@@ -58,10 +59,30 @@ const Profile: React.FC = () => {
           setEmail(data.email);
           setImageUrl(data.imageurl);
           setLoading(false);
+        await AsyncStorage.setItem("userData", JSON.stringify(data));
+
         }
       }
     });
   };
+  const getUserFromStorge= async ()=>{
+    try{
+      const userData =await AsyncStorage.getItem('userData');
+      if(userData){
+        const data= JSON.parse(userData);
+        console.log("data is" , userData);
+        setName(data.name );
+        setPhone(data.phone);
+        setEmail(data.email);
+        setImageUrl(data.imageurl);
+        setLoading(false);
+        
+      }
+    }
+    catch(Error){
+      console.log(Error);
+    }
+  }
 
   const requestPermissions = async () => {
     const { status: cameraStatus } = await Camera.requestCameraPermissionsAsync();
