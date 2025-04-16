@@ -9,26 +9,61 @@ import {
 } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import { useRouter } from "expo-router";
-import HouseData from "@/services/data.json";
 import Icon from "react-native-vector-icons/FontAwesome";
 import colors from '@/components/colors';
+import { useEffect, useState } from "react";
+import { db } from '@/services/firebase';
+import { collection, query, where, onSnapshot, getDoc, doc } from "firebase/firestore";
 
 export default function OwnerDetails() {
-  const { ownerName } = useLocalSearchParams<{ ownerName: string }>();
+  const { ownerId } = useLocalSearchParams<{ ownerId: string }>();
   const router = useRouter();
-  const owner = HouseData.find(
-    (house) => house.owner === ownerName
-  )?.ownerDetails;
-  const ownedHouses = HouseData.filter((house) => house.owner === ownerName);
+  const [owner, setOwner] = useState<any>(null);
+  const [ownedHouses, setOwnedHouses] = useState<any[]>([]);
+  useEffect(() => {
+    const fetchOwner = async () => {
+      try {
+        const userDocRef = doc(db, "Users", ownerId);
+        const docSnap = await getDoc(userDocRef);
+
+        if (docSnap.exists()) {
+          const ownerData = docSnap.data();
+          setOwner(ownerData);
+
+          const seller_id = docSnap.id;
+          const apartmentsRef = collection(db, "Apartments");
+          const houseQuery = query(apartmentsRef, where("seller_id", "==", seller_id));
+
+          const unsubscribe = onSnapshot(houseQuery, (snapshot) => {
+            const houseList = snapshot.docs.map((doc) => ({
+              id: doc.id,
+              ...doc.data(),
+            }));
+            setOwnedHouses(houseList);
+          });
+
+          return () => unsubscribe();
+        } else {
+          console.warn("Owner not found in Users collection.");
+          setOwner(null);
+          setOwnedHouses([]);
+        }
+      } catch (err) {
+        alert(err.message);
+      }
+    };
+
+    fetchOwner();
+  }, [ownerId]);
 
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.header}>Owner Details</Text>
       {owner ? (
         <View style={styles.card}>
-          {owner.owner_image && (
+          {owner.image && (
             <Image
-              source={{ uri: owner.owner_image }}
+              source={{ uri: owner.imageurl[0] }}
               style={styles.ownerImage}
             />
           )}
@@ -71,11 +106,11 @@ export default function OwnerDetails() {
             }
           >
             <View key={house.id} style={styles.houseCard}>
-              <Image source={{ uri: house.image }} style={styles.image} />
+              <Image source={{ uri: house.image[0] }} style={styles.image} />
               <View style={styles.houseInfo}>
-                <Text style={styles.title}>{house.title}</Text>
-                <Text style={styles.address}>{house.address}</Text>
-                <Text style={styles.price}>{house.price} EGP</Text>
+                <Text style={styles.title}>{house.availability_status}</Text>
+                <Text style={styles.address}>{house.location}</Text>
+                <Text style={styles.price}>{house.rent} EGP</Text>
               </View>
             </View>
           </Pressable>
