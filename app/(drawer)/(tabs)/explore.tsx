@@ -22,6 +22,7 @@ const defaultImage = "default.jpg";
 const HouseItem = ({ house }) => {
   const router = useRouter();
   const [owner, setOwner] = useState("");
+  const [ownerId, setOwnerId] = useState("");
 
   useEffect(() => {
     const fetchOwner = async () => {
@@ -31,6 +32,7 @@ const HouseItem = ({ house }) => {
           const userDoc = await getDoc(userDocRef);
           if (userDoc.exists()) {
             setOwner(userDoc.data().name);
+            setOwnerId(userDoc.id);
             await AsyncStorage.setItem("owner" , JSON.stringify({name:userDoc.data().name}))
           } else {
             setOwner("Unknown");
@@ -76,7 +78,7 @@ const HouseItem = ({ house }) => {
               onPress={() =>
                 router.push({
                   pathname: "/screens/owner",
-                  params: { ownerName: owner },
+                  params: { ownerId: ownerId },
                 })
               }
             >
