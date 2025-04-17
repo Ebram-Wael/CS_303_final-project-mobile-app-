@@ -1,11 +1,11 @@
-import { Ionicons } from "@expo/vector-icons";
-import { TouchableOpacity } from "react-native";
+import { Pressable } from "react-native";
 import { useNavigation } from "expo-router";
-
+import Icon from "react-native-vector-icons/FontAwesome";
 export default function FloatingMenuButton() {
   const navigation = useNavigation();
+
   return (
-    <TouchableOpacity
+    <Pressable
       style={{
         position: "absolute",
         top: "5%",
@@ -18,9 +18,9 @@ export default function FloatingMenuButton() {
         alignItems: "center",
         zIndex: 10,
       }}
-      onPress={() => navigation.toggleDrawer()}
+      onPress={() => navigation.dispatch({ type: "OPEN_DRAWER" })}
     >
-      <Ionicons name="menu" size={27} color="white" />
-    </TouchableOpacity>
+      <Icon name="bars" size={25} color="white" />
+    </Pressable>
   );
 }

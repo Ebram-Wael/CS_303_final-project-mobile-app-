@@ -13,24 +13,40 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useEffect, useState, useRef, useLayoutEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { useLocalSearchParams } from "expo-router";
-import { db } from "@/services/firebase"
+import { db } from "@/services/firebase";
 import { doc, getDoc } from "firebase/firestore";
 import Heart from "@/assets/icons/heart-svgrepo-com.svg";
 import RedHeart from "@/assets/icons/heart-svgrepo-com (1).svg";
 import TopArrow from "@/assets/icons/top-arrow-5-svgrepo-com.svg";
 import DownArrow from "@/assets/icons/down-arrow-5-svgrepo-com.svg";
-import colors from '@/components/colors';
+import * as Notifications from "expo-notifications";
+import colors from "@/components/colors";
 
 const defaultImage = "https://via.placeholder.com/150";
 const windowWidth = Dimensions.get("window").width;
 const windowHeight = Dimensions.get("window").height;
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: true,
+  }),
+});
+async function requestNotificationPermissions() {
+  const { status } = await Notifications.requestPermissionsAsync();
+  if (status !== "granted") {
+    Alert.alert("Notification permissions not granted");
+  }
+}
+
 const HouseDesc = ({ house }) => {
   const navigation = useNavigation();
   const [owner, setOwner] = useState("");
 
   useEffect(() => {
+    requestNotificationPermissions();
     const fetchOwner = async () => {
       if (house.seller_id) {
         try {
@@ -65,7 +81,7 @@ const HouseDesc = ({ house }) => {
   useEffect(() => {
     const checkFavorite = async () => {
       try {
-        const favorites = await AsyncStorage.getItem('favorites');
+        const favorites = await AsyncStorage.getItem("favorites");
         if (favorites) {
           const favoritesArray = JSON.parse(favorites);
           if (favoritesArray.includes(house.id)) {
@@ -73,7 +89,7 @@ const HouseDesc = ({ house }) => {
           }
         }
       } catch (error) {
-        console.error('Failed to load favorites', error);
+        console.error("Failed to load favorites", error);
       }
     };
 
@@ -87,22 +103,30 @@ const HouseDesc = ({ house }) => {
 
   const handlePressOnHeart = async () => {
     try {
-      const favorites = await AsyncStorage.getItem('favorites');
+      const favorites = await AsyncStorage.getItem("favorites");
       let favoritesArray = favorites ? JSON.parse(favorites) : [];
       let message = "";
       if (pressHeart) {
-        favoritesArray = favoritesArray.filter(id => id !== house.id);
+        favoritesArray = favoritesArray.filter((id) => id !== house.id);
         message = "Item removed from favorites.";
       } else {
         favoritesArray.push(house.id);
         message = "Item added to favorites.";
       }
 
-      await AsyncStorage.setItem('favorites', JSON.stringify(favoritesArray));
+      await AsyncStorage.setItem("favorites", JSON.stringify(favoritesArray));
       setPressHeart(!pressHeart);
-      Alert.alert("Favorites", message);
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: "favorite",
+          body: message,
+          sound: "default",
+          data: { type: "favorite" },
+        },
+        trigger: null,
+      });
     } catch (error) {
-      console.error('Failed to update favorites', error);
+      console.error("Failed to update favorites", error);
     }
   };
 
@@ -112,7 +136,7 @@ const HouseDesc = ({ house }) => {
       duration: 300,
       useNativeDriver: true,
     }).start();
-  }, [expanded])
+  }, [expanded]);
 
   const translateY = animatedValue.interpolate({
     inputRange: [0, 1],
@@ -151,18 +175,14 @@ const HouseDesc = ({ house }) => {
               style={[styles.detailed, { transform: [{ translateY }] }]}
             >
               <DownArrow width={50} height={50} />
-              <Text style={styles.status}>
-                {house.availability_status}
-              </Text>
+              <Text style={styles.status}>{house.availability_status}</Text>
               <Text style={styles.price}>
                 {house.rent > 0 ? `${house.rent}` : "Invalid Price"} EGP
               </Text>
               <Text style={styles.address}>
                 {house.location || "Unknown Address"}
               </Text>
-              <Text style={styles.title}>
-                Floor: {house.floor}
-              </Text>
+              <Text style={styles.title}>Floor: {house.floor}</Text>
               <Text style={styles.title}>
                 The Number of the unit: {house.unit_number}
               </Text>
@@ -176,8 +196,11 @@ const HouseDesc = ({ house }) => {
               <Text style={styles.owner}>Contact: {owner}</Text>
               <View style={styles.buyNowStyles}>
                 <Pressable onPress={handlePressOnHeart}>
-                  {pressHeart ? <RedHeart width={30} height={30} />
-                    : <Heart width={30} height={30} />}
+                  {pressHeart ? (
+                    <RedHeart width={30} height={30} />
+                  ) : (
+                    <Heart width={30} height={30} />
+                  )}
                 </Pressable>
                 <Pressable style={styles.buyNowView}>
                   <Text style={styles.buyNowText}>Buy Now!</Text>
