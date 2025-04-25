@@ -17,6 +17,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as ImagePicker from "expo-image-picker";
 import { Camera } from "expo-camera";
 
+
 const Profile: React.FC = () => {
   const [userDetails, setUserDetails] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -40,6 +41,7 @@ const Profile: React.FC = () => {
     };
     getUserDetails();
     getUser();
+    getUserFromStorge();
     requestPermissions();
   }, []);
 
@@ -57,10 +59,30 @@ const Profile: React.FC = () => {
           setEmail(data.email);
           setImageUrl(data.imageurl);
           setLoading(false);
+        await AsyncStorage.setItem("userData", JSON.stringify(data));
+
         }
       }
     });
   };
+  const getUserFromStorge= async ()=>{
+    try{
+      const userData =await AsyncStorage.getItem('userData');
+      if(userData){
+        const data= JSON.parse(userData);
+        console.log("data is" , userData);
+        setName(data.name );
+        setPhone(data.phone);
+        setEmail(data.email);
+        setImageUrl(data.imageurl);
+        setLoading(false);
+        
+      }
+    }
+    catch(Error){
+      console.log(Error);
+    }
+  }
 
   const requestPermissions = async () => {
     const { status: cameraStatus } = await Camera.requestCameraPermissionsAsync();
@@ -89,6 +111,7 @@ const Profile: React.FC = () => {
   const handleUpdate = async () => {
     if (!userDetails || !validateInputs()) return;
     try {
+      setLoading(true);
       const userDocRef = doc(db, "Users", auth.currentUser?.uid || "");
       await updateDoc(userDocRef, {
         name,
@@ -99,6 +122,7 @@ const Profile: React.FC = () => {
       Alert.alert("Success", "Profile updated successfully!");
       setUserDetails({ ...userDetails, name, phone, email, imageurl });
       setEditing(false);
+      setLoading(false);
     } catch (error) {
       console.error("Error updating profile:", error);
       Alert.alert("Error", "Failed to update profile.");
@@ -169,6 +193,7 @@ const Profile: React.FC = () => {
       {loading ? (
         <ActivityIndicator size="large" color="#0000ff" />
       ) : (
+        
         <View style={{ alignItems: "center" }}>
           <Pressable onPress={onImagePress}>
             {imageurl ? (

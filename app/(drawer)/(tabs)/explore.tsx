@@ -9,17 +9,20 @@ import {
   TextInput,
   ActivityIndicator,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { db } from "@/services/firebase";
 import { collection, onSnapshot, doc, getDoc } from "firebase/firestore";
 import colors from "@/components/colors";
 import { debounce } from "lodash";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const defaultImage = "default.jpg";
 
 const HouseItem = ({ house }) => {
   const router = useRouter();
   const [owner, setOwner] = useState("");
+  const [ownerId, setOwnerId] = useState("");
 
   useEffect(() => {
     const fetchOwner = async () => {
@@ -29,12 +32,22 @@ const HouseItem = ({ house }) => {
           const userDoc = await getDoc(userDocRef);
           if (userDoc.exists()) {
             setOwner(userDoc.data().name);
+            setOwnerId(userDoc.id);
+            await AsyncStorage.setItem(
+              "owner",
+              JSON.stringify({ name: userDoc.data().name })
+            );
           } else {
             setOwner("Unknown");
           }
         } catch (error) {
           console.error("Error fetching owner:", error);
           setOwner("Error");
+          const data = await AsyncStorage.getItem("owner");
+          if (data) {
+            const parseData = JSON.parse(data);
+            setOwner(parseData.name);
+          }
         }
       } else {
         setOwner("No seller");
@@ -45,48 +58,51 @@ const HouseItem = ({ house }) => {
   }, [house.seller_id]);
 
   return (
-    <Pressable
-      onPress={() =>
-        router.push({
-          pathname: "/screens/[moreview]",
-          params: { moreview: house.seller_id },
-        })
-      }
-    >
-      <View style={styles.card}>
-        <Text style={styles.title}>
-          {house.availability_status || "No Title"}
-        </Text>
-        <Text style={styles.address}>
-          {house.location || "Unknown Location"}
-        </Text>
-        <View style={styles.ownerContainer}>
-          <Text style={styles.owner}>Owner: </Text>
-          <Pressable
-            onPress={() =>
-              router.push({
-                pathname: "/screens/owner",
-                params: { ownerName: owner },
-              })
-            }
-          >
-            <Text style={{ color: colors.blue }}>{owner || "Unknown"}</Text>
-          </Pressable>
+    <SafeAreaView>
+      <Pressable
+        onPress={() =>
+          router.push({
+            pathname: "/screens/[moreview]",
+            params: { moreview: house.id },
+          })
+        }
+      >
+        <View style={styles.card}>
+          <Text style={styles.title}>
+            {house.availability_status || "No Title"}
+          </Text>
+          <Text style={styles.address}>
+            {house.location || "Unknown Location"}
+          </Text>
+          <View style={styles.ownerContainer}>
+            <Text style={styles.owner}>Owner: </Text>
+            <Pressable
+              onPress={() =>
+                router.push({
+                  pathname: "/screens/owner",
+                  params: { ownerId: ownerId },
+                })
+              }
+            >
+              <Text style={{ color: colors.blue }}>{owner || "Unknown"}</Text>
+            </Pressable>
+          </View>
+          <Image
+            source={{
+              uri:
+                house.image && house.image[0] ? house.image[0] : defaultImage,
+            }}
+            style={styles.image}
+          />
+          <Text style={styles.description} numberOfLines={2}>
+            Description: {house.features || "No description available"}
+          </Text>
+          <Text style={styles.price}>
+            Price: {house.rent > 0 ? `${house.rent}` : "Invalid Price"} EGP
+          </Text>
         </View>
-        <Image
-          source={{
-            uri: house.image && house.image[0] ? house.image[0] : defaultImage,
-          }}
-          style={styles.image}
-        />
-        <Text style={styles.description} numberOfLines={2}>
-          Description: {house.features || "No description available"}
-        </Text>
-        <Text style={styles.price}>
-          Price: {house.rent > 0 ? `${house.rent}` : "Invalid Price"} EGP
-        </Text>
-      </View>
-    </Pressable>
+      </Pressable>
+    </SafeAreaView>
   );
 };
 
@@ -98,16 +114,38 @@ export default function HouseList() {
 
   useEffect(() => {
     const colRef = collection(db, "Apartments");
-    const fetchHouses = onSnapshot(colRef, (snapshot) => {
-      const houseList = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      setAllHouses(houseList);
-      setFilteredHouses(houseList);
-      setIsLoading(false);
-    });
-    return () => fetchHouses();
+    const fetchData = async () => {
+      try {
+        const fetchHouses = onSnapshot(colRef, async (snapshot) => {
+          const houseList = snapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
+          setAllHouses(houseList);
+          setFilteredHouses(houseList);
+          setIsLoading(false);
+          await AsyncStorage.setItem(
+            "apartmentData",
+            JSON.stringify({ houseList })
+          );
+        });
+        return fetchHouses;
+      } catch (Error) {
+        const data = await AsyncStorage.getItem("apartmentData");
+        if (data) {
+          const parseData = JSON.parse(data);
+          setAllHouses(parseData);
+          setFilteredHouses(parseData);
+          setIsLoading(false);
+        } else {
+          console.log("no data in local storage");
+        }
+      }
+    };
+    const unsubscribe = fetchData();
+    return () => {
+      if (unsubscribe) unsubscribe.then((unsub) => unsub());
+    };
   }, []);
 
   const handleSearch = useCallback(

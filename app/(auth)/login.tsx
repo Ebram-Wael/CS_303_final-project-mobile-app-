@@ -19,8 +19,21 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { ActivityIndicator } from "react-native-paper";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import colors from '@/components/colors';
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "@/services/firebase";
+
+import * as Notifications from 'expo-notifications';
+
 
 const log = require("../../assets/images/login.jpg");
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: true,
+  }),
+});
 
 const Login = () => {
   const router = useRouter();
@@ -32,16 +45,38 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [isValid, setIsValid] = useState(false);
 
+  const [name ,setName] =useState("")
+
   const ChangePassword = () => {
     setShowPassword(!showPassword);
   };
 
-  // Validation logic
+    async function requestNotificationPermissions() {
+      const { status } = await Notifications.requestPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Notification permissions not granted');
+      }
+    }
+  
+    useEffect(()=>{
+      requestNotificationPermissions();
+    },[])
+  
+    async function sendWelcomeNotification(username) {
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: "Welcome Back!",
+          body: `Hello ${username}, it's great to see you again at Homy.`,
+          data: { screen: 'Home' },
+        },
+        trigger: null,
+      });
+    }
   useEffect(() => {
     const isEmailValid = email.includes('@');
     const isPasswordValid = password.length >= 8;
     setIsValid(isEmailValid && isPasswordValid);
-  }, [email, password]); // Will run on changes to email or password
+  }, [email, password]);
 
   const handleLogIN = async (e) => {
     e.preventDefault();
@@ -50,15 +85,21 @@ const Login = () => {
     try {
       const cardinality = await signInWithEmailAndPassword(auth, email, password);
       const user = cardinality.user;
+      const docc = doc(db, "Users", user.uid);
+      const userdoc =await getDoc(docc);
+      if(userdoc){
+        const data=userdoc.data()
+        setName(data.name);
+      }
       await AsyncStorage.setItem("userData", JSON.stringify({
         uid: user.uid,
-        email: user.email,
+        email: user.email
       }));
-      setTimeout(() => router.replace('/(drawer)/(tabs)/profile'), 100);
+      sendWelcomeNotification(name);
+      setTimeout(() => router.replace('/(drawer)/(tabs)/profile'), 500);
     } catch (error) {
       if (error.code === "auth/invalid-credential") {
         Alert.alert("Invalid Password or email");
-        console.log("Invalid Password or email");
         setLoading(false);
         setEmail("");
         setPassword("");
@@ -133,7 +174,7 @@ const Login = () => {
 
           <View style={styles.join}>
             <Text> Create an Account?</Text>
-            <Pressable onPress={() => router.push("/screens/register")}>
+            <Pressable onPress={() => router.push("/register")}>
               <Text style={{ color: colors.blue, textDecorationLine: "underline" }}>
                 Sign Up
               </Text>
