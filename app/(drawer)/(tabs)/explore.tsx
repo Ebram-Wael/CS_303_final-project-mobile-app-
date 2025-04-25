@@ -49,7 +49,7 @@ const HouseItem = ({ house }) => {
       onPress={() =>
         router.push({
           pathname: "/screens/[moreview]",
-          params: { moreview: house.id },
+          params: { moreview: house.seller_id },
         })
       }
     >
