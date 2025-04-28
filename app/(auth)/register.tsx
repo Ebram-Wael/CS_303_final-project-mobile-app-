@@ -184,11 +184,11 @@ const Register = () => {
           JSON.stringify({
             uid: user.uid,
             email: user.email,
-            name:userData.name,
-            phone:userData.phone,
-            role:userData.phone,
-            image:userData.image,
-            university:userData.university,
+            name:name,
+            phone:phone,
+            role:selectRole,
+            image:image,
+            university:university,
           })
         );
       }
