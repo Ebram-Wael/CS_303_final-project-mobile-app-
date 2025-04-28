@@ -93,7 +93,10 @@ const Login = () => {
       }
       await AsyncStorage.setItem("userData", JSON.stringify({
         uid: user.uid,
-        email: user.email
+        email: user.email,
+        name:name,
+        phone:user.phoneNumber,
+        imageurl:user.photoURL
       }));
       sendWelcomeNotification(name);
       setTimeout(() => router.replace('/(drawer)/(tabs)/profile'), 500);
