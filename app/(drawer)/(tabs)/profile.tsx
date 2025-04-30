@@ -18,6 +18,8 @@ import { signOut } from "firebase/auth";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as ImagePicker from "expo-image-picker";
 import { Camera } from "expo-camera";
+import Colors from '@/components/colors';
+import { useThemes } from '@/components/themeContext';
 
 const Profile: React.FC = () => {
   const [userDetails, setUserDetails] = useState<any>(null);
@@ -29,6 +31,8 @@ const Profile: React.FC = () => {
   const [imageurl, setImageUrl] = useState<string | null>(null);
 
   const router = useRouter();
+  const { theme } = useThemes();
+  const isDark = theme === 'dark';
 
   useEffect(() => {
     const getUserDetails = async () => {
@@ -182,17 +186,17 @@ const Profile: React.FC = () => {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: isDark ? Colors.darkModeBackground : Colors.background }}>
       {loading ? (
-        <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: isDark ? Colors.darkModePrimary : Colors.background }}>
           <ActivityIndicator size="large" color="#7f51ff" />
         </View>
       ) : (
         <View style={styles.container}>
-          <View style={styles.header}>
+          <View style={[styles.header, { backgroundColor: isDark ? Colors.darkModePrimary : "#7f51ff" }]}>
             <View style={styles.headerTopRow}>
               <Pressable onPress={handleLogout}>
-                <Feather name="log-out" size={24} color="#fff" />
+                <Feather name="log-out" size={24} color="white" />
               </Pressable>
               <Text style={styles.headerText}>{name || "User Name"}</Text>
               <Pressable onPress={handleDeleteAccount}>
@@ -213,26 +217,26 @@ const Profile: React.FC = () => {
 
           <View style={styles.infoContainer}>
             <View style={styles.infoRow}>
-              <Feather name="settings" size={24} color="#555" />
-              <Text style={styles.infoText}>{role}</Text>
+              <Feather name="settings" size={24} color={isDark ? Colors.darkModeText : "#555"} />
+              <Text style={[styles.infoText, { color: isDark ? Colors.darkModeText : "#333" }]}>{role}</Text>
             </View>
 
             <View style={styles.infoRow}>
-              <Feather name="user" size={24} color="#555" />
-              <Text style={styles.infoText}>{name}</Text>
+              <Feather name="user" size={24} color={isDark ? Colors.darkModeText : "#555"} />
+              <Text style={[styles.infoText, { color: isDark ? Colors.darkModeText : "#333" }]}>{name}</Text>
             </View>
 
             <View style={styles.infoRow}>
-              <Feather name="phone" size={24} color="#555" />
-              <Text style={styles.infoText}>{phone}</Text>
+              <Feather name="phone" size={24} color={isDark ? Colors.darkModeText : "#555"} />
+              <Text style={[styles.infoText, { color: isDark ? Colors.darkModeText : "#333" }]}>{phone}</Text>
             </View>
 
             <View style={styles.infoRow}>
-              <Feather name="mail" size={24} color="#555" />
-              <Text style={styles.infoText}>{email}</Text>
+              <Feather name="mail" size={24} color={isDark ? Colors.darkModeText : "#555"} />
+              <Text style={[styles.infoText, { color: isDark ? Colors.darkModeText : "#333" }]}>{email}</Text>
             </View>
 
-            <Pressable style={styles.editButton} onPress={() => router.push("../../screens/edit-profile")}>
+            <Pressable style={[styles.editButton, { backgroundColor: isDark ? Colors.darkModePrimary : "#7f51ff" }]} onPress={() => router.push("../../screens/edit-profile")}>
               <Text style={styles.buttonText}>Edit profile</Text>
             </Pressable>
           </View>
@@ -245,8 +249,8 @@ const Profile: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    flexDirection: "column", 
-    justifyContent: "space-between", 
+    flexDirection: "column",
+    justifyContent: "space-between",
   },
   header: {
     backgroundColor: "#7f51ff",
@@ -289,7 +293,7 @@ const styles = StyleSheet.create({
   infoContainer: {
     padding: 20,
     height: "70%",
-    flex:1,
+    flex: 1,
     justifyContent: "center",
     gap: 15,
   },

@@ -1,7 +1,8 @@
 import React, { useRef } from "react";
 import { View, Text, StyleSheet, ScrollView, Image, Dimensions, Pressable } from "react-native";
 import Swiper from "react-native-swiper";
-import colors from "@/components/colors";
+import Colors from "@/components/colors";
+import { useThemes } from '@/components/themeContext'
 
 import pro1 from "@/assets/images/photo_2025-04-11_16-10-28.jpg";
 import pro2 from "@/assets/images/photo_2025-01-09_17-47-33.jpg";
@@ -21,9 +22,12 @@ export default function AboutUs() {
   const goNext = () => swiperRef.current?.scrollBy(1);
   const goPrev = () => swiperRef.current?.scrollBy(-1);
 
+  const { theme } = useThemes();
+  const isDark = theme === 'dark';
+
   return (
-    <ScrollView style={styles.container}>
-     
+    <ScrollView style={[styles.container, { backgroundColor: isDark ? Colors.darkModeBackground : Colors.background }]}>
+
       <View style={styles.sliderWrapper}>
         <Swiper
           ref={swiperRef}
@@ -43,7 +47,7 @@ export default function AboutUs() {
           <Image source={pro8} style={styles.image} />
         </Swiper>
 
-      
+
         <Pressable style={styles.leftArrow} onPress={goPrev}>
           <Text style={styles.arrowText}>‹</Text>
         </Pressable>
@@ -89,7 +93,7 @@ export default function AboutUs() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: Colors.background,
   },
   sliderWrapper: {
     position: "relative",
@@ -129,7 +133,7 @@ const styles = StyleSheet.create({
   content: {
     marginVertical: 15,
     padding: 20,
-    backgroundColor: colors.white,
+    backgroundColor: "white",
     borderRadius: 10,
     elevation: 3,
     marginHorizontal: 15,

@@ -8,11 +8,15 @@ import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/services/firebase";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useThemes } from '@/components/themeContext'
+import Colors from "@/components/colors";
 
 export default function Layout() {
   const [seller, setSeller] = useState(false);
   const [userDetails, setUserDetails] = useState(null);
   const auth = getAuth();
+  const { theme } = useThemes();
+  const isDark = theme === 'dark';
 
   useEffect(() => {
     const getUserDetails = async () => {
@@ -20,7 +24,7 @@ export default function Layout() {
         const storedUserData = await AsyncStorage.getItem("userData");
         if (storedUserData) {
           const userData = JSON.parse(storedUserData);
-          setSeller(userData.role=="seller");
+          setSeller(userData.role == "seller");
           setUserDetails(userData);
         }
       } catch (error) {
@@ -39,8 +43,9 @@ export default function Layout() {
         if (userDoc.exists()) {
           setSeller(userDoc.data().role === "seller");
         }
-      }})
-    
+      }
+    })
+
   };
 
   return (
@@ -48,7 +53,7 @@ export default function Layout() {
       <Drawer
         screenOptions={({ navigation }) => ({
           drawerPosition: "left",
-          drawerStyle: { width: 250, paddingTop: 20 },
+          drawerStyle: { width: 250, paddingTop: 20, backgroundColor: isDark ? Colors.darkModeBackground : 'white' },
           headerShown: false,
           headerLeft: () => (
             <TouchableOpacity
@@ -80,6 +85,7 @@ export default function Layout() {
           name="(tabs)"
           options={{
             drawerLabel: "Home",
+            drawerLabelStyle: { color: isDark ? Colors.darkModeText : Colors.text },
             drawerIcon: ({ color, size }) => (
               <Ionicons name="home-outline" size={size} color={color} />
             ),
@@ -89,8 +95,9 @@ export default function Layout() {
           name="setting"
           options={{
             drawerLabel: "Setting",
-            drawerIcon: ({ size, color }) => (
-              <Ionicons name="settings-outline" size={size} color={color} />
+            drawerLabelStyle: { color: isDark ? Colors.darkModeText : Colors.text },
+            drawerIcon: ({ size }) => (
+              <Ionicons name="settings-outline" size={size} color={Colors.assestGray} />
             ),
           }}
         />
@@ -98,11 +105,12 @@ export default function Layout() {
           name="AboutUs"
           options={{
             drawerLabel: "About Us",
-            drawerIcon: ({ size, color }) => (
+            drawerLabelStyle: { color: isDark ? Colors.darkModeText : Colors.text },
+            drawerIcon: ({ size }) => (
               <Ionicons
                 name="information-circle-outline"
                 size={size}
-                color={color}
+                color={Colors.assestGray}
               />
             ),
           }}
@@ -113,8 +121,9 @@ export default function Layout() {
             name="addApartment"
             options={{
               drawerLabel: "Add Apartment",
-              drawerIcon: ({ size, color }) => (
-                <Ionicons name="add-circle-outline" size={size} color={color} />
+              drawerLabelStyle: { color: isDark ? Colors.darkModeText : Colors.text },
+              drawerIcon: ({ size }) => (
+                <Ionicons name="add-circle-outline" size={size} color={Colors.assestGray} />
               ),
             }}
           />
@@ -123,8 +132,9 @@ export default function Layout() {
             name="FavoritesScreen"
             options={{
               drawerLabel: "Favorites",
-              drawerIcon: ({ size, color }) => (
-                <Ionicons name="heart-outline" size={size} color={color} />
+              drawerLabelStyle: { color: isDark ? Colors.darkModeText : Colors.text },
+              drawerIcon: ({ size }) => (
+                <Ionicons name="heart-outline" size={size} color={Colors.assestGray} />
               ),
             }}
           />
@@ -133,4 +143,3 @@ export default function Layout() {
     </GestureHandlerRootView>
   );
 }
-    

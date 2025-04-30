@@ -10,6 +10,8 @@ import HouseIcon from "@/assets/icons/house-01-svgrepo-com.svg";
 import CartIcon from "@/assets/icons/cart-svgrepo-com.svg";
 import ExploreIcon from "@/assets/icons/explore-svgrepo-com.svg";
 import ProfileIcon from "@/assets/icons/profile-svgrepo-com.svg";
+import Colors from '@/components/colors';
+import { useThemes } from '@/components/themeContext';
 
 export default function TabBar({
   state,
@@ -24,16 +26,18 @@ export default function TabBar({
     explore: (props: any) => <ExploreIcon width={30} height={30} {...props} />,
     profile: (props: any) => <ProfileIcon width={30} height={30} {...props} />,
   };
+  const { theme } = useThemes();
+  const isDark = theme === 'dark';
   return (
-    <View style={styles.tabbar}>
+    <View style={[styles.tabbar, { backgroundColor: isDark ? Colors.darkModePrimary : Colors.primary }]}>
       {state.routes.map((route, index) => {
         const { options } = descriptors[route.key];
         const label =
           options.tabBarLabel !== undefined
             ? options.tabBarLabel
             : options.title !== undefined
-            ? options.title
-            : route.name;
+              ? options.title
+              : route.name;
 
         const isFocused = state.index === index;
 
@@ -73,11 +77,11 @@ export default function TabBar({
             <Text style={{ color: isFocused ? "#fff" : "#fff" }}>
               {typeof label === "function"
                 ? label({
-                    focused: isFocused,
-                    color: isFocused ? "#fff" : "#fff",
-                    position: "below-icon",
-                    children: "",
-                  })
+                  focused: isFocused,
+                  color: isFocused ? "#fff" : "#fff",
+                  position: "below-icon",
+                  children: "",
+                })
                 : label}
             </Text>
           </PlatformPressable>
@@ -92,7 +96,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    backgroundColor: "#26326E",
+    backgroundColor: Colors.primary,
     paddingVertical: 15,
     // shadowColor: "#000",
     // shadowOffset: {
