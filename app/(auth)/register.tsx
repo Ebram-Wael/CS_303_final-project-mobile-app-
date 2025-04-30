@@ -24,7 +24,7 @@ import { setDoc, doc } from "firebase/firestore";
 import { ActivityIndicator, RadioButton } from "react-native-paper";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import colors from '@/components/colors';
+import Colors from '@/components/colors';
 
 import * as Notifications from 'expo-notifications';
 
@@ -88,12 +88,12 @@ const Register = () => {
 
   const [load, setLoad] = useState(false);
 
-  const [borderColor, setBorderColor] = useState(colors.orange);
-  const [borderColor1, setBorderColor1] = useState(colors.orange);
-  const [borderColor2, setBorderColor2] = useState(colors.orange);
-  const [borderColor3, setBorderColor3] = useState(colors.orange);
-  const [borderColor4, setBorderColor4] = useState(colors.orange);
-  const [borderColor5, setBorderColor5] = useState(colors.orange);
+  const [borderColor, setBorderColor] = useState(Colors.secondary);
+  const [borderColor1, setBorderColor1] = useState(Colors.secondary);
+  const [borderColor2, setBorderColor2] = useState(Colors.secondary);
+  const [borderColor3, setBorderColor3] = useState(Colors.secondary);
+  const [borderColor4, setBorderColor4] = useState(Colors.secondary);
+  const [borderColor5, setBorderColor5] = useState(Colors.secondary);
   const [valid, setValid] = useState(false);
 
   const [selectRole, setSelectRole] = useState("buyer");
@@ -220,7 +220,7 @@ const Register = () => {
        showsVerticalScrollIndicator={false} >
         <Text style={styles.header}>Create Account</Text>
         <View style={styles.txt}>
-          <Text style={{ color: colors.background }}>
+          <Text style={{ color: Colors.whiteText }}>
             Create an Account So You Can Explore Our Apartment{" "}
           </Text>
         </View>
@@ -247,8 +247,8 @@ const Register = () => {
         </View>
         <View>
           <TextInput
-            onFocus={() => setBorderColor(colors.background)}
-            onBlur={() => setBorderColor(colors.orange) }
+            onFocus={() => setBorderColor("white")}
+            onBlur={() => setBorderColor(Colors.secondary) }
             style={[styles.input, { borderColor }]}
             placeholder="Full Name"
             onChangeText={(text) => {
@@ -260,8 +260,8 @@ const Register = () => {
           
 
           <TextInput
-            onFocus={() => {setBorderColor2(colors.background) ;setTouchMail(true)}}
-            onBlur={() => setBorderColor2(colors.orange) }
+            onFocus={() => {setBorderColor2("white") ;setTouchMail(true)}}
+            onBlur={() => setBorderColor2(Colors.secondary) }
             style={[styles.input, { borderColor: borderColor2 }]}
             placeholder="Email"
             onChangeText={(text) => {
@@ -272,12 +272,12 @@ const Register = () => {
 
           <View style={[styles.inputContainer, { borderColor: borderColor3 }]}>
             <TextInput
-              onFocus={() => {setBorderColor3(colors.background)
+              onFocus={() => {setBorderColor3("white")
                 setTouchPass(true); 
 
               }}
               onBlur={() => {
-                setBorderColor3(colors.orange); 
+                setBorderColor3(Colors.secondary); 
               }}
               style={[styles.inputField]}
               secureTextEntry={showPassword}
@@ -289,7 +289,7 @@ const Register = () => {
             <MaterialCommunityIcons
               name={showPassword ? "eye-off" : "eye"}
               size={24}
-              color={colors.gray}
+              color={Colors.assestGray}
               onPress={ChangePassword}
               style={{}}
             />
@@ -300,10 +300,10 @@ const Register = () => {
 
           <View style={[styles.inputContainer, { borderColor: borderColor4 }]}>
             <TextInput
-              onFocus={() => {setBorderColor4(colors.background) ;
+              onFocus={() => {setBorderColor4("white") ;
                 setTouchConf(true) }}
               onBlur={() => {
-                setBorderColor4(colors.orange); 
+                setBorderColor4(Colors.secondary); 
               }}
               style={[styles.inputField]}
               secureTextEntry={showConfirmPassword}
@@ -315,7 +315,7 @@ const Register = () => {
             <MaterialCommunityIcons
               name={showConfirmPassword ? "eye-off" : "eye"}
               size={24}
-              color={colors.gray}
+              color={Colors.assestGray}
               onPress={ChangeStyleConfirmPassword}
             />
           </View>
@@ -325,16 +325,16 @@ const Register = () => {
         </View>
         <Pressable style={[styles.btn , {opacity: valid ? 1:0.5 } ]} onPress={handleSignup} disabled={!valid}>
           {load ? (
-            <ActivityIndicator color={colors.white} />
+            <ActivityIndicator color="white" />
           ) : (
-            <Text style={{ color: colors.white, fontSize: 18 }}> Sign Up</Text>
+            <Text style={{ color: Colors.whiteText, fontSize: 18 }}> Sign Up</Text>
           )}
         </Pressable>
 
         <View style={styles.join}>
           <Text> Already Have an Account?</Text>
           <Pressable onPress={() => router.push("/login")}>
-            <Text style={{ color: colors.black, textDecorationLine: "underline" }}>
+            <Text style={{ color: Colors.text, textDecorationLine: "underline" }}>
               {" "}
               Sign In{" "}
             </Text>
@@ -351,12 +351,12 @@ const styles = StyleSheet.create({
     height: 50,
     margin: 12,
     borderWidth: 1,
-    backgroundColor: colors.background,
+    backgroundColor: "white",
     width: 320,
     borderRadius: 5,
   },
   btn: {
-    backgroundColor: colors.blue,
+    backgroundColor: Colors.secondary,
     padding: 10,
     borderRadius: 5,
     width: 250,
@@ -369,7 +369,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    backgroundColor: colors.white,
+    backgroundColor: Colors.background,
     alignItems: "center",
     justifyContent: "center",
     paddingTop: 20,
@@ -381,7 +381,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textAlign: "center",
     marginBottom: 10,
-    color: colors.background,
+    color: Colors.text,
   },
   txt: {
     flexDirection: "row",
@@ -402,15 +402,15 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 20,
 
-    backgroundColor: colors.white,
+    backgroundColor: "white",
   },
   errorText: {
-    color: colors.red,
+    color: Colors.warning,
     marginLeft: 12,
     marginBottom: 5,
   },
   label: {
-    color: colors.black,
+    color: Colors.text,
     fontSize: 16,
     marginLeft: 5,
   },
@@ -432,7 +432,7 @@ const styles = StyleSheet.create({
     height: 50,
     margin: 12,
     borderWidth: 1,
-    backgroundColor: colors.white,
+    backgroundColor: "white",
     width: 320,
     borderRadius: 5,
     paddingHorizontal: 10,

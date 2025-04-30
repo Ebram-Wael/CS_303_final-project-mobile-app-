@@ -7,6 +7,8 @@ import { db } from "@/services/firebase";
 import { getAuth } from "firebase/auth";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ActivityIndicator } from "react-native-paper";
+import { useThemes } from '@/components/themeContext';
+import Colors from '@/components/colors';
 
 export default function EditProfile() {
     const [name, setName] = useState("");
@@ -15,6 +17,9 @@ export default function EditProfile() {
     const [loading, setLoading] = useState(false);
     const router = useRouter();
     const auth = getAuth();
+
+    const { theme } = useThemes();
+    const isDark = theme === 'dark';
 
     useEffect(() => {
         const getUserDetails = async () => {
@@ -79,14 +84,14 @@ export default function EditProfile() {
     };
 
     return (
-        <SafeAreaView style={styles.container}>
-            <Text style={styles.label}>Name</Text>
-            <TextInput value={name } onChangeText={setName} style={styles.input} />
-            <Text style={styles.label}>Phone</Text>
+        <SafeAreaView style={[styles.container, { backgroundColor: isDark ? Colors.darkModeBackground : Colors.background }]}>
+            <Text style={[styles.label, { color: isDark ? Colors.darkModeText : "#555" }]}>Name</Text>
+            <TextInput value={name} onChangeText={setName} style={styles.input} />
+            <Text style={[styles.label, , { color: isDark ? Colors.darkModeText : "#555" }]}>Phone</Text>
             <TextInput value={phone} onChangeText={setPhone} style={styles.input} keyboardType="phone-pad" />
-            <Text style={styles.label}>Email</Text>
+            <Text style={[styles.label, , { color: isDark ? Colors.darkModeText : "#555" }]}>Email</Text>
             <TextInput value={email} onChangeText={setEmail} style={styles.input} keyboardType="email-address" />
-            <Pressable onPress={handleUpdate} style={styles.button}>
+            <Pressable onPress={handleUpdate} style={[styles.button, { backgroundColor: isDark ? Colors.darkModeSecondary : "#7f51ff" }]}>
                 {loading ? (
                     <ActivityIndicator size="small" color="#fff" />
                 ) : (

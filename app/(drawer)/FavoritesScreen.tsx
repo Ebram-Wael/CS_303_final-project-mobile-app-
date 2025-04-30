@@ -16,6 +16,7 @@ import { doc, getDoc } from "firebase/firestore";
 import RedHeart from "@/assets/icons/heart-svgrepo-com (1).svg";
 import * as Notifications from "expo-notifications";
 import Colors from "@/components/colors";
+import { useThemes } from '@/components/themeContext';
 import Icon from "react-native-vector-icons/FontAwesome";
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -123,6 +124,9 @@ const FavoriteItem: React.FC<FavoriteItemProps> = ({
 };
 
 const FavoriteScreen: React.FC = () => {
+  const { theme } = useThemes();
+  const isDark = theme === 'dark';
+
   const [favoriteIds, setFavoriteIds] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -152,7 +156,7 @@ const FavoriteScreen: React.FC = () => {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: isDark ? Colors.darkModeBackground : Colors.background }]}>
       <FlatList
         data={favoriteIds}
         keyExtractor={(item) => item}
@@ -168,7 +172,7 @@ const FavoriteScreen: React.FC = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#f5f5f5",
+    backgroundColor: Colors.background,
   },
   container: {
     flex: 1,
@@ -211,11 +215,11 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 16,
     marginBottom: 5,
-    color: Colors.green,
+    color: Colors.assestGreen,
   },
   favoriteLocation: {
     fontSize: 14,
-    color: "#333",
+    color: Colors.text,
     marginBottom: 5,
   },
   removeButton: {
