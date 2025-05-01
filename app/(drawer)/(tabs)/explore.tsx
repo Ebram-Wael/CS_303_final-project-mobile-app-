@@ -13,13 +13,16 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { db } from "@/services/firebase";
 import { collection, onSnapshot, doc, getDoc } from "firebase/firestore";
-import colors from "@/components/colors";
+import Colors from "@/components/colors";
 import { debounce } from "lodash";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useThemes } from '@/components/themeContext'
 
 const defaultImage = "default.jpg";
 
 const HouseItem = ({ house }) => {
+  const { theme } = useThemes();
+  const isDark = theme === 'dark';
   const router = useRouter();
   const [owner, setOwner] = useState("");
   const [ownerId, setOwnerId] = useState("");
@@ -33,16 +36,17 @@ const HouseItem = ({ house }) => {
           if (userDoc.exists()) {
             setOwner(userDoc.data().name);
             setOwnerId(userDoc.id);
-            await AsyncStorage.setItem(
-              "owner",
-              JSON.stringify({ name: userDoc.data().name })
-            );
           } else {
             setOwner("Unknown");
           }
         } catch (error) {
           console.error("Error fetching owner:", error);
           setOwner("Error");
+          const data = await AsyncStorage.getItem("owner")
+          if (data) {
+            const parseData = JSON.parse(data)
+            setOwner(parseData.name)
+
           const data = await AsyncStorage.getItem("owner");
           if (data) {
             const parseData = JSON.parse(data);
@@ -67,7 +71,7 @@ const HouseItem = ({ house }) => {
           })
         }
       >
-        <View style={styles.card}>
+        <View style={[styles.card, { backgroundColor: isDark ? "#e0e0e0" : "white" }]}>
           <Text style={styles.title}>
             {house.availability_status || "No Title"}
           </Text>
@@ -84,7 +88,7 @@ const HouseItem = ({ house }) => {
                 })
               }
             >
-              <Text style={{ color: colors.blue }}>{owner || "Unknown"}</Text>
+              <Text style={{ color: Colors.assestBlue }}>{owner || "Unknown"}</Text>
             </Pressable>
           </View>
           <Image
@@ -111,6 +115,8 @@ export default function HouseList() {
   const [filteredHouses, setFilteredHouses] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const { theme } = useThemes();
+  const isDark = theme === 'dark';
 
   useEffect(() => {
     const colRef = collection(db, "Apartments");
@@ -124,6 +130,13 @@ export default function HouseList() {
           setAllHouses(houseList);
           setFilteredHouses(houseList);
           setIsLoading(false);
+          await AsyncStorage.setItem("apartmentData", JSON.stringify({ houseList })
+          )
+        });
+        return fetchHouses;
+      }
+      catch (Error) {
+        const data = await AsyncStorage.getItem("apartmentData")
           await AsyncStorage.setItem(
             "apartmentData",
             JSON.stringify({ houseList })
@@ -137,6 +150,16 @@ export default function HouseList() {
           setAllHouses(parseData);
           setFilteredHouses(parseData);
           setIsLoading(false);
+        }
+        else {
+          console.log("no data in local storage");
+        }
+      }
+    }
+    const unsubscribe = fetchData();
+    return () => {
+      if (unsubscribe) unsubscribe.then(unsub => unsub());
+    }
         } else {
           console.log("no data in local storage");
         }
@@ -146,6 +169,7 @@ export default function HouseList() {
     return () => {
       if (unsubscribe) unsubscribe.then((unsub) => unsub());
     };
+
   }, []);
 
   const handleSearch = useCallback(
@@ -187,12 +211,12 @@ export default function HouseList() {
   };
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.container}>
-        <Text style={styles.header}>Houses</Text>
+    <ScrollView style={[styles.container, { backgroundColor: isDark ? Colors.darkModeBackground : Colors.background }]}>
+      <View style={[styles.container, { backgroundColor: isDark ? Colors.darkModeBackground : Colors.background }]}>
+        <Text style={[styles.header, { color: isDark ? Colors.darkModeText : Colors.text }]}>Houses</Text>
 
         {/* Search bar */}
-        <View style={styles.searchContainer}>
+        <View style={[styles.searchContainer, { backgroundColor: isDark ? "#e0e0e0" : "white" }]}>
           <TextInput
             placeholder="Search location, features, price..."
             clearButtonMode="always"
@@ -206,7 +230,7 @@ export default function HouseList() {
 
         {isLoading ? (
           <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color={colors.blue} />
+            <ActivityIndicator size="large" color={Colors.assestBlue} />
           </View>
         ) : filteredHouses.length > 0 ? (
           filteredHouses.map((house) => (
@@ -225,17 +249,17 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: colors.background,
+    backgroundColor: Colors.background,
   },
   header: {
     fontSize: 26,
     fontWeight: "bold",
     textAlign: "center",
     marginBottom: 20,
-    color: colors.black,
+    color: Colors.text,
   },
   card: {
-    backgroundColor: colors.white,
+    backgroundColor: "white",
     padding: 15,
     marginBottom: 15,
     borderRadius: 16,
@@ -251,23 +275,23 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 17,
     fontWeight: "bold",
-    color: colors.black,
+    color: Colors.text,
     marginBottom: 5,
   },
   owner: {
     fontSize: 14,
-    color: colors.black,
+    color: Colors.text,
     marginBottom: 5,
   },
   description: {
     fontSize: 14,
-    color: colors.gray,
+    color: Colors.assestGray,
     marginBottom: 10,
   },
   price: {
     fontSize: 18,
     fontWeight: "bold",
-    color: colors.blue,
+    color: Colors.assestBlue,
   },
   ownerContainer: {
     flexDirection: "row",
@@ -275,20 +299,20 @@ const styles = StyleSheet.create({
   },
   address: {
     fontSize: 14,
-    color: colors.gray,
+    color: Colors.assestGray,
     marginTop: 5,
   },
   loadingText: {
     textAlign: "center",
     fontSize: 16,
-    color: colors.gray,
+    color: Colors.assestGray,
     marginTop: 20,
   },
 
   // New styles for search
   searchContainer: {
     marginBottom: 15,
-    backgroundColor: colors.white,
+    backgroundColor: "white",
     borderRadius: 16,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },

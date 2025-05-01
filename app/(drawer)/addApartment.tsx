@@ -16,7 +16,8 @@ import { db } from "@/services/firebase";
 import * as ImagePicker from "expo-image-picker";
 import { getAuth } from "firebase/auth";
 import { useRouter } from "expo-router";
-import colors from '@/components/colors';
+import Colors from '@/components/colors';
+import { useThemes } from '@/components/themeContext'
 
 export default function AddApartment() {
   const [unitNum, setunitNum] = useState("");
@@ -42,6 +43,8 @@ export default function AddApartment() {
 
   const router = useRouter();
 
+  const { theme } = useThemes();
+  const isDark = theme === 'dark';
   useEffect(() => {
     if (user) {
       setSellerId(user.uid);
@@ -131,7 +134,7 @@ export default function AddApartment() {
     }
   };
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: isDark ? Colors.darkModeBackground : Colors.background }]}>
       <ScrollView showsVerticalScrollIndicator={false}>
         <Text style={styles.text}> Add your Apartment </Text>
         <Image
@@ -190,7 +193,7 @@ export default function AddApartment() {
         />
         {errorFeatures && <Text style={styles.error}>{errorFeatures}</Text>}
         <Pressable style={styles.pickImageButton} onPress={pickImage}>
-          <Text style={styles.txt}>Upload Image</Text>
+          <Text style={[styles.txt, { color: isDark ? Colors.darkModeText : Colors.text }]}>Upload Image</Text>
         </Pressable>
         <ScrollView horizontal>
           {image.map((uri, index) => (
@@ -200,7 +203,7 @@ export default function AddApartment() {
         {errorImage && <Text style={styles.error}>{errorImage}</Text>}
         <View style={styles.sub}>
           <Pressable
-            style={styles.btn}
+            style={[styles.btn, { backgroundColor: isDark ? Colors.darkModeSecondary : Colors.secondary }]}
             onPress={async () => await handleSubmit()}
           >
             <Text>ADD APARTMENT</Text>
@@ -213,7 +216,7 @@ export default function AddApartment() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: Colors.background,
     alignItems: "center",
     justifyContent: "center",
     paddingTop: 30,
@@ -222,12 +225,12 @@ const styles = StyleSheet.create({
     height: 50,
     margin: 12,
     borderWidth: 1,
-    backgroundColor: colors.white ,
+    backgroundColor: "white",
     width: 320,
     borderRadius: 5,
   },
   btn: {
-    backgroundColor:colors.orange ,
+    backgroundColor: Colors.secondary,
     width: 200,
     height: 50,
     paddingVertical: 12,
@@ -262,7 +265,7 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   error: {
-    color: colors.red,
+    color: Colors.warning,
     fontSize: 12,
     marginLeft: 12,
     marginBottom: 10,

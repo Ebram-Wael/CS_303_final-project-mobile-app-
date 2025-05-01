@@ -10,16 +10,20 @@ import {
 import { useLocalSearchParams } from "expo-router";
 import { useRouter } from "expo-router";
 import Icon from "react-native-vector-icons/FontAwesome";
-import colors from '@/components/colors';
+import Colors from '@/components/colors';
 import { useEffect, useState } from "react";
 import { db } from '@/services/firebase';
 import { collection, query, where, onSnapshot, getDoc, doc } from "firebase/firestore";
+import { useThemes } from '@/components/themeContext';
 
 export default function OwnerDetails() {
   const { ownerId } = useLocalSearchParams<{ ownerId: string }>();
   const router = useRouter();
   const [owner, setOwner] = useState<any>(null);
   const [ownedHouses, setOwnedHouses] = useState<any[]>([]);
+   const { theme } = useThemes();
+    const isDark = theme === 'dark';
+
   useEffect(() => {
     const fetchOwner = async () => {
       try {
@@ -57,7 +61,7 @@ export default function OwnerDetails() {
   }, [ownerId]);
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={[styles.container,{backgroundColor:isDark?Colors.darkModeBackground:Colors.background}]}>
       <Text style={styles.header}>Owner Details</Text>
       {owner ? (
         <View style={styles.card}>
@@ -73,7 +77,7 @@ export default function OwnerDetails() {
               <Icon
                 name="phone"
                 size={20}
-                color={colors.blue}
+                color={Colors.assestGray}
                 style={styles.icon}
               />
               <Text style={styles.info}>{owner.phone || "Not Available"}</Text>
@@ -82,7 +86,7 @@ export default function OwnerDetails() {
               <Icon
                 name="envelope"
                 size={20}
-                color={colors.blue}
+                color={Colors.assestGray}
                 style={styles.icon}
               />
               <Text style={styles.info}>{owner.email || "Not Available"}</Text>
@@ -128,17 +132,17 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: colors.background,
+    backgroundColor: Colors.background,
   },
   header: {
     fontSize: 26,
     fontWeight: "bold",
     textAlign: "center",
     marginBottom: 20,
-    color: colors.black,
+    color: Colors.text,
   },
   card: {
-    backgroundColor: colors.white,
+    backgroundColor: "white",
     padding: 20,
     borderRadius: 10,
     alignItems: "center",
@@ -155,13 +159,13 @@ const styles = StyleSheet.create({
     borderRadius: 100,
     marginBottom: 10,
     borderWidth: 4,
-    borderColor: colors.black,
+    borderColor: "black",
   },
   name: {
     fontSize: 18,
     fontWeight: "bold",
     marginBottom: 20,
-    color: "#222",
+    color: Colors.text,
     textAlign: "center",
   },
   detailsContainer: {
@@ -182,7 +186,7 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 16,
-    color: "red",
+    color: Colors.warning,
     textAlign: "center",
   },
   subHeader: {
@@ -190,11 +194,11 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginTop: 20,
     marginBottom: 10,
-    color: colors.black,
+    color: Colors.text,
   },
   houseCard: {
     flexDirection: "row",
-    backgroundColor: colors.white,
+    backgroundColor: "white",
     padding: 10,
     borderRadius: 10,
     // shadowColor: "#000",
@@ -227,7 +231,7 @@ const styles = StyleSheet.create({
   price: {
     fontSize: 16,
     fontWeight: "bold",
-    color: colors.blue,
+    color: Colors.assestBlue,
   },
   noHousesText: {
     fontSize: 16,

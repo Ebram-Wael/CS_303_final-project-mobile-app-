@@ -18,7 +18,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { ActivityIndicator } from "react-native-paper";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import colors from '@/components/colors';
+import Colors from '@/components/colors';
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/services/firebase";
 
@@ -45,24 +45,27 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [isValid, setIsValid] = useState(false);
 
-  const [name ,setName] =useState("")
+  const [name, setName] = useState("")
 
   const ChangePassword = () => {
     setShowPassword(!showPassword);
   };
 
-    async function requestNotificationPermissions() {
+  async function requestNotificationPermissions() {
+    if (Platform.OS !== "web") {
       const { status } = await Notifications.requestPermissionsAsync();
       if (status !== 'granted') {
         Alert.alert('Notification permissions not granted');
       }
     }
-  
-    useEffect(()=>{
-      requestNotificationPermissions();
-    },[])
-  
-    async function sendWelcomeNotification(username) {
+  }
+
+  useEffect(() => {
+    requestNotificationPermissions();
+  }, [])
+
+  async function sendWelcomeNotification(username: string) {
+    if (Platform.OS !== "web") {
       await Notifications.scheduleNotificationAsync({
         content: {
           title: "Welcome Back!",
@@ -72,6 +75,7 @@ const Login = () => {
         trigger: null,
       });
     }
+  }
   useEffect(() => {
     const isEmailValid = email.includes('@');
     const isPasswordValid = password.length >= 8;
@@ -80,20 +84,23 @@ const Login = () => {
 
   const handleLogIN = async (e) => {
     e.preventDefault();
-    if(loading) return;
+    if (loading) return;
     setLoading(true);
     try {
       const cardinality = await signInWithEmailAndPassword(auth, email, password);
       const user = cardinality.user;
       const docc = doc(db, "Users", user.uid);
-      const userdoc =await getDoc(docc);
-      if(userdoc){
-        const data=userdoc.data()
+      const userdoc = await getDoc(docc);
+      if (userdoc) {
+        const data = userdoc.data()
         setName(data.name);
       }
       await AsyncStorage.setItem("userData", JSON.stringify({
         uid: user.uid,
-        email: user.email
+        email: user.email,
+        name: name,
+        phone: user.phoneNumber,
+        imageurl: user.photoURL
       }));
       sendWelcomeNotification(name);
       setTimeout(() => router.replace('/(drawer)/(tabs)/profile'), 500);
@@ -124,7 +131,7 @@ const Login = () => {
         >
           <Text style={styles.header}>Login Here</Text>
           <View style={styles.txt}>
-            <Text style={{ color: colors.darkblue }}>
+            <Text style={{ color: Colors.primary }}>
               Welcome Back You've Been Missed!
             </Text>
           </View>
@@ -134,8 +141,8 @@ const Login = () => {
               source={log}
             />
             <TextInput
-              onFocus={() => setBorderColor(colors.orange)}
-              onBlur={() => setBorderColor(colors.darkblue)}
+              onFocus={() => setBorderColor(Colors.secondary)}
+              onBlur={() => setBorderColor(Colors.primary)}
               style={[styles.input, { borderColor }]}
               placeholder="Email"
               onChangeText={(text) => setEmail(text)}
@@ -143,8 +150,8 @@ const Login = () => {
             />
             <View style={[styles.inputContainer, { borderColor: borderColor1 }]}>
               <TextInput
-                onFocus={() => setBorderColor1(colors.orange)}
-                onBlur={() => setBorderColor1(colors.darkblue)}
+                onFocus={() => setBorderColor1(Colors.secondary)}
+                onBlur={() => setBorderColor1(Colors.primary)}
                 style={[styles.inputField]}
                 secureTextEntry={showPassword}
                 placeholder="Password"
@@ -154,7 +161,7 @@ const Login = () => {
               <MaterialCommunityIcons
                 name={showPassword ? "eye-off" : "eye"}
                 size={24}
-                color={colors.gray}
+                color={Colors.assestGray}
                 onPress={ChangePassword}
               />
             </View>
@@ -166,16 +173,16 @@ const Login = () => {
             disabled={!isValid}
           >
             {loading ? (
-              <ActivityIndicator size="small" color={colors.white} />
+              <ActivityIndicator size="small" color="white" />
             ) : (
-              <Text style={{ color: colors.white, fontSize: 18 }}>Login</Text>
+              <Text style={{ color: Colors.whiteText, fontSize: 18 }}>Login</Text>
             )}
           </Pressable>
 
           <View style={styles.join}>
             <Text> Create an Account?</Text>
             <Pressable onPress={() => router.push("/register")}>
-              <Text style={{ color: colors.blue, textDecorationLine: "underline" }}>
+              <Text style={{ color: Colors.assestBlue, textDecorationLine: "underline" }}>
                 Sign Up
               </Text>
             </Pressable>
@@ -189,7 +196,7 @@ const Login = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: Colors.background,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -197,7 +204,7 @@ const styles = StyleSheet.create({
     height: 50,
     margin: 12,
     borderWidth: 1,
-    backgroundColor: colors.white,
+    backgroundColor: "white",
     width: 320,
     borderRadius: 5,
     borderColor: "#FFFE91",
@@ -207,7 +214,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textAlign: "center",
     marginBottom: 10,
-    color: colors.orange,
+    color: Colors.secondary,
   },
   txt: {
     flexDirection: "row",
@@ -218,7 +225,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   btn: {
-    backgroundColor: colors.orange,
+    backgroundColor: Colors.secondary,
     padding: 10,
     borderRadius: 5,
     width: 250,
@@ -241,7 +248,7 @@ const styles = StyleSheet.create({
     height: 50,
     margin: 12,
     borderWidth: 1,
-    backgroundColor: colors.white,
+    backgroundColor: "white",
     width: 320,
     borderRadius: 5,
     paddingHorizontal: 10,
@@ -251,7 +258,7 @@ const styles = StyleSheet.create({
     height: "100%",
   },
   errorText: {
-    color: colors.red,
+    color: Colors.warning,
     marginLeft: 12,
     marginBottom: 5,
   },
