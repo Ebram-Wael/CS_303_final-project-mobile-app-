@@ -13,17 +13,31 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { db } from "@/services/firebase";
 import { collection, onSnapshot, doc, getDoc } from "firebase/firestore";
-import Colors from "@/components/colors";
 import { debounce } from "lodash";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useThemes } from "@/components/themeContext";
+import FilterIcon from "@/assets/icons/filter.svg";
+import Filters from "@/components/Filters";
+import { MaterialIcons } from "@expo/vector-icons";
+import * as Haptics from "expo-haptics";
+
+const COLORS = {
+  primaryDark: "#023336",
+  primary: "#4DA674",
+  primaryLight: "#C1E6B7",
+  background: "#EAF8E7",
+  text: "#023336",
+  textLight: "#4DA674",
+  white: "#FFFFFF",
+  success: "#81C784",
+};
 
 const STORAGE_KEYS = {
   APARTMENTS: "apartmentData",
   OWNER: "owner",
 };
 
-import defaultImage from "@/assets/images/default.jpg";
+import defaultImage from "@/assets/images/default.png";
 
 const HouseItem = ({ house }) => {
   const { theme } = useThemes();
@@ -69,6 +83,7 @@ const HouseItem = ({ house }) => {
   }, [house.seller_id]);
 
   const navigateToDetails = () => {
+    Haptics.selectionAsync();
     router.push({
       pathname: "/screens/[moreview]",
       params: { moreview: house.id },
@@ -77,6 +92,7 @@ const HouseItem = ({ house }) => {
 
   const navigateToOwner = () => {
     if (ownerId) {
+      Haptics.selectionAsync();
       router.push({
         pathname: "/screens/owner",
         params: { ownerId },
@@ -85,73 +101,121 @@ const HouseItem = ({ house }) => {
   };
 
   return (
-    <SafeAreaView>
-      <Pressable onPress={navigateToDetails}>
-        <View
-          style={[styles.card, { backgroundColor: isDark ? "#333" : "white" }]}
+    <Pressable
+      onPress={navigateToDetails}
+      style={({ pressed }) => [styles.cardContainer, pressed && styles.pressed]}
+    >
+      <View
+        style={[
+          styles.card,
+          { backgroundColor: isDark ? "#333" : COLORS.white },
+        ]}
+      >
+        <View style={styles.cardHeader}>
+          <Text
+            style={[
+              styles.title,
+              { color: isDark ? COLORS.white : COLORS.text },
+            ]}
+          >
+            {house.features || house.property_type || "House"}
+          </Text>
+        </View>
+
+        <Text
+          style={[
+            styles.address,
+            { color: isDark ? COLORS.primaryLight : COLORS.textLight },
+          ]}
         >
-          <Text
-            style={[styles.title, { color: isDark ? "#fff" : Colors.text }]}
-          >
-            {house.title || house.property_type || "House"}
-          </Text>
-          <Text
-            style={[
-              styles.address,
-              { color: isDark ? "#bbb" : Colors.assestGray },
-            ]}
-          >
-            {house.location || "Unknown Location"}
-          </Text>
-          <View style={styles.ownerContainer}>
-            <Text
-              style={[styles.owner, { color: isDark ? "#fff" : Colors.text }]}
-            >
-              Owner:{" "}
-            </Text>
-            <Pressable onPress={navigateToOwner}>
-              <Text style={{ color: Colors.assestBlue }}>
-                {owner || "Unknown"}
-              </Text>
-            </Pressable>
-          </View>
-          <View style={styles.imageContainer}>
-            <Image
-              source={{
-                uri:
-                  house.image && house.image[0] ? house.image[0] : defaultImage,
-              }}
-              style={styles.image}
-              defaultSource={defaultImage}
+          {house.location || "Unknown Location"}
+        </Text>
+
+        <View style={styles.imageContainer}>
+          <Image
+            source={{
+              uri:
+                house.image && house.image[0] ? house.image[0] : defaultImage,
+            }}
+            style={styles.image}
+            defaultSource={defaultImage}
+          />
+        </View>
+
+        <View style={styles.detailsContainer}>
+          <View style={styles.detailRow}>
+            <MaterialIcons
+              name="hotel"
+              size={18}
+              color={isDark ? COLORS.primaryLight : COLORS.textLight}
             />
-          </View>
-          <Text
-            style={[
-              styles.description,
-              { color: isDark ? "#bbb" : Colors.assestGray },
-            ]}
-            numberOfLines={2}
-          >
-            Description: {house.features || "No description available"}
-          </Text>
-          <View style={styles.priceContainer}>
             <Text
               style={[
-                styles.price,
-                { color: isDark ? "#80b3ff" : Colors.assestBlue },
+                styles.detailText,
+                { color: isDark ? COLORS.primaryLight : COLORS.textLight },
               ]}
             >
-              Price: {house.rent > 0 ? `${house.rent}` : "Invalid Price"} EGP
+              {house.num_bedrooms || "N/A"} Beds
             </Text>
+
+            <MaterialIcons
+              name="layers"
+              size={18}
+              color={isDark ? COLORS.primaryLight : COLORS.textLight}
+              style={styles.detailIcon}
+            />
+            <Text
+              style={[
+                styles.detailText,
+                { color: isDark ? COLORS.primaryLight : COLORS.textLight },
+              ]}
+            >
+              Floor {house.floor || "N/A"}
+            </Text>
+          </View>
+        </View>
+
+        <View style={styles.footer}>
+          <View style={styles.footerLeft}>
+            <View style={styles.ownerContainer}>
+              <Text
+                style={[
+                  styles.owner,
+                  { color: isDark ? COLORS.white : COLORS.text },
+                ]}
+              >
+                Owner:{" "}
+              </Text>
+              <Pressable onPress={navigateToOwner}>
+                <Text style={{ color: COLORS.primary }}>
+                  {owner || "Unknown"}
+                </Text>
+              </Pressable>
+            </View>
+
             {house.availability_status === "Available" && (
-              <View style={styles.availabilityBadge}>
+              <View
+                style={[
+                  styles.availabilityBadge,
+                  { backgroundColor: isDark ? COLORS.success : COLORS.primary },
+                ]}
+              >
                 <Text style={styles.availabilityText}>Available</Text>
               </View>
             )}
           </View>
+
+          <Text
+            style={[
+              styles.price,
+              { color: isDark ? COLORS.primaryLight : COLORS.primary },
+            ]}
+          >
+            {house.rent > 0 ? `${house.rent.toLocaleString()}` : "N/A"} EGP
+          </Text>
         </View>
-      </Pressable>
-    </SafeAreaView>
+      </View>
+    </Pressable>
   );
 };
 
@@ -162,6 +226,16 @@ export default function HouseList() {
   const [searchQuery, setSearchQuery] = useState("");
   const { theme } = useThemes();
   const isDark = theme === "dark";
+
+  const [filters, setFilters] = useState({
+    priceRange: { min: 0, max: 10000 },
+    bedrooms: [],
+    locations: [],
+    status: [],
+    propertyType: [],
+  });
+
+  const [showFilters, setShowFilters] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -224,75 +298,84 @@ export default function HouseList() {
   }, []);
 
   const handleSearch = useCallback(
-    debounce((query) => {
-      if (!query.trim()) {
-        setFilteredHouses(allHouses);
-        return;
+    debounce((query, currentFilters) => {
+      let results = [...allHouses];
+
+      results = results.filter((house) => {
+        const price = Number(house.rent) || 0;
+        return (
+          price >= currentFilters.priceRange.min &&
+          price <= currentFilters.priceRange.max
+        );
+      });
+      if (currentFilters.bedrooms.length > 0) {
+        results = results.filter((house) => {
+          const beds = house.num_bedrooms;
+          return currentFilters.bedrooms.some((filterBed) => {
+            if (filterBed === "4+") return Number(beds) >= 4;
+            return beds === filterBed;
+          });
+        });
+      }
+      if (currentFilters.propertyType.length > 0) {
+        results = results.filter(
+          (house) =>
+            house.property_type &&
+            currentFilters.propertyType.includes(house.property_type)
+        );
+      }
+      if (currentFilters.status.length > 0) {
+        results = results.filter(
+          (house) =>
+            house.availability_status &&
+            currentFilters.status.includes(house.availability_status)
+        );
       }
 
-      const searchTerms = query.toLowerCase().trim().split(/\s+/);
-
-      const filtered = allHouses.filter((house) => {
-        return searchTerms.some((term) => {
-          const location = (house.location || "").toLowerCase();
-          const features = (house.features || "").toLowerCase();
-          const status = (house.availability_status || "").toLowerCase();
-          const bedrooms = String(house.num_bedrooms || "");
-          const floor = String(house.floor || "");
-          const price = String(house.rent || "");
-
-          const isUnderPrice =
-            term.startsWith("under-") &&
-            parseInt(price) <= parseInt(term.substring(6));
-
-          const hasMatchingKeyword =
-            Array.isArray(house.keywords) &&
-            house.keywords.some((keyword) =>
-              (keyword || "").toLowerCase().includes(term)
-            );
-
-          return (
-            location.includes(term) ||
-            features.includes(term) ||
-            bedrooms.includes(term) ||
-            isUnderPrice ||
-            price === term ||
-            status.includes(term) ||
-            floor.includes(term) ||
-            hasMatchingKeyword
-          );
-        });
-      });
-
-      setFilteredHouses(filtered);
+      setFilteredHouses(results);
     }, 300),
     [allHouses]
   );
 
   const onChangeText = (query) => {
     setSearchQuery(query);
-    handleSearch(query);
+    handleSearch(query, filters);
   };
+
+  const applyFilters = useCallback(
+    (newFilters) => {
+      setFilters(newFilters);
+      handleSearch(searchQuery, newFilters);
+    },
+    [handleSearch, searchQuery]
+  );
 
   const renderContent = useMemo(() => {
     if (isLoading) {
       return (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={Colors.assestBlue} />
+          <ActivityIndicator size="large" color={COLORS.primary} />
         </View>
       );
     }
 
     if (filteredHouses.length === 0) {
       return (
-        <Text
-          style={[
-            styles.loadingText,
-            { color: isDark ? "#bbb" : Colors.assestGray },
-          ]}
-        >
-          No houses found
-        </Text>
+        <View style={styles.emptyState}>
+          <MaterialIcons
+            name="search-off"
+            size={48}
+            color={isDark ? COLORS.textLight : COLORS.primaryLight}
+          />
+          <Text
+            style={[
+              styles.loadingText,
+              { color: isDark ? COLORS.primaryLight : COLORS.textLight },
+            ]}
+          >
+            No houses match your search
+          </Text>
+        </View>
       );
     }
 
@@ -302,81 +385,120 @@ export default function HouseList() {
   }, [isLoading, filteredHouses, isDark]);
 
   return (
-    <ScrollView
+    <View
       style={[
         styles.container,
-        {
-          backgroundColor: isDark
-            ? Colors.darkModeBackground
-            : Colors.background,
-        },
+        { backgroundColor: isDark ? COLORS.primaryDark : COLORS.background },
       ]}
-      contentContainerStyle={styles.contentContainer}
     >
-      <Text
-        style={[
-          styles.header,
-          { color: isDark ? Colors.darkModeText : Colors.text },
-        ]}
-      >
-        Houses
-      </Text>
-
+      <SafeAreaView edges={["top"]} style={styles.headerContainer}>
+        <Text
+          style={[
+            styles.header,
+            { color: isDark ? COLORS.white : COLORS.text },
+          ]}
+        >
+          Available Properties
+        </Text>
+      </SafeAreaView>
       <View
         style={[
           styles.searchContainer,
-          { backgroundColor: isDark ? "#333" : "white" },
+          { backgroundColor: isDark ? COLORS.primaryDark : COLORS.white },
         ]}
       >
         <TextInput
           placeholder="Search location, features, price..."
-          placeholderTextColor={isDark ? "#999" : "#666"}
-          clearButtonMode="always"
-          style={[styles.searchBox, { color: isDark ? "#fff" : "#000" }]}
+          placeholderTextColor={isDark ? COLORS.primaryLight : COLORS.textLight}
+          clearButtonMode="while-editing"
+          style={[
+            styles.searchBox,
+            { color: isDark ? COLORS.white : COLORS.text },
+          ]}
           autoCapitalize="none"
           autoCorrect={false}
           value={searchQuery}
           onChangeText={onChangeText}
+          cursorColor={COLORS.primary}
         />
+        <Pressable
+          onPress={() => {
+            Haptics.selectionAsync();
+            setShowFilters(true);
+          }}
+          style={({ pressed }) => [
+            styles.filterButton,
+            pressed && styles.pressed,
+          ]}
+        >
+          <FilterIcon width={24} height={24} />
+        </Pressable>
       </View>
-
-      {renderContent}
-    </ScrollView>
+      <ScrollView
+        contentContainerStyle={styles.contentContainer}
+        showsVerticalScrollIndicator={false}
+      >
+        {renderContent}
+      </ScrollView>
+      <Filters
+        visible={showFilters}
+        onClose={() => setShowFilters(false)}
+        onApply={applyFilters}
+        initialFilters={filters}
+      />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
   },
-  contentContainer: {
-    padding: 20,
-    paddingBottom: 40,
+  headerContainer: {
+    paddingHorizontal: 20,
+    paddingTop: 10,
+    paddingBottom: 5,
   },
   header: {
-    fontSize: 26,
+    fontSize: 24,
     fontWeight: "bold",
-    textAlign: "center",
-    marginBottom: 20,
-    color: Colors.text,
+  },
+  contentContainer: {
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+  },
+  cardContainer: {
+    marginBottom: 15,
   },
   card: {
-    backgroundColor: "white",
-    padding: 15,
-    marginBottom: 15,
+    padding: 16,
     borderRadius: 16,
-    elevation: 4,
+    elevation: 2,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
   },
+  cardHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: "bold",
+    flex: 1,
+  },
+  address: {
+    fontSize: 14,
+    marginBottom: 12,
+  },
   imageContainer: {
     width: "100%",
     height: 180,
     borderRadius: 12,
-    marginBottom: 10,
+    marginBottom: 12,
     overflow: "hidden",
     backgroundColor: "#f0f0f0",
   },
@@ -385,77 +507,90 @@ const styles = StyleSheet.create({
     height: "100%",
     resizeMode: "cover",
   },
-  title: {
-    fontSize: 17,
-    fontWeight: "bold",
-    color: Colors.text,
-    marginBottom: 5,
+  detailsContainer: {
+    marginBottom: 12,
   },
-  owner: {
-    fontSize: 14,
-    color: Colors.text,
-  },
-  description: {
-    fontSize: 14,
-    color: Colors.assestGray,
-    marginBottom: 10,
-  },
-  priceContainer: {
+  detailRow: {
     flexDirection: "row",
     alignItems: "center",
+    marginBottom: 6,
+  },
+  detailText: {
+    fontSize: 14,
+    marginLeft: 4,
+  },
+  detailIcon: {
+    marginLeft: 12,
+  },
+  footer: {
+    flexDirection: "row",
     justifyContent: "space-between",
+    alignItems: "center",
   },
-  price: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: Colors.assestBlue,
-  },
-  availabilityBadge: {
-    backgroundColor: "#81C784",
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 8,
-    marginLeft: 10,
-  },
-  availabilityText: {
-    color: "white",
-    fontSize: 12,
-    fontWeight: "bold",
+  footerLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
   },
   ownerContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 10,
   },
-  address: {
+  owner: {
     fontSize: 14,
-    color: Colors.assestGray,
-    marginBottom: 5,
   },
-  loadingText: {
-    textAlign: "center",
-    fontSize: 16,
-    color: Colors.assestGray,
-    marginTop: 40,
+  price: {
+    fontSize: 18,
+    fontWeight: "bold",
   },
-  searchContainer: {
-    marginBottom: 15,
-    backgroundColor: "white",
-    borderRadius: 16,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
+  availabilityBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
   },
-  searchBox: {
-    paddingHorizontal: 15,
-    paddingVertical: 12,
-    borderRadius: 16,
-    fontSize: 16,
+  availabilityText: {
+    color: "#fff",
+    fontSize: 12,
+    fontWeight: "bold",
   },
   loadingContainer: {
     paddingVertical: 40,
     alignItems: "center",
+  },
+  emptyState: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 40,
+  },
+  loadingText: {
+    fontSize: 16,
+    marginTop: 16,
+  },
+  searchContainer: {
+    marginHorizontal: 20,
+    marginVertical: 15,
+    flexDirection: "row",
+    alignItems: "center",
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+  },
+  searchBox: {
+    flex: 1,
+    fontSize: 16,
+    paddingVertical: 8,
+  },
+  filterButton: {
+    padding: 8,
+    borderRadius: 8,
+  },
+  pressed: {
+    opacity: 0.7,
+    transform: [{ scale: 0.98 }],
   },
 });
