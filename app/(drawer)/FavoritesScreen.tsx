@@ -16,8 +16,8 @@ import { doc, getDoc } from "firebase/firestore";
 import RedHeart from "@/assets/icons/heart-svgrepo-com (1).svg";
 import * as Notifications from "expo-notifications";
 import Colors from "@/components/colors";
-import { useThemes } from '@/components/themeContext';
-import Icon from "react-native-vector-icons/FontAwesome";
+import { useThemes } from "@/components/themeContext";
+
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
@@ -25,6 +25,7 @@ Notifications.setNotificationHandler({
     shouldSetBadge: true,
   }),
 });
+import { useRouter } from "expo-router";
 async function requestNotificationPermissions() {
   const { status } = await Notifications.requestPermissionsAsync();
   if (status !== "granted") {
@@ -44,11 +45,13 @@ interface HouseData {
 interface FavoriteItemProps {
   favoriteId: string;
   onRemove: (id: string) => void;
+  onPress: (id: string) => void;
 }
 
 const FavoriteItem: React.FC<FavoriteItemProps> = ({
   favoriteId,
   onRemove,
+  onPress,
 }) => {
   const [house, setHouse] = useState<HouseData | null>(null);
 
@@ -95,7 +98,7 @@ const FavoriteItem: React.FC<FavoriteItemProps> = ({
 
   return (
     <SafeAreaView>
-      <View style={styles.favoriteItem}>
+      <Pressable onPress={() => onPress(house.id)} style={styles.favoriteItem}>
         {house.image && Array.isArray(house.image) && house.image.length > 0 ? (
           <Image
             source={{ uri: house.image[0] }}
@@ -118,14 +121,15 @@ const FavoriteItem: React.FC<FavoriteItemProps> = ({
         <Pressable onPress={handleRemoveFavorite} style={styles.removeButton}>
           <RedHeart width={25} height={25} />
         </Pressable>
-      </View>
+      </Pressable>
     </SafeAreaView>
   );
 };
 
 const FavoriteScreen: React.FC = () => {
   const { theme } = useThemes();
-  const isDark = theme === 'dark';
+  const isDark = theme === "dark";
+  const router = useRouter();
 
   const [favoriteIds, setFavoriteIds] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -154,14 +158,32 @@ const FavoriteScreen: React.FC = () => {
   const handleRemoveFavorite = (removedId: string) => {
     setFavoriteIds((prevIds) => prevIds.filter((id) => id !== removedId));
   };
-
+  const handlePress = (id: string) => {
+    router.push({
+      pathname: "/screens/[moreview]",
+      params: { moreview: id },
+    });
+  };
   return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor: isDark ? Colors.darkModeBackground : Colors.background }]}>
+    <SafeAreaView
+      style={[
+        styles.safeArea,
+        {
+          backgroundColor: isDark
+            ? Colors.darkModeBackground
+            : Colors.background,
+        },
+      ]}
+    >
       <FlatList
         data={favoriteIds}
         keyExtractor={(item) => item}
         renderItem={({ item }) => (
-          <FavoriteItem favoriteId={item} onRemove={handleRemoveFavorite} />
+          <FavoriteItem
+            favoriteId={item}
+            onRemove={handleRemoveFavorite}
+            onPress={handlePress}
+          />
         )}
         contentContainerStyle={styles.listContainer}
       />
