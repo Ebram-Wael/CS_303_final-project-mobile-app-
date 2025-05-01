@@ -80,6 +80,12 @@ export default function index() {
           >
             <Text style={{ color: "white" }}>Click me!</Text>
           </Pressable>
+          <Pressable
+            style={styles.btn}
+            onPress={() => router.push("../../screens/Maps")}
+          >
+            <Text style={{ color: "white" }}>Maps</Text>
+          </Pressable>
         </View>
       </ScrollView>
     </SafeAreaView>
