@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import {
   View,
   Text,
@@ -13,100 +13,209 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { db } from "@/services/firebase";
 import { collection, onSnapshot, doc, getDoc } from "firebase/firestore";
-import Colors from "@/components/colors";
 import { debounce } from "lodash";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useThemes } from '@/components/themeContext'
+import { useThemes } from "@/components/themeContext";
+import FilterIcon from "@/assets/icons/filter.svg";
+import Filters from "@/components/Filters";
+import { MaterialIcons } from "@expo/vector-icons";
+import * as Haptics from "expo-haptics";
 
-const defaultImage = "default.jpg";
+const COLORS = {
+  primaryDark: "#023336",
+  primary: "#4DA674",
+  primaryLight: "#C1E6B7",
+  background: "#EAF8E7",
+  text: "#023336",
+  textLight: "#4DA674",
+  white: "#FFFFFF",
+  success: "#81C784",
+};
+
+const STORAGE_KEYS = {
+  APARTMENTS: "apartmentData",
+  OWNER: "owner",
+};
+
+import defaultImage from "@/assets/images/default.png";
 
 const HouseItem = ({ house }) => {
   const { theme } = useThemes();
-  const isDark = theme === 'dark';
+  const isDark = theme === "dark";
   const router = useRouter();
   const [owner, setOwner] = useState("");
   const [ownerId, setOwnerId] = useState("");
 
   useEffect(() => {
     const fetchOwner = async () => {
-      if (house.seller_id) {
-        try {
-          const userDocRef = doc(db, "Users", house.seller_id);
-          const userDoc = await getDoc(userDocRef);
-          if (userDoc.exists()) {
-            setOwner(userDoc.data().name);
-            setOwnerId(userDoc.id);
-          } else {
-            setOwner("Unknown");
-          }
-        } catch (error) {
-          console.error("Error fetching owner:", error);
-          setOwner("Error");
-          const data = await AsyncStorage.getItem("owner")
-          if (data) {
-            const parseData = JSON.parse(data)
-            setOwner(parseData.name)
+      if (!house.seller_id) {
+        setOwner("No seller");
+        return;
+      }
 
-          const data = await AsyncStorage.getItem("owner");
+      try {
+        const userDocRef = doc(db, "Users", house.seller_id);
+        const userDoc = await getDoc(userDocRef);
+
+        if (userDoc.exists()) {
+          setOwner(userDoc.data().name);
+          setOwnerId(userDoc.id);
+        } else {
+          setOwner("Unknown");
+        }
+      } catch (error) {
+        console.error("Error fetching owner:", error);
+        setOwner("Error");
+
+        try {
+          const data = await AsyncStorage.getItem(STORAGE_KEYS.OWNER);
           if (data) {
             const parseData = JSON.parse(data);
             setOwner(parseData.name);
           }
+        } catch (storageError) {
+          console.error("Error retrieving owner from storage:", storageError);
         }
-      } else {
-        setOwner("No seller");
       }
     };
 
     fetchOwner();
   }, [house.seller_id]);
 
+  const navigateToDetails = () => {
+    Haptics.selectionAsync();
+    router.push({
+      pathname: "/screens/[moreview]",
+      params: { moreview: house.id },
+    });
+  };
+
+  const navigateToOwner = () => {
+    if (ownerId) {
+      Haptics.selectionAsync();
+      router.push({
+        pathname: "/screens/owner",
+        params: { ownerId },
+      });
+    }
+  };
+
   return (
-    <SafeAreaView>
-      <Pressable
-        onPress={() =>
-          router.push({
-            pathname: "/screens/[moreview]",
-            params: { moreview: house.id },
-          })
-        }
+    <Pressable
+      onPress={navigateToDetails}
+      style={({ pressed }) => [styles.cardContainer, pressed && styles.pressed]}
+    >
+      <View
+        style={[
+          styles.card,
+          { backgroundColor: isDark ? "#333" : COLORS.white },
+        ]}
       >
-        <View style={[styles.card, { backgroundColor: isDark ? "#e0e0e0" : "white" }]}>
-          <Text style={styles.title}>
-            {house.availability_status || "No Title"}
+        <View style={styles.cardHeader}>
+          <Text
+            style={[
+              styles.title,
+              { color: isDark ? COLORS.white : COLORS.text },
+            ]}
+          >
+            {house.features || house.property_type || "House"}
           </Text>
-          <Text style={styles.address}>
-            {house.location || "Unknown Location"}
-          </Text>
-          <View style={styles.ownerContainer}>
-            <Text style={styles.owner}>Owner: </Text>
-            <Pressable
-              onPress={() =>
-                router.push({
-                  pathname: "/screens/owner",
-                  params: { ownerId: ownerId },
-                })
-              }
-            >
-              <Text style={{ color: Colors.assestBlue }}>{owner || "Unknown"}</Text>
-            </Pressable>
-          </View>
+        </View>
+
+        <Text
+          style={[
+            styles.address,
+            { color: isDark ? COLORS.primaryLight : COLORS.textLight },
+          ]}
+        >
+          {house.location || "Unknown Location"}
+        </Text>
+
+        <View style={styles.imageContainer}>
           <Image
             source={{
               uri:
                 house.image && house.image[0] ? house.image[0] : defaultImage,
             }}
             style={styles.image}
+            defaultSource={defaultImage}
           />
-          <Text style={styles.description} numberOfLines={2}>
-            Description: {house.features || "No description available"}
-          </Text>
-          <Text style={styles.price}>
-            Price: {house.rent > 0 ? `${house.rent}` : "Invalid Price"} EGP
+        </View>
+
+        <View style={styles.detailsContainer}>
+          <View style={styles.detailRow}>
+            <MaterialIcons
+              name="hotel"
+              size={18}
+              color={isDark ? COLORS.primaryLight : COLORS.textLight}
+            />
+            <Text
+              style={[
+                styles.detailText,
+                { color: isDark ? COLORS.primaryLight : COLORS.textLight },
+              ]}
+            >
+              {house.num_bedrooms || "N/A"} Beds
+            </Text>
+
+            <MaterialIcons
+              name="layers"
+              size={18}
+              color={isDark ? COLORS.primaryLight : COLORS.textLight}
+              style={styles.detailIcon}
+            />
+            <Text
+              style={[
+                styles.detailText,
+                { color: isDark ? COLORS.primaryLight : COLORS.textLight },
+              ]}
+            >
+              Floor {house.floor || "N/A"}
+            </Text>
+          </View>
+        </View>
+
+        <View style={styles.footer}>
+          <View style={styles.footerLeft}>
+            <View style={styles.ownerContainer}>
+              <Text
+                style={[
+                  styles.owner,
+                  { color: isDark ? COLORS.white : COLORS.text },
+                ]}
+              >
+                Owner:{" "}
+              </Text>
+              <Pressable onPress={navigateToOwner}>
+                <Text style={{ color: COLORS.primary }}>
+                  {owner || "Unknown"}
+                </Text>
+              </Pressable>
+            </View>
+
+            {house.availability_status === "Available" && (
+              <View
+                style={[
+                  styles.availabilityBadge,
+                  { backgroundColor: isDark ? COLORS.success : COLORS.primary },
+                ]}
+              >
+                <Text style={styles.availabilityText}>Available</Text>
+              </View>
+            )}
+          </View>
+
+          <Text
+            style={[
+              styles.price,
+              { color: isDark ? COLORS.primaryLight : COLORS.primary },
+            ]}
+          >
+            {house.rent > 0 ? `${house.rent.toLocaleString()}` : "N/A"} EGP
           </Text>
         </View>
-      </Pressable>
-    </SafeAreaView>
+      </View>
+    </Pressable>
   );
 };
 
@@ -116,218 +225,372 @@ export default function HouseList() {
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const { theme } = useThemes();
-  const isDark = theme === 'dark';
+  const isDark = theme === "dark";
+
+  const [filters, setFilters] = useState({
+    priceRange: { min: 0, max: 10000 },
+    bedrooms: [],
+    locations: [],
+    status: [],
+    propertyType: [],
+  });
+
+  const [showFilters, setShowFilters] = useState(false);
 
   useEffect(() => {
-    const colRef = collection(db, "Apartments");
     const fetchData = async () => {
       try {
-        const fetchHouses = onSnapshot(colRef, async (snapshot) => {
+        const colRef = collection(db, "Apartments");
+        const unsubscribe = onSnapshot(colRef, async (snapshot) => {
           const houseList = snapshot.docs.map((doc) => ({
             id: doc.id,
             ...doc.data(),
           }));
+
           setAllHouses(houseList);
           setFilteredHouses(houseList);
           setIsLoading(false);
-          await AsyncStorage.setItem("apartmentData", JSON.stringify({ houseList })
-          )
+
+          try {
+            await AsyncStorage.setItem(
+              STORAGE_KEYS.APARTMENTS,
+              JSON.stringify(houseList)
+            );
+          } catch (storageError) {
+            console.error("Error saving to AsyncStorage:", storageError);
+          }
         });
-        return fetchHouses;
-      }
-      catch (Error) {
-        const data = await AsyncStorage.getItem("apartmentData")
-          await AsyncStorage.setItem(
-            "apartmentData",
-            JSON.stringify({ houseList })
-          );
-        });
-        return fetchHouses;
-      } catch (Error) {
-        const data = await AsyncStorage.getItem("apartmentData");
-        if (data) {
-          const parseData = JSON.parse(data);
-          setAllHouses(parseData);
-          setFilteredHouses(parseData);
+
+        return unsubscribe;
+      } catch (error) {
+        console.error("Error fetching apartments:", error);
+        try {
+          const data = await AsyncStorage.getItem(STORAGE_KEYS.APARTMENTS);
+          if (data) {
+            const parseData = JSON.parse(data);
+            setAllHouses(parseData);
+            setFilteredHouses(parseData);
+          } else {
+            console.log("No data in local storage");
+          }
+        } catch (storageError) {
+          console.error("Error reading from AsyncStorage:", storageError);
+        } finally {
           setIsLoading(false);
         }
-        else {
-          console.log("no data in local storage");
-        }
+        return () => {};
       }
-    }
-    const unsubscribe = fetchData();
-    return () => {
-      if (unsubscribe) unsubscribe.then(unsub => unsub());
-    }
-        } else {
-          console.log("no data in local storage");
-        }
-      }
-    };
-    const unsubscribe = fetchData();
-    return () => {
-      if (unsubscribe) unsubscribe.then((unsub) => unsub());
     };
 
+    const unsubscribePromise = fetchData();
+
+    return () => {
+      if (unsubscribePromise) {
+        unsubscribePromise
+          .then((unsubscribe) => {
+            if (typeof unsubscribe === "function") {
+              unsubscribe();
+            }
+          })
+          .catch((err) => console.error("Error unsubscribing:", err));
+      }
+    };
   }, []);
 
   const handleSearch = useCallback(
-    debounce((query) => {
-      if (query === "") {
-        setFilteredHouses(allHouses);
-        return;
+    debounce((query, currentFilters) => {
+      let results = [...allHouses];
+
+      results = results.filter((house) => {
+        const price = Number(house.rent) || 0;
+        return (
+          price >= currentFilters.priceRange.min &&
+          price <= currentFilters.priceRange.max
+        );
+      });
+      if (currentFilters.bedrooms.length > 0) {
+        results = results.filter((house) => {
+          const beds = house.num_bedrooms;
+          return currentFilters.bedrooms.some((filterBed) => {
+            if (filterBed === "4+") return Number(beds) >= 4;
+            return beds === filterBed;
+          });
+        });
+      }
+      if (currentFilters.propertyType.length > 0) {
+        results = results.filter(
+          (house) =>
+            house.property_type &&
+            currentFilters.propertyType.includes(house.property_type)
+        );
+      }
+      if (currentFilters.status.length > 0) {
+        results = results.filter(
+          (house) =>
+            house.availability_status &&
+            currentFilters.status.includes(house.availability_status)
+        );
       }
 
-      const searchTerms = query.toLowerCase().trim().split(/\s+/);
-
-      const filtered = allHouses.filter((house) => {
-        return searchTerms.some((term) => {
-          return (
-            (house.location?.toLowerCase() || "").includes(term) ||
-            (house.features?.toLowerCase() || "").includes(term) ||
-            (house.num_bedrooms || "").includes(term) ||
-            (term.startsWith("under-") &&
-              parseInt(house.rent || "0") <= parseInt(term.substring(6))) ||
-            house.rent === term ||
-            (house.availability_status?.toLowerCase() || "").includes(term) ||
-            (house.floor || "").includes(term) ||
-            (Array.isArray(house.keywords) &&
-              house.keywords.some((keyword) =>
-                (keyword || "").toLowerCase().includes(term)
-              ))
-          );
-        });
-      });
-
-      setFilteredHouses(filtered);
+      setFilteredHouses(results);
     }, 300),
     [allHouses]
   );
 
   const onChangeText = (query) => {
     setSearchQuery(query);
-    handleSearch(query);
+    handleSearch(query, filters);
   };
 
-  return (
-    <ScrollView style={[styles.container, { backgroundColor: isDark ? Colors.darkModeBackground : Colors.background }]}>
-      <View style={[styles.container, { backgroundColor: isDark ? Colors.darkModeBackground : Colors.background }]}>
-        <Text style={[styles.header, { color: isDark ? Colors.darkModeText : Colors.text }]}>Houses</Text>
+  const applyFilters = useCallback(
+    (newFilters) => {
+      setFilters(newFilters);
+      handleSearch(searchQuery, newFilters);
+    },
+    [handleSearch, searchQuery]
+  );
 
-        {/* Search bar */}
-        <View style={[styles.searchContainer, { backgroundColor: isDark ? "#e0e0e0" : "white" }]}>
-          <TextInput
-            placeholder="Search location, features, price..."
-            clearButtonMode="always"
-            style={styles.searchBox}
-            autoCapitalize="none"
-            autoCorrect={false}
-            value={searchQuery}
-            onChangeText={onChangeText}
-          />
+  const renderContent = useMemo(() => {
+    if (isLoading) {
+      return (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={COLORS.primary} />
         </View>
+      );
+    }
 
-        {isLoading ? (
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color={Colors.assestBlue} />
-          </View>
-        ) : filteredHouses.length > 0 ? (
-          filteredHouses.map((house) => (
-            <HouseItem key={house.id} house={house} />
-          ))
-        ) : (
-          <Text style={styles.loadingText}>No houses found</Text>
-        )}
+    if (filteredHouses.length === 0) {
+      return (
+        <View style={styles.emptyState}>
+          <MaterialIcons
+            name="search-off"
+            size={48}
+            color={isDark ? COLORS.textLight : COLORS.primaryLight}
+          />
+          <Text
+            style={[
+              styles.loadingText,
+              { color: isDark ? COLORS.primaryLight : COLORS.textLight },
+            ]}
+          >
+            No houses match your search
+          </Text>
+        </View>
+      );
+    }
+
+    return filteredHouses.map((house) => (
+      <HouseItem key={house.id} house={house} />
+    ));
+  }, [isLoading, filteredHouses, isDark]);
+
+  return (
+    <View
+      style={[
+        styles.container,
+        { backgroundColor: isDark ? COLORS.primaryDark : COLORS.background },
+      ]}
+    >
+      <SafeAreaView edges={["top"]} style={styles.headerContainer}>
+        <Text
+          style={[
+            styles.header,
+            { color: isDark ? COLORS.white : COLORS.text },
+          ]}
+        >
+          Available Properties
+        </Text>
+      </SafeAreaView>
+      <View
+        style={[
+          styles.searchContainer,
+          { backgroundColor: isDark ? COLORS.primaryDark : COLORS.white },
+        ]}
+      >
+        <TextInput
+          placeholder="Search location, features, price..."
+          placeholderTextColor={isDark ? COLORS.primaryLight : COLORS.textLight}
+          clearButtonMode="while-editing"
+          style={[
+            styles.searchBox,
+            { color: isDark ? COLORS.white : COLORS.text },
+          ]}
+          autoCapitalize="none"
+          autoCorrect={false}
+          value={searchQuery}
+          onChangeText={onChangeText}
+          cursorColor={COLORS.primary}
+        />
+        <Pressable
+          onPress={() => {
+            Haptics.selectionAsync();
+            setShowFilters(true);
+          }}
+          style={({ pressed }) => [
+            styles.filterButton,
+            pressed && styles.pressed,
+          ]}
+        >
+          <FilterIcon width={24} height={24} />
+        </Pressable>
       </View>
-    </ScrollView>
+      <ScrollView
+        contentContainerStyle={styles.contentContainer}
+        showsVerticalScrollIndicator={false}
+      >
+        {renderContent}
+      </ScrollView>
+      <Filters
+        visible={showFilters}
+        onClose={() => setShowFilters(false)}
+        onApply={applyFilters}
+        initialFilters={filters}
+      />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  // Your existing styles
   container: {
     flex: 1,
-    padding: 20,
-    backgroundColor: Colors.background,
+  },
+  headerContainer: {
+    paddingHorizontal: 20,
+    paddingTop: 10,
+    paddingBottom: 5,
   },
   header: {
-    fontSize: 26,
+    fontSize: 24,
     fontWeight: "bold",
-    textAlign: "center",
-    marginBottom: 20,
-    color: Colors.text,
+  },
+  contentContainer: {
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+  },
+  cardContainer: {
+    marginBottom: 15,
   },
   card: {
-    backgroundColor: "white",
-    padding: 15,
-    marginBottom: 15,
+    padding: 16,
     borderRadius: 16,
-    elevation: 4,
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  cardHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: "bold",
+    flex: 1,
+  },
+  address: {
+    fontSize: 14,
+    marginBottom: 12,
+  },
+  imageContainer: {
+    width: "100%",
+    height: 180,
+    borderRadius: 12,
+    marginBottom: 12,
+    overflow: "hidden",
+    backgroundColor: "#f0f0f0",
   },
   image: {
     width: "100%",
-    height: 180,
+    height: "100%",
     resizeMode: "cover",
-    borderRadius: 12,
-    marginBottom: 10,
   },
-  title: {
-    fontSize: 17,
-    fontWeight: "bold",
-    color: Colors.text,
-    marginBottom: 5,
+  detailsContainer: {
+    marginBottom: 12,
   },
-  owner: {
+  detailRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 6,
+  },
+  detailText: {
     fontSize: 14,
-    color: Colors.text,
-    marginBottom: 5,
+    marginLeft: 4,
   },
-  description: {
-    fontSize: 14,
-    color: Colors.assestGray,
-    marginBottom: 10,
+  detailIcon: {
+    marginLeft: 12,
   },
-  price: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: Colors.assestBlue,
+  footer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  footerLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
   },
   ownerContainer: {
     flexDirection: "row",
     alignItems: "center",
   },
-  address: {
+  owner: {
     fontSize: 14,
-    color: Colors.assestGray,
-    marginTop: 5,
+  },
+  price: {
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  availabilityBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
+  },
+  availabilityText: {
+    color: "#fff",
+    fontSize: 12,
+    fontWeight: "bold",
+  },
+  loadingContainer: {
+    paddingVertical: 40,
+    alignItems: "center",
+  },
+  emptyState: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 40,
   },
   loadingText: {
-    textAlign: "center",
     fontSize: 16,
-    color: Colors.assestGray,
-    marginTop: 20,
+    marginTop: 16,
   },
-
-  // New styles for search
   searchContainer: {
-    marginBottom: 15,
-    backgroundColor: "white",
-    borderRadius: 16,
+    marginHorizontal: 20,
+    marginVertical: 15,
+    flexDirection: "row",
+    alignItems: "center",
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    elevation: 2,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 2,
-    elevation: 2,
   },
   searchBox: {
-    paddingHorizontal: 15,
-    paddingVertical: 12,
-    borderRadius: 16,
+    flex: 1,
     fontSize: 16,
+    paddingVertical: 8,
   },
-  loadingContainer: {
-    paddingVertical: 20,
-    alignItems: "center",
+  filterButton: {
+    padding: 8,
+    borderRadius: 8,
+  },
+  pressed: {
+    opacity: 0.7,
+    transform: [{ scale: 0.98 }],
   },
 });
