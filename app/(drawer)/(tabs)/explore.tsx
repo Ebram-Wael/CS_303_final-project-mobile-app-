@@ -36,7 +36,6 @@ const HouseItem = ({ house }) => {
           if (userDoc.exists()) {
             setOwner(userDoc.data().name);
             setOwnerId(userDoc.id);
-            await AsyncStorage.setItem("owner", JSON.stringify({ name: userDoc.data().name }))
           } else {
             setOwner("Unknown");
           }
@@ -48,6 +47,10 @@ const HouseItem = ({ house }) => {
             const parseData = JSON.parse(data)
             setOwner(parseData.name)
 
+          const data = await AsyncStorage.getItem("owner");
+          if (data) {
+            const parseData = JSON.parse(data);
+            setOwner(parseData.name);
           }
         }
       } else {
@@ -90,7 +93,8 @@ const HouseItem = ({ house }) => {
           </View>
           <Image
             source={{
-              uri: house.image && house.image[0] ? house.image[0] : defaultImage,
+              uri:
+                house.image && house.image[0] ? house.image[0] : defaultImage,
             }}
             style={styles.image}
           />
@@ -133,6 +137,14 @@ export default function HouseList() {
       }
       catch (Error) {
         const data = await AsyncStorage.getItem("apartmentData")
+          await AsyncStorage.setItem(
+            "apartmentData",
+            JSON.stringify({ houseList })
+          );
+        });
+        return fetchHouses;
+      } catch (Error) {
+        const data = await AsyncStorage.getItem("apartmentData");
         if (data) {
           const parseData = JSON.parse(data);
           setAllHouses(parseData);
@@ -148,6 +160,16 @@ export default function HouseList() {
     return () => {
       if (unsubscribe) unsubscribe.then(unsub => unsub());
     }
+        } else {
+          console.log("no data in local storage");
+        }
+      }
+    };
+    const unsubscribe = fetchData();
+    return () => {
+      if (unsubscribe) unsubscribe.then((unsub) => unsub());
+    };
+
   }, []);
 
   const handleSearch = useCallback(
