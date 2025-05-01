@@ -8,7 +8,7 @@ import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/services/firebase";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useThemes } from '@/components/themeContext'
+import { useThemes } from "@/components/themeContext";
 import Colors from "@/components/colors";
 
 export default function Layout() {
@@ -16,7 +16,7 @@ export default function Layout() {
   const [userDetails, setUserDetails] = useState(null);
   const auth = getAuth();
   const { theme } = useThemes();
-  const isDark = theme === 'dark';
+  const isDark = theme === "dark";
 
   useEffect(() => {
     const getUserDetails = async () => {
@@ -44,8 +44,7 @@ export default function Layout() {
           setSeller(userDoc.data().role === "seller");
         }
       }
-    })
-
+    });
   };
 
   return (
@@ -53,7 +52,11 @@ export default function Layout() {
       <Drawer
         screenOptions={({ navigation }) => ({
           drawerPosition: "left",
-          drawerStyle: { width: 250, paddingTop: 20, backgroundColor: isDark ? Colors.darkModeBackground : 'white' },
+          drawerStyle: {
+            width: 250,
+            paddingTop: 20,
+            backgroundColor: isDark ? Colors.darkModeBackground : "white",
+          },
           headerShown: false,
           headerLeft: () => (
             <TouchableOpacity
@@ -85,7 +88,9 @@ export default function Layout() {
           name="(tabs)"
           options={{
             drawerLabel: "Home",
-            drawerLabelStyle: { color: isDark ? Colors.darkModeText : Colors.text },
+            drawerLabelStyle: {
+              color: isDark ? Colors.darkModeText : Colors.text,
+            },
             drawerIcon: ({ color, size }) => (
               <Ionicons name="home-outline" size={size} color={color} />
             ),
@@ -95,9 +100,15 @@ export default function Layout() {
           name="setting"
           options={{
             drawerLabel: "Setting",
-            drawerLabelStyle: { color: isDark ? Colors.darkModeText : Colors.text },
+            drawerLabelStyle: {
+              color: isDark ? Colors.darkModeText : Colors.text,
+            },
             drawerIcon: ({ size }) => (
-              <Ionicons name="settings-outline" size={size} color={Colors.assestGray} />
+              <Ionicons
+                name="settings-outline"
+                size={size}
+                color={Colors.assestGray}
+              />
             ),
           }}
         />
@@ -105,7 +116,9 @@ export default function Layout() {
           name="AboutUs"
           options={{
             drawerLabel: "About Us",
-            drawerLabelStyle: { color: isDark ? Colors.darkModeText : Colors.text },
+            drawerLabelStyle: {
+              color: isDark ? Colors.darkModeText : Colors.text,
+            },
             drawerIcon: ({ size }) => (
               <Ionicons
                 name="information-circle-outline"
@@ -121,9 +134,15 @@ export default function Layout() {
             name="addApartment"
             options={{
               drawerLabel: "Add Apartment",
-              drawerLabelStyle: { color: isDark ? Colors.darkModeText : Colors.text },
+              drawerLabelStyle: {
+                color: isDark ? Colors.darkModeText : Colors.text,
+              },
               drawerIcon: ({ size }) => (
-                <Ionicons name="add-circle-outline" size={size} color={Colors.assestGray} />
+                <Ionicons
+                  name="add-circle-outline"
+                  size={size}
+                  color={Colors.assestGray}
+                />
               ),
             }}
           />
@@ -132,9 +151,15 @@ export default function Layout() {
             name="FavoritesScreen"
             options={{
               drawerLabel: "Favorites",
-              drawerLabelStyle: { color: isDark ? Colors.darkModeText : Colors.text },
+              drawerLabelStyle: {
+                color: isDark ? Colors.darkModeText : Colors.text,
+              },
               drawerIcon: ({ size }) => (
-                <Ionicons name="heart-outline" size={size} color={Colors.assestGray} />
+                <Ionicons
+                  name="heart-outline"
+                  size={size}
+                  color={Colors.assestGray}
+                />
               ),
             }}
           />
