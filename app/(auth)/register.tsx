@@ -28,7 +28,6 @@ import Colors from '@/components/colors';
 
 import * as Notifications from 'expo-notifications';
 
-const reg = require('../../assets/images/join.jpg');
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -88,12 +87,12 @@ const Register = () => {
 
   const [load, setLoad] = useState(false);
 
-  const [borderColor, setBorderColor] = useState(Colors.secondary);
-  const [borderColor1, setBorderColor1] = useState(Colors.secondary);
-  const [borderColor2, setBorderColor2] = useState(Colors.secondary);
-  const [borderColor3, setBorderColor3] = useState(Colors.secondary);
-  const [borderColor4, setBorderColor4] = useState(Colors.secondary);
-  const [borderColor5, setBorderColor5] = useState(Colors.secondary);
+  const [borderColor, setBorderColor] = useState(Colors.assestGreen);
+  const [borderColor1, setBorderColor1] = useState(Colors.assestGreen);
+  const [borderColor2, setBorderColor2] = useState(Colors.assestGreen);
+  const [borderColor3, setBorderColor3] = useState(Colors.assestGreen);
+  const [borderColor4, setBorderColor4] = useState(Colors.assestGreen);
+  const [borderColor5, setBorderColor5] = useState(Colors.assestGreen);
   const [valid, setValid] = useState(false);
 
   const [selectRole, setSelectRole] = useState("buyer");
@@ -220,11 +219,11 @@ const Register = () => {
        showsVerticalScrollIndicator={false} >
         <Text style={styles.header}>Create Account</Text>
         <View style={styles.txt}>
-          <Text style={{ color: Colors.whiteText }}>
+          <Text style={{ color: '#023336' }}>
             Create an Account So You Can Explore Our Apartment{" "}
           </Text>
         </View>
-        <Image style={{width:200 ,height:200 ,alignSelf:'center'}} source={reg}/>
+        {/* <Image style={{width:200 ,height:200 ,alignSelf:'center'}} source={reg}/> */}
         <View style={{ display: "flex", flexDirection: "row", gap: 80 }}>
           <View style={styles.select}>
             <RadioButton.Android
@@ -248,7 +247,7 @@ const Register = () => {
         <View>
           <TextInput
             onFocus={() => setBorderColor("white")}
-            onBlur={() => setBorderColor(Colors.secondary) }
+            onBlur={() => setBorderColor(Colors.assestGreen) }
             style={[styles.input, { borderColor }]}
             placeholder="Full Name"
             onChangeText={(text) => {
@@ -261,7 +260,7 @@ const Register = () => {
 
           <TextInput
             onFocus={() => {setBorderColor2("white") ;setTouchMail(true)}}
-            onBlur={() => setBorderColor2(Colors.secondary) }
+            onBlur={() => setBorderColor2(Colors.assestGreen) }
             style={[styles.input, { borderColor: borderColor2 }]}
             placeholder="Email"
             onChangeText={(text) => {
@@ -277,7 +276,7 @@ const Register = () => {
 
               }}
               onBlur={() => {
-                setBorderColor3(Colors.secondary); 
+                setBorderColor3(Colors.assestGreen); 
               }}
               style={[styles.inputField]}
               secureTextEntry={showPassword}
@@ -303,7 +302,7 @@ const Register = () => {
               onFocus={() => {setBorderColor4("white") ;
                 setTouchConf(true) }}
               onBlur={() => {
-                setBorderColor4(Colors.secondary); 
+                setBorderColor4(Colors.assestGreen); 
               }}
               style={[styles.inputField]}
               secureTextEntry={showConfirmPassword}
@@ -334,7 +333,7 @@ const Register = () => {
         <View style={styles.join}>
           <Text> Already Have an Account?</Text>
           <Pressable onPress={() => router.push("/login")}>
-            <Text style={{ color: Colors.text, textDecorationLine: "underline" }}>
+            <Text style={{ color: Colors.assestGreen, textDecorationLine: "underline" }}>
               {" "}
               Sign In{" "}
             </Text>
@@ -356,7 +355,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   btn: {
-    backgroundColor: Colors.secondary,
+    backgroundColor: Colors.assestGreen,
     padding: 10,
     borderRadius: 5,
     width: 250,
@@ -381,7 +380,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textAlign: "center",
     marginBottom: 10,
-    color: Colors.text,
+    color: '#023336',
   },
   txt: {
     flexDirection: "row",
@@ -390,6 +389,7 @@ const styles = StyleSheet.create({
     marginBottom: 40,
     justifyContent: "center",
     fontSize: 13,
+    color: Colors.assestGreen,
   },
   screen: {
     display: "none",
