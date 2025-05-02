@@ -13,7 +13,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { db } from "@/services/firebase";
 import { collection, onSnapshot, doc, getDoc } from "firebase/firestore";
-import { debounce, min, set } from "lodash";
+import { debounce } from "lodash";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useThemes } from "@/components/themeContext";
 import FilterIcon from "@/assets/icons/filter.svg";
@@ -21,7 +21,6 @@ import Filters from "@/components/Filters";
 import { MaterialIcons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { useLocalSearchParams } from "expo-router";
-
 
 const COLORS = {
   primaryDark: "#023336",
@@ -102,6 +101,10 @@ const HouseItem = ({ house }) => {
     }
   };
 
+  // Fix: Safely access the image array
+  const houseImage =
+    house.image && house.image.length > 0 ? house.image[0] : null;
+
   return (
     <Pressable
       onPress={navigateToDetails}
@@ -135,10 +138,7 @@ const HouseItem = ({ house }) => {
 
         <View style={styles.imageContainer}>
           <Image
-            source={{
-              uri:
-                house.image && house.image[0] ? house.image[0] : defaultImage,
-            }}
+            source={{ uri: houseImage || defaultImage }}
             style={styles.image}
             defaultSource={defaultImage}
           />
@@ -230,13 +230,12 @@ export default function HouseList() {
   const { theme } = useThemes();
   const isDark = theme === "dark";
 
-  
   const searchParams = useLocalSearchParams();
-  const location = searchParams.location;
-  const maxPrice = searchParams.price;
-  const bedrooms = searchParams.bedrooms;
-  const nearby = searchParams.nearby;
-  
+  const location = searchParams?.location;
+  const maxPrice = searchParams?.price;
+  const bedrooms = searchParams?.bedrooms;
+  const nearby = searchParams?.nearby;
+
   const [filters, setFilters] = useState({
     priceRange: { min: 0, max: 10000 },
     bedrooms: [],
@@ -246,33 +245,31 @@ export default function HouseList() {
     propertyType: [],
   });
 
-  useEffect(()=>{
-    if(!isDataLoaded) return;
-   if(location|| maxPrice || bedrooms || nearby){
-    const newFilters = {
-      locations: location ? [location] : [],
-      priceRange: {
-        min: 0,
-        max: maxPrice ? Number(maxPrice) : 10000,
-      },
-      bedrooms: bedrooms
-        ? [bedrooms === "4+" ? "4+" : Number(bedrooms)]
-        : [],
-      status: [],
-      propertyType: [],
-      nearby: nearby ? [nearby] : [],
-    };
+  useEffect(() => {
+    if (!isDataLoaded) return;
+
+    if (location || maxPrice || bedrooms || nearby) {
+      const newFilters = {
+        ...filters, // Keep existing filter values
+        locations: location ? [location] : filters.locations,
+        priceRange: {
+          min: 0,
+          max: maxPrice ? Number(maxPrice) : 10000,
+        },
+        bedrooms: bedrooms
+          ? [bedrooms === "4+" ? "4+" : Number(bedrooms)]
+          : filters.bedrooms,
+        nearby: nearby ? [nearby] : filters.nearby,
+      };
       setFilters(newFilters);
     }
-  },[location, maxPrice, bedrooms ])
+  }, [location, maxPrice, bedrooms, nearby, isDataLoaded]);
 
   useEffect(() => {
-    handleSearch(searchQuery, filters);
-  }, [filters ,searchQuery]);
-
-
-  
-
+    if (isDataLoaded) {
+      handleSearch(searchQuery, filters);
+    }
+  }, [filters, searchQuery, isDataLoaded]);
 
   const [showFilters, setShowFilters] = useState(false);
 
@@ -290,21 +287,22 @@ export default function HouseList() {
           setFilteredHouses(houseList);
           setIsDataLoaded(true);
 
-          const initialFilters ={
+          const initialFilters = {
             locations: location ? [location] : [],
             priceRange: {
               min: 0,
               max: maxPrice ? Number(maxPrice) : 10000,
             },
-            bedrooms: bedrooms ? [bedrooms === "4+" ? "4+" : Number(bedrooms)] : [],
+            bedrooms: bedrooms
+              ? [bedrooms === "4+" ? "4+" : Number(bedrooms)]
+              : [],
             status: [],
             propertyType: [],
             nearby: nearby ? [nearby] : [],
-          } 
+          };
           setFilters(initialFilters);
           handleSearch(searchQuery, initialFilters);
           setIsLoading(false);
-
 
           try {
             await AsyncStorage.setItem(
@@ -316,7 +314,6 @@ export default function HouseList() {
           }
         });
 
-
         return unsubscribe;
       } catch (error) {
         console.error("Error fetching apartments:", error);
@@ -326,6 +323,7 @@ export default function HouseList() {
             const parseData = JSON.parse(data);
             setAllHouses(parseData);
             setFilteredHouses(parseData);
+            setIsDataLoaded(true);
           } else {
             console.log("No data in local storage");
           }
@@ -355,16 +353,21 @@ export default function HouseList() {
 
   const handleSearch = useCallback(
     debounce((query, currentFilters) => {
+      if (!allHouses || !currentFilters) return;
+
       let results = [...allHouses];
 
-      results = results.filter((house) => {
-        const price = Number(house.rent) || 0;
-        return (
-          price >= currentFilters.priceRange.min &&
-          price <= currentFilters.priceRange.max
-        );
-      });
-      if (currentFilters.bedrooms.length > 0) {
+      if (currentFilters.priceRange) {
+        results = results.filter((house) => {
+          const price = Number(house.rent) || 0;
+          return (
+            price >= currentFilters.priceRange.min &&
+            price <= currentFilters.priceRange.max
+          );
+        });
+      }
+
+      if (currentFilters.bedrooms && currentFilters.bedrooms.length > 0) {
         results = results.filter((house) => {
           const beds = house.num_bedrooms;
           return currentFilters.bedrooms.some((filterBed) => {
@@ -373,36 +376,55 @@ export default function HouseList() {
           });
         });
       }
-      if (currentFilters.propertyType.length > 0) {
+
+      if (
+        currentFilters.propertyType &&
+        currentFilters.propertyType.length > 0
+      ) {
         results = results.filter(
           (house) =>
             house.property_type &&
             currentFilters.propertyType.includes(house.property_type)
         );
       }
-      if (currentFilters.status.length > 0) {
+
+      if (currentFilters.status && currentFilters.status.length > 0) {
         results = results.filter(
           (house) =>
             house.availability_status &&
             currentFilters.status.includes(house.availability_status)
         );
       }
-      if (currentFilters.locations.length > 0) {
+
+      if (currentFilters.locations && currentFilters.locations.length > 0) {
         results = results.filter(
           (house) =>
-            house.location &&
-            currentFilters.locations.includes(house.location)
+            house.location && currentFilters.locations.includes(house.location)
         );
       }
-      if (currentFilters.nearby.length > 0) {
-        results =results.filter(
-          (house)=>
+
+      if (currentFilters.nearby && currentFilters.nearby.length > 0) {
+        results = results.filter(
+          (house) =>
             house.nearby &&
-            currentFilters.nearby.includes(house.nearby)
-        )
-        
+            currentFilters.nearby.some((item) => house.nearby.includes(item))
+        );
       }
-    
+
+      if (query && query.trim() !== "") {
+        const lowerQuery = query.toLowerCase().trim();
+        results = results.filter(
+          (house) =>
+            (house.location &&
+              house.location.toLowerCase().includes(lowerQuery)) ||
+            (house.features &&
+              house.features.toLowerCase().includes(lowerQuery)) ||
+            (house.property_type &&
+              house.property_type.toLowerCase().includes(lowerQuery)) ||
+            (house.rent && house.rent.toString().includes(lowerQuery))
+        );
+      }
+
       setFilteredHouses(results);
     }, 300),
     [allHouses]
@@ -410,7 +432,9 @@ export default function HouseList() {
 
   const onChangeText = (query) => {
     setSearchQuery(query);
-    handleSearch(query, filters);
+    if (isDataLoaded) {
+      handleSearch(query, filters);
+    }
   };
 
   const applyFilters = useCallback(
@@ -430,7 +454,7 @@ export default function HouseList() {
       );
     }
 
-    if (filteredHouses.length === 0) {
+    if (!filteredHouses || filteredHouses.length === 0) {
       return (
         <View style={styles.emptyState}>
           <MaterialIcons
@@ -517,7 +541,6 @@ export default function HouseList() {
         onApply={applyFilters}
         initialFilters={filters}
       />
-      
     </View>
   );
 }

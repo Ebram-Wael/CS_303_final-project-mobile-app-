@@ -1,49 +1,43 @@
 import { Tabs, useRouter } from "expo-router";
 import React from "react";
 import TabBar from "@/components/TabBar";
-import { View  ,StyleSheet ,Pressable} from "react-native";
+import { View, StyleSheet, Pressable } from "react-native";
 import * as Animatable from "react-native-animatable";
 
-import bot from '../../../assets/images/chatbot.png'
+import bot from "../../../assets/images/chatbot.png";
 const TabLayout = () => {
   const router = useRouter();
   return (
     <View style={{ flex: 1 }}>
+      <Tabs
+        tabBar={(props) => <TabBar {...props} />}
+        screenOptions={{ headerShown: false, tabBarShowLabel: false }}
+      >
+        <Tabs.Screen name="index" options={{ headerShown: false }} />
+        <Tabs.Screen name="cart" />
+        <Tabs.Screen name="explore" />
+        <Tabs.Screen name="profile" />
+      </Tabs>
 
-    <Tabs
-      tabBar={(props) => <TabBar {...props} />}
-      screenOptions={{ headerShown: false }}
-    >
-      <Tabs.Screen
-        name="index"
-        options={{ title: "Home", headerShown: false }}
-      />
-      <Tabs.Screen name="cart" options={{ title: "My Cart" }} />
-      <Tabs.Screen name="explore" options={{ title: "Explore" }} />
-      <Tabs.Screen name="profile" options={{ title: "Profile" }} />
-    </Tabs>
-
-    <Pressable
-    style={styles.floatingButton}
-    onPress={()=>router.push ('../../screens/chatbot') }>
-
+      <Pressable
+        style={styles.floatingButton}
+        onPress={() => router.push("../../screens/chatbot")}
+      >
         <Animatable.Image
-          animation="tada" 
+          animation="tada"
           iterationCount="infinite"
           duration={2000}
           source={bot}
           style={{ width: 35, height: 35 }}
         />
-    </Pressable>
+      </Pressable>
     </View>
-
   );
 };
 
 export default TabLayout;
 
-
-const styles = StyleSheet.create ({
+const styles = StyleSheet.create({
   floatingButton: {
     position: "absolute",
     bottom: 90,
@@ -57,5 +51,4 @@ const styles = StyleSheet.create ({
     shadowRadius: 4,
     elevation: 5,
   },
-})
-
+});
