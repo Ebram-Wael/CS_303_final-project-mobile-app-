@@ -21,14 +21,14 @@ import { Camera } from "expo-camera";
 import Colors from "@/components/colors";
 import { useThemes } from "@/components/themeContext";
 
-const Profile: React.FC = () => {
-  const [userDetails, setUserDetails] = useState<any>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [name, setName] = useState<string>("");
-  const [role, setRole] = useState<string>("");
-  const [phone, setPhone] = useState<string>("");
-  const [email, setEmail] = useState<string>("");
-  const [imageurl, setImageUrl] = useState<string | null>(null);
+const Profile = () => {
+  const [userDetails, setUserDetails] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [name, setName] = useState("");
+  const [role, setRole] = useState("");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+  const [imageurl, setImageUrl] = useState(null);
 
   const router = useRouter();
   const { theme } = useThemes();
@@ -77,10 +77,8 @@ const Profile: React.FC = () => {
   };
 
   const requestPermissions = async () => {
-    const { status: cameraStatus } =
-      await Camera.requestCameraPermissionsAsync();
-    const { status: mediaStatus } =
-      await ImagePicker.requestMediaLibraryPermissionsAsync();
+    const { status: cameraStatus } = await Camera.requestCameraPermissionsAsync();
+    const { status: mediaStatus } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (cameraStatus !== "granted" || mediaStatus !== "granted") {
       alert("You need to enable camera and media permissions.");
     }
@@ -112,32 +110,23 @@ const Profile: React.FC = () => {
   };
 
   const deleteImage = async () => {
-    Alert.alert(
-      "Delete Profile Picture",
-      "Are you sure you want to delete the profile picture?",
-      [
-        {
-          text: "Cancel",
-          style: "cancel",
+    Alert.alert("Delete Profile Picture", "Are you sure you want to delete the profile picture?", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Delete",
+        onPress: async () => {
+          setImageUrl(null);
+          try {
+            const userDocRef = doc(db, "Users", auth.currentUser?.uid || "");
+            await updateDoc(userDocRef, { imageurl: null });
+            Alert.alert("Success", "Profile picture deleted successfully!");
+          } catch (error) {
+            console.error("Error deleting image:", error);
+            Alert.alert("Error", "Failed to delete profile picture.");
+          }
         },
-        {
-          text: "Delete",
-          onPress: async () => {
-            setImageUrl(null);
-            try {
-              const userDocRef = doc(db, "Users", auth.currentUser?.uid || "");
-              await updateDoc(userDocRef, {
-                imageurl: null,
-              });
-              Alert.alert("Success", "Profile picture deleted successfully!");
-            } catch (error) {
-              console.error("Error deleting image:", error);
-              Alert.alert("Error", "Failed to delete profile picture.");
-            }
-          },
-        },
-      ]
-    );
+      },
+    ]);
   };
 
   const onImagePress = () => {
@@ -162,33 +151,29 @@ const Profile: React.FC = () => {
   };
 
   const handleDeleteAccount = () => {
-    Alert.alert(
-      "Confirm Deletion",
-      "Are you sure you want to delete your account? This action cannot be undone.",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Delete",
-          style: "destructive",
-          onPress: async () => {
-            try {
-              const user = auth.currentUser;
-              if (user) {
-                const userDocRef = doc(db, "Users", user.uid);
-                await updateDoc(userDocRef, { deleted: true });
-                await AsyncStorage.clear();
-                await user.delete();
-                Alert.alert("Deleted", "Your account has been deleted.");
-                router.replace("/");
-              }
-            } catch (error) {
-              console.error("Delete account error:", error);
-              Alert.alert("Error", "Failed to delete account.");
+    Alert.alert("Confirm Deletion", "Are you sure you want to delete your account? This action cannot be undone.", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Delete",
+        style: "destructive",
+        onPress: async () => {
+          try {
+            const user = auth.currentUser;
+            if (user) {
+              const userDocRef = doc(db, "Users", user.uid);
+              await updateDoc(userDocRef, { deleted: true });
+              await AsyncStorage.clear();
+              await user.delete();
+              Alert.alert("Deleted", "Your account has been deleted.");
+              router.replace("/");
             }
-          },
+          } catch (error) {
+            console.error("Delete account error:", error);
+            Alert.alert("Error", "Failed to delete account.");
+          }
         },
-      ]
-    );
+      },
+    ]);
   };
 
   return (
@@ -199,33 +184,19 @@ const Profile: React.FC = () => {
       }}
     >
       {loading ? (
-        <View
-          style={{
-            flex: 1,
-            justifyContent: "center",
-            alignItems: "center",
-            backgroundColor: isDark
-              ? Colors.darkModePrimary
-              : Colors.background,
-          }}
-        >
-          <ActivityIndicator size="large" color="#7f51ff" />
+        <View style={styles.loaderContainer}>
+          <ActivityIndicator size="large" color={Colors.assestGreen} />
         </View>
       ) : (
         <View style={styles.container}>
-          <View
-            style={[
-              styles.header,
-              { backgroundColor: isDark ? Colors.darkModePrimary : "#7f51ff" },
-            ]}
-          >
+          <View style={[styles.header, { backgroundColor: isDark ? Colors.darkModePrimary : Colors.primary }]}>
             <View style={styles.headerTopRow}>
               <Pressable onPress={handleLogout}>
                 <Feather name="log-out" size={24} color="white" />
               </Pressable>
               <Text style={styles.headerText}>{name || "User Name"}</Text>
               <Pressable onPress={handleDeleteAccount}>
-                <Feather name="trash-2" size={24} color="red" />
+                <Feather name="trash-2" size={24} color={Colors.warning} />
               </Pressable>
             </View>
 
@@ -242,76 +213,27 @@ const Profile: React.FC = () => {
 
           <View style={styles.infoContainer}>
             <View style={styles.infoRow}>
-              <Feather
-                name="settings"
-                size={24}
-                color={isDark ? Colors.darkModeText : "#555"}
-              />
-              <Text
-                style={[
-                  styles.infoText,
-                  { color: isDark ? Colors.darkModeText : "#333" },
-                ]}
-              >
-                {role}
-              </Text>
+              <Feather name="settings" size={24} color={isDark ? Colors.darkModeText : Colors.text} />
+              <Text style={[styles.infoText, { color: isDark ? Colors.darkModeText : Colors.text }]}>{role}</Text>
             </View>
 
             <View style={styles.infoRow}>
-              <Feather
-                name="user"
-                size={24}
-                color={isDark ? Colors.darkModeText : "#555"}
-              />
-              <Text
-                style={[
-                  styles.infoText,
-                  { color: isDark ? Colors.darkModeText : "#333" },
-                ]}
-              >
-                {name}
-              </Text>
+              <Feather name="user" size={24} color={isDark ? Colors.darkModeText : Colors.text} />
+              <Text style={[styles.infoText, { color: isDark ? Colors.darkModeText : Colors.text }]}>{name}</Text>
             </View>
 
             <View style={styles.infoRow}>
-              <Feather
-                name="phone"
-                size={24}
-                color={isDark ? Colors.darkModeText : "#555"}
-              />
-              <Text
-                style={[
-                  styles.infoText,
-                  { color: isDark ? Colors.darkModeText : "#333" },
-                ]}
-              >
-                {phone}
-              </Text>
+              <Feather name="phone" size={24} color={isDark ? Colors.darkModeText : Colors.text} />
+              <Text style={[styles.infoText, { color: isDark ? Colors.darkModeText : Colors.text }]}>{phone}</Text>
             </View>
 
             <View style={styles.infoRow}>
-              <Feather
-                name="mail"
-                size={24}
-                color={isDark ? Colors.darkModeText : "#555"}
-              />
-              <Text
-                style={[
-                  styles.infoText,
-                  { color: isDark ? Colors.darkModeText : "#333" },
-                ]}
-              >
-                {email}
-              </Text>
+              <Feather name="mail" size={24} color={isDark ? Colors.darkModeText : Colors.text} />
+              <Text style={[styles.infoText, { color: isDark ? Colors.darkModeText : Colors.text }]}>{email}</Text>
             </View>
 
             <Pressable
-              style={[
-                styles.editButton,
-                {
-                  backgroundColor: isDark ? Colors.darkModePrimary : "#7f51ff",
-                },
-              ]}
+              style={[styles.editButton, { backgroundColor: isDark ? Colors.darkModePrimary : Colors.primary }]}
               onPress={() => router.push("../../screens/edit-profile")}
             >
               <Text style={styles.buttonText}>Edit profile</Text>
@@ -329,8 +251,12 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     justifyContent: "space-between",
   },
+  loaderContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
   header: {
-    backgroundColor: "#7f51ff",
     paddingTop: 50,
     paddingBottom: 30,
     alignItems: "center",
@@ -369,7 +295,6 @@ const styles = StyleSheet.create({
   },
   infoContainer: {
     padding: 20,
-    height: "70%",
     flex: 1,
     justifyContent: "center",
     gap: 15,
@@ -384,10 +309,8 @@ const styles = StyleSheet.create({
   },
   infoText: {
     fontSize: 16,
-    color: "#333",
   },
   editButton: {
-    backgroundColor: "#7f51ff",
     marginTop: 30,
     padding: 15,
     borderRadius: 30,
