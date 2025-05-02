@@ -1,7 +1,7 @@
 import { Drawer } from "expo-router/drawer";
 import { Ionicons } from "@expo/vector-icons";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { TouchableOpacity, View } from "react-native";
+import { Pressable, TouchableOpacity, View } from "react-native";
 import { DrawerItemList } from "@react-navigation/drawer";
 import { useEffect, useState } from "react";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
@@ -55,13 +55,14 @@ export default function Layout() {
           drawerStyle: {
             width: 250,
             paddingTop: 20,
-            backgroundColor: isDark ? Colors.darkModeBackground : "white",
+            backgroundColor: isDark ? Colors.darkModeBackground :"white",
           },
+          drawerActiveTintColor:"#4DA674",
           headerShown: false,
           headerLeft: () => (
-            <TouchableOpacity
+            <Pressable
               onPress={() => navigation.toggleDrawer()}
-            ></TouchableOpacity>
+            ></Pressable>
           ),
         })}
         drawerContent={(props) => {
@@ -83,6 +84,7 @@ export default function Layout() {
             </View>
           );
         }}
+
       >
         <Drawer.Screen
           name="(tabs)"
@@ -91,8 +93,8 @@ export default function Layout() {
             drawerLabelStyle: {
               color: isDark ? Colors.darkModeText : Colors.text,
             },
-            drawerIcon: ({ color, size }) => (
-              <Ionicons name="home-outline" size={size} color={color} />
+            drawerIcon: ({ size }) => (
+              <Ionicons name="home-outline" size={size} color={"#4DA674"} />
             ),
           }}
         />
@@ -103,11 +105,11 @@ export default function Layout() {
             drawerLabelStyle: {
               color: isDark ? Colors.darkModeText : Colors.text,
             },
-            drawerIcon: ({ size }) => (
+            drawerIcon: ({size }) => (
               <Ionicons
                 name="settings-outline"
                 size={size}
-                color={Colors.assestGray}
+                color={"#4DA674"}
               />
             ),
           }}
@@ -123,7 +125,7 @@ export default function Layout() {
               <Ionicons
                 name="information-circle-outline"
                 size={size}
-                color={Colors.assestGray}
+                color={"#4DA674"}
               />
             ),
           }}
@@ -141,7 +143,7 @@ export default function Layout() {
                 <Ionicons
                   name="add-circle-outline"
                   size={size}
-                  color={Colors.assestGray}
+                  color={"#4DA674"}
                 />
               ),
             }}
@@ -158,7 +160,7 @@ export default function Layout() {
                 <Ionicons
                   name="heart-outline"
                   size={size}
-                  color={Colors.assestGray}
+                  color={"#4DA674"}
                 />
               ),
             }}
