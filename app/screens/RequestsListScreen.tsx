@@ -18,9 +18,10 @@ import {
   doc,
   deleteDoc,
 } from "firebase/firestore";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Notifications from "expo-notifications";
-
+import auth from "@/services/firebase";
+import { onAuthStateChanged, User } from "firebase/auth";
+import { useIsFocused } from "@react-navigation/native";
 interface Request {
   id: string;
   issueType: string;
@@ -39,46 +40,36 @@ interface RequestsListScreenProps {
 const RequestsListScreen: React.FC<RequestsListScreenProps> = ({
   onNavigateToNewRequest,
 }) => {
-  const [storedUser, setStoredUser] = useState<any>(null);
-  const [loadingUser, setLoadingUser] = useState<boolean>(true);
   const [requests, setRequests] = useState<Request[]>([]);
   const [loadingRequests, setLoadingRequests] = useState<boolean>(true);
-
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const isFocused = useIsFocused();
   useEffect(() => {
-    const loadUserData = async () => {
-      try {
-        const userData = await AsyncStorage.getItem("userData");
-        if (userData) {
-          setStoredUser(JSON.parse(userData));
-        }
-      } catch (error) {
-        console.error("Error loading user data from AsyncStorage:", error);
-      } finally {
-        setLoadingUser(false);
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setCurrentUser(user);
+        fetchRequests(user.uid);
       }
-    };
-
-    loadUserData();
+      else{
+        setCurrentUser(null);
+        setRequests([]);
+      }
+    });
+    return unsubscribe;
   }, []);
-
+  
   useEffect(() => {
-    if (!loadingUser && storedUser?.uid) {
-      fetchRequests();
+    if (isFocused && currentUser) {
+      fetchRequests(currentUser.uid);
     }
-  }, [loadingUser, storedUser?.uid]);
+  }, [isFocused]);
 
-  const fetchRequests = async (): Promise<void> => {
+  const fetchRequests = async (userId: string): Promise<void> => {
     try {
       setLoadingRequests(true);
-      if (!storedUser?.uid) {
-        console.warn("User ID not available.");
-        setLoadingRequests(false);
-        return;
-      }
-
       const q = query(
         collection(db, "requests"),
-        where("userId", "==", storedUser.uid)
+        where("userId", "==", userId)
       );
       const querySnapshot = await getDocs(q);
       const requestsData: Request[] = [];
@@ -131,7 +122,7 @@ const RequestsListScreen: React.FC<RequestsListScreenProps> = ({
   if (loadingRequests) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#0000ff" />
+        <ActivityIndicator size="large" color="#4DA674" />
       </View>
     );
   }
@@ -199,7 +190,6 @@ const styles = StyleSheet.create({
   },
   container: {
     padding: 20,
-    backgroundColor: "#f5f5f5",
   },
   loadingContainer: {
     flex: 1,
@@ -251,7 +241,7 @@ const styles = StyleSheet.create({
     marginLeft: "53%",
   },
   newRequestButton: {
-    backgroundColor: "#0056A6",
+    backgroundColor: "#023336",
     padding: 15,
     borderRadius: 5,
     margin: 10,

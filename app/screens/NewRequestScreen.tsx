@@ -15,10 +15,10 @@ import * as ImagePicker from "expo-image-picker";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { db } from "@/services/firebase";
 import { collection, addDoc } from "firebase/firestore";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Calendar } from "react-native-calendars";
 import { Camera } from "expo-camera";
-
+import auth from "@/services/firebase";
+import { onAuthStateChanged, User } from "firebase/auth";
 interface Request {
   id: string;
   issueType: string;
@@ -46,10 +46,7 @@ const NewRequestScreen: React.FC<NewRequestScreenProps> = ({
   onNavigateBack,
   onNewRequestSubmitted,
 }) => {
-  const [storedUser, setStoredUser] = useState<any>(null);
-  const [loadingUser, setLoadingUser] = useState(true);
   const [selectedDate, setSelectedDate] = useState<string>("");
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [showcalendar, setShowCalendar] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [isImagePickerModalVisible, setIsImagePickerModalVisible] =
@@ -60,6 +57,7 @@ const NewRequestScreen: React.FC<NewRequestScreenProps> = ({
     imageUrl: "",
     preferredDate: "",
   });
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
   const requestPermissions = async () => {
     const { status: cameraStatus } =
       await Camera.requestCameraPermissionsAsync();
@@ -71,20 +69,14 @@ const NewRequestScreen: React.FC<NewRequestScreenProps> = ({
   };
 
   useEffect(() => {
-    const loadUserData = async () => {
-      try {
-        const userData = await AsyncStorage.getItem("userData");
-        if (userData) {
-          setStoredUser(JSON.parse(userData));
-        }
-      } catch (error) {
-        console.error("Error loading user data from AsyncStorage:", error);
-      } finally {
-        setLoadingUser(false);
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setCurrentUser(user);
+      if (!user) {
+        Alert.alert("Login Required", "Please login to submit a request");
       }
-    };
+    });
     requestPermissions();
-    loadUserData();
+    return unsubscribe;
   }, []);
 
   const takePhoto = async () => {
@@ -126,7 +118,7 @@ const NewRequestScreen: React.FC<NewRequestScreenProps> = ({
   const submitRequest = async (): Promise<void> => {
     try {
       setSubmitting(true);
-      if (!storedUser?.uid) {
+      if (!currentUser?.uid) {
         alert("Please login to submit a request");
         return;
       }
@@ -137,9 +129,9 @@ const NewRequestScreen: React.FC<NewRequestScreenProps> = ({
 
       const requestData: Omit<Request, "id"> = {
         ...newRequest,
-        userId: storedUser.uid,
+        userId: currentUser.uid,
         userName:
-          storedUser.displayName || storedUser.email || "Anonymous User",
+          currentUser.displayName || currentUser.email || "Anonymous User",
         createdAt: new Date().toISOString(),
         preferredDate: selectedDate,
       };
@@ -243,7 +235,7 @@ const NewRequestScreen: React.FC<NewRequestScreenProps> = ({
         <Calendar
           onDayPress={onDayPress}
           markedDates={{
-            [selectedDate]: { selected: true, disableTouchEvent: true },
+            [selectedDate]: { selected: true, disableTouchEvent: true},
           }}
         />
       )}
@@ -315,6 +307,7 @@ const styles = StyleSheet.create({
     color: "#333",
   },
   pickerContainer: {
+    backgroundColor:"white",
     borderWidth: 1,
     borderColor: "#ccc",
     borderRadius: 5,
@@ -322,6 +315,7 @@ const styles = StyleSheet.create({
   },
 
   descriptionInput: {
+    backgroundColor:"white",
     borderWidth: 1,
     borderColor: "#ccc",
     borderRadius: 5,
@@ -332,6 +326,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   uploadButton: {
+    backgroundColor:"white",
     borderWidth: 2,
     borderColor: "#ccc",
     borderRadius: 5,
@@ -360,7 +355,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   submitButton: {
-    backgroundColor: "#0056A6",
+    backgroundColor: "#023336",
     padding: 10,
     borderRadius: 5,
     marginTop: 30,
@@ -369,7 +364,7 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 5,
     marginTop: 10,
-    backgroundColor: "#D32F2F",
+    backgroundColor: "#4DA674",
     marginBottom: 20,
   },
   buttonText: {
@@ -400,6 +395,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   dateInput: {
+    backgroundColor:"white",
     flex: 1,
     paddingVertical: 10,
     fontSize: 12,
@@ -431,10 +427,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   buttonOpen: {
-    backgroundColor: "#0056A6",
+    backgroundColor: "#023336",
   },
   buttonClose: {
-    backgroundColor: "#aaa",
+    backgroundColor: "#4DA674",
   },
   modalText: {
     marginBottom: 15,
