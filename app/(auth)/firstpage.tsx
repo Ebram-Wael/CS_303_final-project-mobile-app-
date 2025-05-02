@@ -1,9 +1,8 @@
 import React from "react";
-import { StyleSheet, View, Text, Pressable, Image } from "react-native";
+import { StyleSheet, View, Text, Pressable, Image, ScrollView } from "react-native";
 import { useRouter } from "expo-router";
 import { useNavigation } from "@react-navigation/native";
 import { useLayoutEffect } from "react";
-import logo from "../../assets/images/homeStudent.jpg";
 import Colors from '@/components/colors';
 
 const Firstpage = () => {
@@ -14,9 +13,10 @@ const Firstpage = () => {
     navigation.setOptions({ headerShown: false });
   }, [navigation]);
   return (
+    // <ScrollView>
     <View style={styles.cont}>
-      <Image style={styles.img} source={logo} />
-      <View>
+      {/* <Image style={styles.img} source={logo} /> */}
+      <View style ={{alignItems:'center' ,marginTop:40}} >
         <Text style={styles.title}>Welcome To Homy</Text>
       </View>
       <Text style={styles.txt}>Easily Find the Home That Fits You</Text>
@@ -35,24 +35,34 @@ const Firstpage = () => {
         </Pressable>
       </View>
     </View>
+    // </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   img: {
-    width: "100%",
-    height: 500,
+    width: 300,
+    height: 300,
+    borderRadius: 0,
+    marginBottom: 20,
+    marginTop: 20,
+    borderTopLeftRadius: 100,
+    borderTopRightRadius: 100,
   },
   cont: {
-    backgroundColor: Colors.background,
+    backgroundColor: "white",
     padding: 20,
     justifyContent: "center",
-    alignItems: "center",
     display: "flex",
+    flex: 1,
+    paddingTop: 30,
+    alignSelf: "center",
+    marginTop: '20%',
+  
   },
   btn: {
     display: "flex",
-    backgroundColor: Colors.secondary,
+    backgroundColor: Colors.assestGreen,
     width: 250,
     height: 50,
     justifyContent: "center",

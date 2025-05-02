@@ -25,7 +25,6 @@ import { db } from "@/services/firebase";
 import * as Notifications from 'expo-notifications';
 
 
-const log = require("../../assets/images/login.jpg");
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -136,10 +135,10 @@ const Login = () => {
             </Text>
           </View>
           <View>
-            <Image
+            {/* <Image
               style={{ width: 250, height: 250, alignSelf: "center" }}
               source={log}
-            />
+            /> */}
             <TextInput
               onFocus={() => setBorderColor(Colors.secondary)}
               onBlur={() => setBorderColor(Colors.primary)}
@@ -182,7 +181,7 @@ const Login = () => {
           <View style={styles.join}>
             <Text> Create an Account?</Text>
             <Pressable onPress={() => router.push("/register")}>
-              <Text style={{ color: Colors.assestBlue, textDecorationLine: "underline" }}>
+              <Text style={{ color: Colors.assestGreen, textDecorationLine: "underline" }}>
                 Sign Up
               </Text>
             </Pressable>
@@ -213,19 +212,20 @@ const styles = StyleSheet.create({
     fontSize: 30,
     fontWeight: "bold",
     textAlign: "center",
-    marginBottom: 10,
-    color: Colors.secondary,
+    marginBottom: 20,
+    color: '#023336',
   },
   txt: {
     flexDirection: "row",
     gap: 10,
     alignItems: "center",
     marginBottom: 40,
-    fontSize: 13,
+    fontSize: 20,
     justifyContent: "center",
+    fontWeight: "bold",
   },
   btn: {
-    backgroundColor: Colors.secondary,
+    backgroundColor: Colors.assestGreen,
     padding: 10,
     borderRadius: 5,
     width: 250,

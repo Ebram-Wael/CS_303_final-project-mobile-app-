@@ -29,9 +29,9 @@ export default function AddApartment() {
   const [features, setFeatures] = useState("");
   const [floor, setFloor] = useState("");
   const [image, setImage] = useState([]);
+  const [nearby, setNearby] = useState("");
   const auth = getAuth();
   const user = auth.currentUser;
-  const city = require("../../assets/images/city.jpg");
 
   const [errorNum, setErorrorNum] = useState("");
   const [errorPrice, setErrorPrice] = useState("");
@@ -40,6 +40,8 @@ export default function AddApartment() {
   const [errorImage, setErrorImage] = useState("");
   const [errorFeatures, setErrorFeatures] = useState("");
   const [errorFloor, setErrorFloor] = useState("");
+  const [errorNearby, setErrorNearby] = useState("");
+  
 
   const router = useRouter();
 
@@ -60,6 +62,7 @@ export default function AddApartment() {
     setErrorImage("");
     setErrorFeatures("");
     setErrorFloor("");
+    setErrorNearby
     if (!unitNum) {
       setErorrorNum("Please enter unit number");
       isValid = false;
@@ -88,6 +91,10 @@ export default function AddApartment() {
       setErrorFloor("Please enter floor");
       isValid = false;
     }
+    if (!nearby) {
+      setErrorNearby("Please enter nearby");
+      isValid = false;
+    }
     return isValid;
   };
 
@@ -106,6 +113,8 @@ export default function AddApartment() {
         image: image,
         features: features,
         floor: floor,
+        nearby: nearby,
+        
       });
       Alert.alert("Apartment added successfully!");
       setunitNum("");
@@ -116,6 +125,7 @@ export default function AddApartment() {
       setImage([]);
       setFeatures("");
       setFloor("");
+      setNearby("");
       router.push("../(drawer)/(tabs)/explore");
     } catch (error) {
       console.log("Error adding document: ", error);
@@ -137,10 +147,10 @@ export default function AddApartment() {
     <SafeAreaView style={[styles.container, { backgroundColor: isDark ? Colors.darkModeBackground : Colors.background }]}>
       <ScrollView showsVerticalScrollIndicator={false}>
         <Text style={styles.text}> Add your Apartment </Text>
-        <Image
+        {/* <Image
           style={{ width: 300, height: 200, alignSelf: "center" }}
           source={city}
-        />
+        /> */}
         <TextInput
           style={styles.input}
           placeholder="Enter unit Number"
@@ -182,6 +192,13 @@ export default function AddApartment() {
           keyboardType="numeric"
         />
         {errorFloor && <Text style={styles.error}>{errorFloor}</Text>}
+        <TextInput
+          style={styles.input}
+          placeholder="Enter nearby"
+          value={nearby}
+          onChangeText={(text) => setNearby(text)}
+        />
+        {errorNearby && <Text style={styles.error}>{errorNearby}</Text>}
 
         <TextInput
           style={styles.input}
@@ -203,7 +220,7 @@ export default function AddApartment() {
         {errorImage && <Text style={styles.error}>{errorImage}</Text>}
         <View style={styles.sub}>
           <Pressable
-            style={[styles.btn, { backgroundColor: isDark ? Colors.darkModeSecondary : Colors.secondary }]}
+            style={[styles.btn, { backgroundColor: isDark ? Colors.darkModeSecondary : Colors.assestGreen }]}
             onPress={async () => await handleSubmit()}
           >
             <Text>ADD APARTMENT</Text>
@@ -230,7 +247,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   btn: {
-    backgroundColor: Colors.secondary,
+    backgroundColor: Colors.assestGreen,
     width: 200,
     height: 50,
     paddingVertical: 12,

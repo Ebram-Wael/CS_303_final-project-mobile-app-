@@ -79,7 +79,7 @@ export default function index() {
             Learn More about us by clicking the button below
           </Text>
           <Pressable
-            style={[styles.btn, { backgroundColor: isDark ? Colors.darkModeSecondary : Colors.secondary }]}
+            style={[styles.btn, { backgroundColor: isDark ? Colors.darkModeSecondary : Colors.assestGreen }]}
             onPress={() => router.push("/(drawer)/AboutUs")}
           >
             <Text style={{ color: "white" }}>Click me!</Text>
@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
   btn: {
     width: 150,
     height: 45,
-    backgroundColor: Colors.secondary,
+    backgroundColor: Colors.assestGreen,
     textAlign: "center",
     justifyContent: "center",
     alignSelf: "center",
