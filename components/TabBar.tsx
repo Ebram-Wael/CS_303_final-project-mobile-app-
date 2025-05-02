@@ -119,7 +119,9 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     backgroundColor: Colors.primary,
-    paddingVertical: 12,
+    paddingVertical: 10,
+    borderTopLeftRadius: 6,
+    borderTopRightRadius: 6,
   },
   tabbarItem: {
     flex: 1,
