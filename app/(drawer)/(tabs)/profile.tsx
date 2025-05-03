@@ -196,7 +196,7 @@ const Profile = () => {
               </Pressable>
               <Text style={styles.headerText}>{name || "User Name"}</Text>
               <Pressable onPress={handleDeleteAccount}>
-                <Feather name="trash-2" size={24} color={Colors.warning} />
+                <Feather name="trash-2" size={24} color={Colors.whiteText} />
               </Pressable>
             </View>
 
