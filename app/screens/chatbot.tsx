@@ -55,7 +55,13 @@ useEffect(() => {
                     setLoading(false);
                 }, 2000);
             }
-            else {
+            else if(messagein.includes("hi") || messagein.includes("hello") || messagein.includes("hey")) {
+                setTimeout(() => {
+                    setMessages((prev) => [...prev, { role: "bot", content: `Hello! How can I help you today?` }]);
+                    setLoading(false);
+                }, 2000);
+            }
+            else if(messagein.includes("location") || messagein.includes("price") || messagein.includes("bedrooms") || messagein.includes("university")|| messagein.includes("nearest") ||messagein.includes ("near to") ){
               const givenToAi =`you are a helpful assistant that helps users to filter Apartment with any of these fields : 
               location ,price ,number of bedrooms and nearest to university 
               Return your response in a JSON format with the following:
@@ -113,6 +119,12 @@ useEffect(() => {
               }
              
                 
+            }
+            else {
+                setTimeout(() => {
+                    setMessages((prev) => [...prev, { role: "bot", content: `Sorry, I don't support this type of question\n I can help you to get apartment with specific type` }]);
+                    setLoading(false);
+                }, 2000);
             }
 
         } catch (error) {
