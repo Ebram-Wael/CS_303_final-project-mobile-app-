@@ -16,7 +16,7 @@ import pic4 from "@/assets/images/homepic4.jpg";
 import FloatingMenuButton from "@/components/FloatingMenuButton";
 import Colors from '@/components/colors';
 import { useRouter } from "expo-router";
-import { useThemes } from '@/components/themeContext'
+import { useThemes } from '@/components/themeContext';
 
 export default function index() {
   const { theme } = useThemes();
