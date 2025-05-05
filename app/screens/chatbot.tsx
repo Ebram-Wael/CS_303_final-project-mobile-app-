@@ -1,7 +1,8 @@
 import { useRouter } from "expo-router";
 import React, { useEffect, useState ,useRef ,ReactNode } from "react";
 import { View, Text, Pressable, ScrollView, TextInput, StyleSheet, ActivityIndicator } from "react-native";
-
+import Colors from "@/components/colors";
+import { useThemes } from '@/components/themeContext';
 
 const apiKey = "AIzaSyCLiJ4ok_zmtWFO0SRrNHfdZTakFFBx0rQ";
 type message ={
@@ -17,6 +18,8 @@ const [messages , setMessages] = useState<message[]>([]);
 const [loading , setLoading] = useState(false);
 const scrollViewRef = useRef<ScrollView>(null);
 const [hasTyped, setHasTyped] = useState(false);
+ const { theme } = useThemes();
+    const isDark = theme === 'dark';
 
 useEffect(() => {
     scrollViewRef.current?.scrollToEnd({ animated: true });
@@ -170,7 +173,7 @@ useEffect(() => {
                         }
                     })
                 }>
-                    <Text style={{color:'#023336' ,textDecorationLine :'underline'}} >Click here</Text>
+                    <Text style={{color:isDark?Colors.darkModeText:Colors.text ,textDecorationLine :'underline'}} >Click here</Text>
                 </Pressable>
             ) },
         ]);
@@ -181,8 +184,8 @@ useEffect(() => {
 
 
 return (
-    <View style={styles.container}>
-      <View style={styles.header}>
+    <View style={[styles.container,{backgroundColor:isDark?Colors.darkModeBackground:Colors.background}]}>
+      <View style={[styles.header,{backgroundColor:isDark?Colors.darkModePrimary:Colors.primary}]}>
         <Text style={styles.headerText}> Chat bot </Text>
       </View>
       <ScrollView 
@@ -196,23 +199,29 @@ return (
             key={index}
             style={[
               styles.bubble,
-              msg.role === 'user' ? styles.userBubble : styles.botBubble,
+              msg.role === 'user' ? 
+             [ styles.userBubble ,{backgroundColor:isDark?Colors.assestGreenThree:Colors.assestGreenTwo}]
+              : 
+             [ styles.botBubble,{backgroundColor:isDark?Colors.assestGreenTwo:Colors.assestGreenThree}],
             ]}
           >
-            <Text style={msg.role === 'user' ? styles.userText : styles.botText}>
+            <Text style={msg.role === 'user' ? 
+              [styles.userText,{color:isDark?Colors.text:Colors.darkModeText}]
+              :
+               [styles.botText,{color:isDark?Colors.darkModeText:Colors.text}]}>
               {msg.content}
             </Text>
           </View>
         ))}
         {loading && (
-          <View style={[styles.bubble, styles.botBubble]}>
-            <ActivityIndicator size="small" color="#666" />
-            <Text style={styles.typingText}>Typing...</Text>
+          <View style={[styles.bubble, styles.botBubble,{backgroundColor:isDark?Colors.assestGreenTwo:Colors.assestGreenThree}]}>
+            <ActivityIndicator size="small" color={isDark?Colors.darkIndicator:Colors.indicator} />
+            <Text style={[styles.typingText,{color:isDark?Colors.darkModeText:Colors.text}]}>Typing...</Text>
           </View>
         )}
       </ScrollView>
       
-      <View style={styles.inputCont}>
+      <View style={[styles.inputCont,{backgroundColor:isDark?Colors.darkModeBackground:Colors.background}]}>
         <TextInput
           value={input}
           onChangeText={(text)=>{
@@ -220,17 +229,20 @@ return (
             (text.length > 0) ? setHasTyped(false) : setHasTyped(false);
           }}
           placeholder="Type your message..."
-          style={styles.input}
+          style={[styles.input,
+            {backgroundColor:isDark?Colors.darkModePrimary:Colors.primary,
+              color:isDark?Colors.darkModeText:Colors.darkModeText
+            }]}
           
           multiline
           onSubmitEditing={handleSend}
         />
         <Pressable 
-          style={styles.sendButton} 
+          style={[styles.sendButton,{backgroundColor:isDark?Colors.darkModePrimary:Colors.primary}]} 
           onPress={handleSend}
           disabled={loading}
         >
-          <Text style={styles.sendButtonText}>Send</Text>
+          <Text style={[styles.sendButtonText,{color:isDark?Colors.darkModeText:Colors.darkModeText}]}>Send</Text>
         </Pressable>
       </View>
     </View>

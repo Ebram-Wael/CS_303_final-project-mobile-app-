@@ -91,7 +91,7 @@ export default function EditProfile() {
             <TextInput value={phone} onChangeText={setPhone} style={styles.input} keyboardType="phone-pad" />
             <Text style={[styles.label, , { color: isDark ? Colors.darkModeText : "#555" }]}>Email</Text>
             <TextInput value={email} onChangeText={setEmail} style={styles.input} keyboardType="email-address" />
-            <Pressable onPress={handleUpdate} style={[styles.button, { backgroundColor: isDark ? Colors.darkModeSecondary : "#7f51ff" }]}>
+            <Pressable onPress={handleUpdate} style={[styles.button, { backgroundColor: isDark ? Colors.darkModeSecondary : Colors.primary }]}>
                 {loading ? (
                     <ActivityIndicator size="small" color="#fff" />
                 ) : (
@@ -121,7 +121,7 @@ const styles = StyleSheet.create({
         marginBottom: 20,
     },
     button: {
-        backgroundColor: "#7f51ff",
+        backgroundColor: Colors.primary,
         padding: 15,
         borderRadius: 30,
         alignItems: "center",

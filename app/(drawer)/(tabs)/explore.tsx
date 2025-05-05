@@ -21,6 +21,7 @@ import Filters from "@/components/Filters";
 import { MaterialIcons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { useLocalSearchParams } from "expo-router";
+import Colors from "@/components/colors";
 
 const COLORS = {
   primaryDark: "#023336",
@@ -113,14 +114,14 @@ const HouseItem = ({ house }) => {
       <View
         style={[
           styles.card,
-          { backgroundColor: isDark ? "#333" : COLORS.white },
+          { backgroundColor: isDark ? Colors.darkModePrimary : Colors.assestWhite },
         ]}
       >
         <View style={styles.cardHeader}>
           <Text
             style={[
               styles.title,
-              { color: isDark ? COLORS.white : COLORS.text },
+              { color: isDark ? Colors.assestWhite : Colors.assest },
             ]}
           >
             {house.features || house.property_type || "House"}
@@ -130,7 +131,7 @@ const HouseItem = ({ house }) => {
         <Text
           style={[
             styles.address,
-            { color: isDark ? COLORS.primaryLight : COLORS.textLight },
+            { color: isDark ? Colors.assestGreenThree : Colors.assestGreenTwo },
           ]}
         >
           {house.location || "Unknown Location"}
@@ -149,12 +150,12 @@ const HouseItem = ({ house }) => {
             <MaterialIcons
               name="hotel"
               size={18}
-              color={isDark ? COLORS.primaryLight : COLORS.textLight}
+              color={isDark ? Colors.assestGreenThree : Colors.assestGreenTwo}
             />
             <Text
               style={[
                 styles.detailText,
-                { color: isDark ? COLORS.primaryLight : COLORS.textLight },
+                { color: isDark ? Colors.assestGreenThree : Colors.assestGreenTwo },
               ]}
             >
               {house.num_bedrooms || "N/A"} Beds
@@ -163,13 +164,13 @@ const HouseItem = ({ house }) => {
             <MaterialIcons
               name="layers"
               size={18}
-              color={isDark ? COLORS.primaryLight : COLORS.textLight}
+              color={isDark ? Colors.assestGreenThree : Colors.assestGreenTwo}
               style={styles.detailIcon}
             />
             <Text
               style={[
                 styles.detailText,
-                { color: isDark ? COLORS.primaryLight : COLORS.textLight },
+                { color: isDark ? Colors.assestGreenThree : Colors.assestGreenTwo },
               ]}
             >
               Floor {house.floor || "N/A"}
@@ -183,13 +184,13 @@ const HouseItem = ({ house }) => {
               <Text
                 style={[
                   styles.owner,
-                  { color: isDark ? COLORS.white : COLORS.text },
+                  { color: isDark ? Colors.assestWhite : Colors.assest },
                 ]}
               >
                 Owner:{" "}
               </Text>
               <Pressable onPress={navigateToOwner}>
-                <Text style={{ color: COLORS.primary }}>
+                <Text style={{ color: Colors.assestGreenTwo }}>
                   {owner || "Unknown"}
                 </Text>
               </Pressable>
@@ -199,7 +200,7 @@ const HouseItem = ({ house }) => {
               <View
                 style={[
                   styles.availabilityBadge,
-                  { backgroundColor: isDark ? COLORS.success : COLORS.primary },
+                  { backgroundColor: isDark ? Colors.assestGreenTwo : Colors.assestGreenTwo },
                 ]}
               >
                 <Text style={styles.availabilityText}>Available</Text>
@@ -210,7 +211,7 @@ const HouseItem = ({ house }) => {
           <Text
             style={[
               styles.price,
-              { color: isDark ? COLORS.primaryLight : COLORS.primary },
+              { color: isDark ? Colors.assestGreenThree : Colors.assestGreenTwo },
             ]}
           >
             {house.rent > 0 ? `${house.rent.toLocaleString()}` : "N/A"} EGP
@@ -332,7 +333,7 @@ export default function HouseList() {
         } finally {
           setIsLoading(false);
         }
-        return () => {};
+        return () => { };
       }
     };
 
@@ -448,8 +449,8 @@ export default function HouseList() {
   const renderContent = useMemo(() => {
     if (isLoading) {
       return (
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={COLORS.primary} />
+        <View style={[styles.loadingContainer, { backgroundColor: isDark ? Colors.darkModeBackground : Colors.background }]}>
+          <ActivityIndicator size="large" color={isDark ? Colors.darkIndicator : Colors.indicator} />
         </View>
       );
     }
@@ -460,12 +461,12 @@ export default function HouseList() {
           <MaterialIcons
             name="search-off"
             size={48}
-            color={isDark ? COLORS.textLight : COLORS.primaryLight}
+            color={isDark ? Colors.assestGreenTwo : Colors.assestGreenThree}
           />
           <Text
             style={[
               styles.loadingText,
-              { color: isDark ? COLORS.primaryLight : COLORS.textLight },
+              { color: isDark ? Colors.assestGreenThree : Colors.assestGreenTwo },
             ]}
           >
             No houses match your search
@@ -483,14 +484,14 @@ export default function HouseList() {
     <View
       style={[
         styles.container,
-        { backgroundColor: isDark ? COLORS.primaryDark : COLORS.background },
+        { backgroundColor: isDark ? Colors.darkModeBackground : Colors.background },
       ]}
     >
       <SafeAreaView edges={["top"]} style={styles.headerContainer}>
         <Text
           style={[
             styles.header,
-            { color: isDark ? COLORS.white : COLORS.text },
+            { color: isDark ? Colors.darkModeText : Colors.assest },
           ]}
         >
           Available Properties
@@ -499,22 +500,22 @@ export default function HouseList() {
       <View
         style={[
           styles.searchContainer,
-          { backgroundColor: isDark ? COLORS.primaryDark : COLORS.white },
+          { backgroundColor: isDark ? Colors.darkModePrimary : Colors.assestWhite },
         ]}
       >
         <TextInput
           placeholder="Search location, features, price..."
-          placeholderTextColor={isDark ? COLORS.primaryLight : COLORS.textLight}
+          placeholderTextColor={isDark ? Colors.assestGreenThree : Colors.assestGreenTwo}
           clearButtonMode="while-editing"
           style={[
             styles.searchBox,
-            { color: isDark ? COLORS.white : COLORS.text },
+            { color: isDark ? Colors.assestWhite : Colors.text },
           ]}
           autoCapitalize="none"
           autoCorrect={false}
           value={searchQuery}
           onChangeText={onChangeText}
-          cursorColor={COLORS.primary}
+          cursorColor={Colors.assestGreenTwo}
         />
         <Pressable
           onPress={() => {

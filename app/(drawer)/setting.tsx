@@ -79,7 +79,7 @@ const Settings = () => {
         </View>
         <View style={styles.block}>
           <Pressable
-            onPress={() => router.push("../components/contactUs")}
+            onPress={() => router.push("../screens/contactUs")}
             style={styles.iconTextRow}
           >
             <MailIcon width={20} height={20} />
@@ -97,7 +97,9 @@ const Settings = () => {
           Privacy
         </Text>
         <View style={styles.block}>
-          <Pressable style={styles.iconTextRow}>
+          <Pressable
+            onPress={() => router.push("../screens/privacy")}
+            style={styles.iconTextRow}>
             <Privacy width={20} height={20} />
             <Text style={[styles.text, { color: Colors.text }]}>
               Privacy Policy
