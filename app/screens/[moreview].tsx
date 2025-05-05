@@ -137,6 +137,30 @@ const HouseDesc = ({ house }) => {
     }
   };
 
+  const handleAddToCart =async ()=>{
+    try {
+      const existingCart = await AsyncStorage.getItem("cart");
+      const parsedCart = existingCart ? JSON.parse(existingCart) : [];
+  
+      const newItem = {
+        id: house.id,
+        image: house.image[0], 
+        rent: house.rent,
+        location: house.location,
+        features: house.features,
+        floor: house.floor,
+        unit_number: house.unit_number,
+        num_bedrooms: house.num_bedrooms,
+      };
+      const updatedCart = [...parsedCart, newItem];
+  
+      await AsyncStorage.setItem("cart", JSON.stringify(updatedCart));
+      console.log("Cart updated:", updatedCart);
+    } catch (error) {
+      console.error("Failed to add to cart:", error);
+    }
+  };
+
   useEffect(() => {
     Animated.timing(animatedValue, {
       toValue: expanded ? 1 : 0,
@@ -212,7 +236,7 @@ const HouseDesc = ({ house }) => {
                     : <Heart width={30} height={30} />
                 )}
               </Pressable>
-              <Pressable style={[styles.buyNowView, { backgroundColor: isDark ? Colors.assestBlue : Colors.text }]}>
+              <Pressable onPress={handleAddToCart} style={[styles.buyNowView, { backgroundColor: isDark ? Colors.assestBlue : Colors.text }]}>
                 <Text style={styles.buyNowText}>Buy Now!</Text>
               </Pressable>
             </View>
