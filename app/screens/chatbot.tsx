@@ -69,10 +69,7 @@ useEffect(() => {
                     setMessages((prev) => [...prev, { role: "bot", content: `I can help you to get apartment with specific type` }]);
                     setLoading(false);
                 }, 2000);
-                setTimeout(() => {
-                    setMessages((prev) => [...prev, { role: "bot", content: `I can help you to get apartment with specific type` }]);
-                    setLoading(false);
-                }, 2000);
+               
             }
             else if(messagein.includes("help") || messagein.includes("support") || messagein.includes("assistance")){
                 setTimeout(() => {
