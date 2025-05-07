@@ -106,6 +106,10 @@ const HouseItem = ({ house }) => {
   const houseImage =
     house.image && house.image.length > 0 ? house.image[0] : null;
 
+    if(house.status === "pending") {
+      return null;
+    }
+
   return (
     <Pressable
       onPress={navigateToDetails}

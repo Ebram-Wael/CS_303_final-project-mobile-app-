@@ -64,6 +64,22 @@ useEffect(() => {
                     setLoading(false);
                 }, 2000);
             }
+            else if(messagein.includes("apartment") || messagein.includes("unit") || messagein.includes("room") || messagein.includes("house") || messagein.includes("flat") && messagein.includes("find") || messagein.includes("search") || messagein.includes("looking") || messagein.includes("help") ){
+                setTimeout(() => {
+                    setMessages((prev) => [...prev, { role: "bot", content: `I can help you to get apartment with specific type` }]);
+                    setLoading(false);
+                }, 2000);
+                setTimeout(() => {
+                    setMessages((prev) => [...prev, { role: "bot", content: `I can help you to get apartment with specific type` }]);
+                    setLoading(false);
+                }, 2000);
+            }
+            else if(messagein.includes("help") || messagein.includes("support") || messagein.includes("assistance")){
+                setTimeout(() => {
+                    setMessages((prev) => [...prev, { role: "bot", content: `You can contact support:\n1. Visit the "Help" setting\n2. Select "Contact Support"\n3. Choose your apartment seller'  ` }]);
+                    setLoading(false);
+                }, 2000);
+            }
             else if(messagein.includes("location") || messagein.includes("price") || messagein.includes("bedrooms") || messagein.includes("university")|| messagein.includes("nearest") ||messagein.includes ("near to") ){
               const givenToAi =`you are a helpful assistant that helps users to filter Apartment with any of these fields : 
               location ,price ,number of bedrooms and nearest to university 

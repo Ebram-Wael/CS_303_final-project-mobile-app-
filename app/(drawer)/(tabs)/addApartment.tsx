@@ -9,6 +9,7 @@ import {
   Image,
   ScrollView,
   SafeAreaView,
+  ActivityIndicator,
 } from "react-native";
 import { useState, useEffect } from "react";
 import { addDoc, collection } from "firebase/firestore";
@@ -20,6 +21,7 @@ import Colors from '@/components/colors';
 import { useThemes } from '@/components/themeContext'
 
 export default function AddApartment() {
+  const [loading, setLoading] = useState(false);
   const [unitNum, setunitNum] = useState("");
   const [sellerId, setSellerId] = useState("");
   const [price, setPrice] = useState("");
@@ -30,6 +32,7 @@ export default function AddApartment() {
   const [floor, setFloor] = useState("");
   const [image, setImage] = useState([]);
   const [nearby, setNearby] = useState("");
+  const [status , setStatus] = useState("pending");
   const auth = getAuth();
   const user = auth.currentUser;
 
@@ -55,6 +58,8 @@ export default function AddApartment() {
 
   const validateInputs = () => {
     let isValid = true;
+    if(loading)return
+    setLoading(true);
     setErorrorNum("");
     setErrorPrice("");
     setErrorLocation("");
@@ -114,9 +119,11 @@ export default function AddApartment() {
         features: features,
         floor: floor,
         nearby: nearby,
+        status: status,
         
       });
-      Alert.alert("Apartment added successfully!");
+      Alert.alert("we gonna review your apartment and get back to you");
+      setLoading(false);
       setunitNum("");
       setPrice("");
       setLocation("");
@@ -126,7 +133,7 @@ export default function AddApartment() {
       setFeatures("");
       setFloor("");
       setNearby("");
-      router.push("../(drawer)/(tabs)/explore");
+      router.push("/(drawer)/(tabs)/explore");
     } catch (error) {
       console.log("Error adding document: ", error);
     }
@@ -147,10 +154,6 @@ export default function AddApartment() {
     <SafeAreaView style={[styles.container, { backgroundColor: isDark ? Colors.darkModeBackground : Colors.background }]}>
       <ScrollView showsVerticalScrollIndicator={false}>
         <Text style={styles.text}> Add your Apartment </Text>
-        {/* <Image
-          style={{ width: 300, height: 200, alignSelf: "center" }}
-          source={city}
-        /> */}
         <TextInput
           style={styles.input}
           placeholder="Enter unit Number"
@@ -219,12 +222,16 @@ export default function AddApartment() {
         </ScrollView>
         {errorImage && <Text style={styles.error}>{errorImage}</Text>}
         <View style={styles.sub}>
-          <Pressable
+
+          {loading ? ( <ActivityIndicator size="small" color="white" />) :(
+            <Pressable disabled={loading}
             style={[styles.btn, { backgroundColor: isDark ? Colors.darkModeSecondary : Colors.assestGreen }]}
             onPress={async () => await handleSubmit()}
           >
             <Text>ADD APARTMENT</Text>
           </Pressable>
+          )}
+          
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -237,6 +244,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     paddingTop: 30,
+    paddingBottom: 30,
   },
   input: {
     height: 50,

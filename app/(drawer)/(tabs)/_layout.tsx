@@ -15,8 +15,12 @@ const TabLayout = () => {
       >
         <Tabs.Screen name="index" options={{ headerShown: false }} />
         <Tabs.Screen name="cart" />
+        <Tabs.Screen name="addApartment" />
         <Tabs.Screen name="explore" />
+        <Tabs.Screen name="approve" />
+        <Tabs.Screen name="amount" />
         <Tabs.Screen name="profile" />
+
       </Tabs>
 
       <Pressable
