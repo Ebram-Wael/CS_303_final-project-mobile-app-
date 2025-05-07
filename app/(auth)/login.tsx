@@ -43,9 +43,6 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(true);
   const [loading, setLoading] = useState(false);
   const [isValid, setIsValid] = useState(false);
-
-  const [name, setName] = useState("")
-
   const ChangePassword = () => {
     setShowPassword(!showPassword);
   };
@@ -90,9 +87,10 @@ const Login = () => {
       const user = cardinality.user;
       const docc = doc(db, "Users", user.uid);
       const userdoc = await getDoc(docc);
-      if (userdoc) {
+      let userName ="";
+      if (userdoc.exists()) {
         const data = userdoc.data()
-        setName(data.name);
+        userName = data.name;
       }
       await AsyncStorage.setItem("userData", JSON.stringify({
         uid: user.uid,
@@ -101,7 +99,7 @@ const Login = () => {
         phone: user.phoneNumber,
         imageurl: user.photoURL
       }));
-      sendWelcomeNotification(name);
+      sendWelcomeNotification(userName);
       setTimeout(() => router.replace('/(drawer)/(tabs)/profile'), 500);
     } catch (error) {
       if (error.code === "auth/invalid-credential") {
