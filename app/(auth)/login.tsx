@@ -18,9 +18,10 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { ActivityIndicator } from "react-native-paper";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import Colors from '@/components/colors';
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/services/firebase";
+import Colors from '@/components/colors';
+import { useThemes } from '@/components/themeContext'
 
 import * as Notifications from 'expo-notifications';
 
@@ -45,6 +46,9 @@ const Login = () => {
   const [isValid, setIsValid] = useState(false);
 
   const [name, setName] = useState("")
+
+  const { theme } = useThemes();
+  const isDark = theme === 'dark';
 
   const ChangePassword = () => {
     setShowPassword(!showPassword);
@@ -172,7 +176,7 @@ const Login = () => {
             disabled={!isValid}
           >
             {loading ? (
-              <ActivityIndicator size="small" color="white" />
+              <ActivityIndicator size="small" color={isDark ? Colors.darkIndicator : Colors.indicator} />
             ) : (
               <Text style={{ color: Colors.whiteText, fontSize: 18 }}>Login</Text>
             )}

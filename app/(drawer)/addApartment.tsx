@@ -41,7 +41,7 @@ export default function AddApartment() {
   const [errorFeatures, setErrorFeatures] = useState("");
   const [errorFloor, setErrorFloor] = useState("");
   const [errorNearby, setErrorNearby] = useState("");
-  
+
 
   const router = useRouter();
 
@@ -114,7 +114,7 @@ export default function AddApartment() {
         features: features,
         floor: floor,
         nearby: nearby,
-        
+
       });
       Alert.alert("Apartment added successfully!");
       setunitNum("");
@@ -146,7 +146,7 @@ export default function AddApartment() {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: isDark ? Colors.darkModeBackground : Colors.background }]}>
       <ScrollView showsVerticalScrollIndicator={false}>
-        <Text style={styles.text}> Add your Apartment </Text>
+        <Text style={[styles.text, { color: isDark ? Colors.darkModeText : Colors.text }]}> Add your Apartment </Text>
         {/* <Image
           style={{ width: 300, height: 200, alignSelf: "center" }}
           source={city}

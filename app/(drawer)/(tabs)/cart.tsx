@@ -12,6 +12,8 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Icon from "react-native-vector-icons/FontAwesome";
 import Colors from "@/components/colors";
+import { useThemes } from "@/components/themeContext";
+
 interface CartItem {
   id: string;
   image: string;
@@ -25,13 +27,16 @@ interface CartItem {
 
 const CartScreen = () => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const { theme } = useThemes();
+  const isDark = theme === "dark";
+
   useEffect(() => {
     const fetchCart = async () => {
       try {
         const cart = await AsyncStorage.getItem("cart");
         if (cart) {
           const parsedCart = JSON.parse(cart);
-          
+
           setCartItems(parsedCart);
         }
       } catch (error) {
@@ -66,34 +71,36 @@ const CartScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: isDark ? Colors.darkModeBackground : Colors.background }]}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         {cartItems.length === 0 ? (
-          <Text style={styles.emptyText}>Your cart is empty 🛒</Text>
+          <Text style={[styles.emptyText, { color: isDark ? Colors.darkModeText : Colors.text }]}>Your cart is empty 🛒</Text>
         ) : (
           cartItems.map((item) => (
-            <View key={item.id} style={styles.card}>
+            <View key={item.id} style={[styles.card, { backgroundColor: isDark ? Colors.darkModePrimary : Colors.assestWhite }]}>
               <Image
                 source={{
-                  uri: item.image ,
+                  uri: item.image,
                 }}
                 style={styles.image}
               />
-              <View style={styles.details}>
-                <Text style={styles.location}>{item.location}</Text>
-                <Text style={styles.price}>{item.rent} EGP</Text>
-                {item.floor && <Text>Floor: {item.floor}</Text>}
-                {item.unit_number && <Text>Unit: {item.unit_number}</Text>}
+              <View style={[styles.details]}>
+                <Text style={[styles.location, { color: isDark ? Colors.assestGreenThree : Colors.text }]}>{item.location}</Text>
+                <Text style={[styles.price, { color: isDark ? Colors.assestGreenTwo : Colors.assestGreen }]}>{item.rent} EGP</Text>
+                {item.floor && <Text style={{ color: isDark ? Colors.assestGreenThree : Colors.text }}>Floor: {item.floor}</Text>}
+                {item.unit_number && <Text style={{ color: isDark ? Colors.assestGreenThree : Colors.text }}>Unit: {item.unit_number}</Text>}
                 {item.num_bedrooms !== undefined && (
-                  <Text>Bedrooms: {item.num_bedrooms}</Text>
+                  <Text style={{ color: isDark ? Colors.assestGreenThree : Colors.text }}>Bedrooms: {item.num_bedrooms}</Text>
                 )}
-                {item.features && <Text>Features: {item.features}</Text>}
+                {item.features && <Text style={{ color: isDark ? Colors.assestGreenThree : Colors.text }}>Features: {item.features}</Text>}
               </View>
               <Pressable
                 style={styles.trashButton}
                 onPress={() => handleRemoveItem(item.id)}
               >
-                <Icon name="trash" size={25} color="black" />
+                {isDark ?
+                  <Icon name="trash" size={25} color="white" />
+                  : <Icon name="trash" size={25} color="black" />}
               </Pressable>
             </View>
           ))
@@ -101,8 +108,8 @@ const CartScreen = () => {
       </ScrollView>
 
       {cartItems.length > 0 && (
-        <View style={styles.footer}>
-          <Pressable style={styles.checkoutButton} onPress={handleCheckout}>
+        <View style={[styles.footer, { backgroundColor: isDark ? Colors.darkModeBackground : Colors.background }]}>
+          <Pressable style={[styles.checkoutButton, { backgroundColor: isDark ? Colors.darkModeSecondary : Colors.assestGreen }]} onPress={handleCheckout}>
             <Text style={styles.checkoutButtonText}>Proceed to Checkout</Text>
           </Pressable>
         </View>
@@ -120,11 +127,11 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     padding: 10,
-    paddingBottom: 120, 
+    paddingBottom: 120,
   },
   emptyText: {
     textAlign: "center",
-    marginTop: 50,fontSize: 18,
+    marginTop: 50, fontSize: 18,
     color: "#999",
   },
   card: {

@@ -22,6 +22,8 @@ import * as Notifications from "expo-notifications";
 import auth from "@/services/firebase";
 import { onAuthStateChanged, User } from "firebase/auth";
 import { useIsFocused } from "@react-navigation/native";
+import { useThemes } from '@/components/themeContext';
+import Colors from '@/components/colors';
 interface Request {
   id: string;
   issueType: string;
@@ -50,14 +52,14 @@ const RequestsListScreen: React.FC<RequestsListScreenProps> = ({
         setCurrentUser(user);
         fetchRequests(user.uid);
       }
-      else{
+      else {
         setCurrentUser(null);
         setRequests([]);
       }
     });
     return unsubscribe;
   }, []);
-  
+
   useEffect(() => {
     if (isFocused && currentUser) {
       fetchRequests(currentUser.uid);
@@ -118,11 +120,12 @@ const RequestsListScreen: React.FC<RequestsListScreenProps> = ({
       { cancelable: false }
     );
   };
-
+  const { theme } = useThemes();
+  const isDark = theme === 'dark';
   if (loadingRequests) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#4DA674" />
+        <ActivityIndicator size="large" color={isDark ? Colors.darkIndicator : Colors.indicator} />
       </View>
     );
   }

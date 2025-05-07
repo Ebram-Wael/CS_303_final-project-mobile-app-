@@ -4,11 +4,15 @@ import { useEffect, useState } from "react";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ThemeProvider } from "@/components/themeContext"; // Adjust the import as necessary
+import Colors from '@/components/colors';
+import { useThemes } from '@/components/themeContext'
 
 export default function RootLayout() {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
   const router = useRouter();
+  const { theme } = useThemes();
+  const isDark = theme === 'dark';
 
   useEffect(() => {
     const auth = getAuth();
@@ -63,7 +67,7 @@ export default function RootLayout() {
     return (
       <ThemeProvider>
         <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-          <ActivityIndicator size="large" />
+          <ActivityIndicator size="large" color={isDark ? Colors.darkIndicator : Colors.indicator} />
         </View>
       </ThemeProvider>
     );

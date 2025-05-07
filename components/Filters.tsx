@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, Pressable, StyleSheet, ScrollView } from "react-native";
+import { View, Text, Pressable, StyleSheet, ScrollView, Platform } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import Slider from "@react-native-community/slider";
@@ -70,25 +70,30 @@ const Filters: React.FC<FilterComponentProps> = ({
   ]);
 
   const toggleOption = (categoryId: string, optionId: string) => {
-    Haptics.selectionAsync();
+    if (Platform.OS !== 'web') {
+      Haptics.selectionAsync();
+    }
     setCategories((prevCategories) =>
       prevCategories.map((category) =>
         category.id === categoryId
           ? {
-              ...category,
-              options: category.options.map((option) =>
-                option.id === optionId
-                  ? { ...option, selected: !option.selected }
-                  : option
-              ),
-            }
+            ...category,
+            options: category.options.map((option) =>
+              option.id === optionId
+                ? { ...option, selected: !option.selected }
+                : option
+            ),
+          }
           : category
       )
     );
   };
 
   const handleApply = () => {
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    if (Platform.OS !== 'web') {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+
+    }
 
     const selectedFilters = {
       priceRange,
@@ -115,7 +120,9 @@ const Filters: React.FC<FilterComponentProps> = ({
   };
 
   const handleReset = () => {
-    Haptics.selectionAsync();
+    if (Platform.OS !== 'web') {
+      Haptics.selectionAsync();
+    }
     setPriceRange({ min: 0, max: 10000 });
     setCategories((prevCategories) =>
       prevCategories.map((category) => ({

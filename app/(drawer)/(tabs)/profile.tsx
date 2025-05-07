@@ -185,7 +185,7 @@ const Profile = () => {
     >
       {loading ? (
         <View style={styles.loaderContainer}>
-          <ActivityIndicator size="large" color={Colors.assestGreen} />
+          <ActivityIndicator size="large" color={isDark?Colors.darkIndicator:Colors.indicator} />
         </View>
       ) : (
         <View style={styles.container}>

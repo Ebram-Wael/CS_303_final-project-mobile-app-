@@ -8,6 +8,7 @@ import {
   ScrollView,
   TextInput,
   ActivityIndicator,
+  Platform,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
@@ -85,7 +86,9 @@ const HouseItem = ({ house }) => {
   }, [house.seller_id]);
 
   const navigateToDetails = () => {
-    Haptics.selectionAsync();
+    if (Platform.OS !== 'web') {
+      Haptics.selectionAsync();
+    }
     router.push({
       pathname: "/screens/[moreview]",
       params: { moreview: house.id },
@@ -94,7 +97,9 @@ const HouseItem = ({ house }) => {
 
   const navigateToOwner = () => {
     if (ownerId) {
-      Haptics.selectionAsync();
+      if (Platform.OS !== 'web') {
+        Haptics.selectionAsync();
+      }
       router.push({
         pathname: "/screens/owner",
         params: { ownerId },
@@ -519,7 +524,9 @@ export default function HouseList() {
         />
         <Pressable
           onPress={() => {
-            Haptics.selectionAsync();
+            if (Platform.OS !== 'web') {
+              Haptics.selectionAsync();
+            }
             setShowFilters(true);
           }}
           style={({ pressed }) => [

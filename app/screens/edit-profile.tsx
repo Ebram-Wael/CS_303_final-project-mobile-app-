@@ -93,7 +93,7 @@ export default function EditProfile() {
             <TextInput value={email} onChangeText={setEmail} style={styles.input} keyboardType="email-address" />
             <Pressable onPress={handleUpdate} style={[styles.button, { backgroundColor: isDark ? Colors.darkModeSecondary : Colors.primary }]}>
                 {loading ? (
-                    <ActivityIndicator size="small" color="#fff" />
+                    <ActivityIndicator size="small" color={isDark?Colors.darkIndicator:Colors.indicator} />
                 ) : (
                     <Text style={styles.buttonText}>Save Changes</Text>
                 )}
