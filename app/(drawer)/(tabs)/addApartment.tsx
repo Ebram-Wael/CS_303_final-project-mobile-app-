@@ -17,8 +17,8 @@ import { db } from "@/services/firebase";
 import * as ImagePicker from "expo-image-picker";
 import { getAuth } from "firebase/auth";
 import { useRouter } from "expo-router";
-import Colors from '@/components/colors';
-import { useThemes } from '@/components/themeContext'
+import Colors from "@/components/colors";
+import { useThemes } from "@/components/themeContext";
 
 export default function AddApartment() {
   const [loading, setLoading] = useState(false);
@@ -32,7 +32,7 @@ export default function AddApartment() {
   const [floor, setFloor] = useState("");
   const [image, setImage] = useState([]);
   const [nearby, setNearby] = useState("");
-  const [status , setStatus] = useState("pending");
+  const [status, setStatus] = useState("pending");
   const auth = getAuth();
   const user = auth.currentUser;
 
@@ -44,12 +44,11 @@ export default function AddApartment() {
   const [errorFeatures, setErrorFeatures] = useState("");
   const [errorFloor, setErrorFloor] = useState("");
   const [errorNearby, setErrorNearby] = useState("");
-  
 
   const router = useRouter();
 
   const { theme } = useThemes();
-  const isDark = theme === 'dark';
+  const isDark = theme === "dark";
   useEffect(() => {
     if (user) {
       setSellerId(user.uid);
@@ -58,7 +57,7 @@ export default function AddApartment() {
 
   const validateInputs = () => {
     let isValid = true;
-    if(loading)return
+    if (loading) return;
     setLoading(true);
     setErorrorNum("");
     setErrorPrice("");
@@ -67,7 +66,7 @@ export default function AddApartment() {
     setErrorImage("");
     setErrorFeatures("");
     setErrorFloor("");
-    setErrorNearby
+    setErrorNearby;
     if (!unitNum) {
       setErorrorNum("Please enter unit number");
       isValid = false;
@@ -120,7 +119,6 @@ export default function AddApartment() {
         floor: floor,
         nearby: nearby,
         status: status,
-        
       });
       Alert.alert("we gonna review your apartment and get back to you");
       setLoading(false);
@@ -151,7 +149,16 @@ export default function AddApartment() {
     }
   };
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: isDark ? Colors.darkModeBackground : Colors.background }]}>
+    <SafeAreaView
+      style={[
+        styles.container,
+        {
+          backgroundColor: isDark
+            ? Colors.darkModeBackground
+            : Colors.background,
+        },
+      ]}
+    >
       <ScrollView showsVerticalScrollIndicator={false}>
         <Text style={styles.text}> Add your Apartment </Text>
         <TextInput
@@ -213,7 +220,14 @@ export default function AddApartment() {
         />
         {errorFeatures && <Text style={styles.error}>{errorFeatures}</Text>}
         <Pressable style={styles.pickImageButton} onPress={pickImage}>
-          <Text style={[styles.txt, { color: isDark ? Colors.darkModeText : Colors.text }]}>Upload Image</Text>
+          <Text
+            style={[
+              styles.txt,
+              { color: isDark ? Colors.darkModeText : Colors.text },
+            ]}
+          >
+            Upload Image
+          </Text>
         </Pressable>
         <ScrollView horizontal>
           {image.map((uri, index) => (
@@ -222,67 +236,84 @@ export default function AddApartment() {
         </ScrollView>
         {errorImage && <Text style={styles.error}>{errorImage}</Text>}
         <View style={styles.sub}>
-
-          {loading ? ( <ActivityIndicator size="small" color="white" />) :(
-            <Pressable disabled={loading}
-            style={[styles.btn, { backgroundColor: isDark ? Colors.darkModeSecondary : Colors.assestGreen }]}
-            onPress={async () => await handleSubmit()}
-          >
-            <Text>ADD APARTMENT</Text>
-          </Pressable>
+          {loading ? (
+            <ActivityIndicator size="small" color="white" />
+          ) : (
+            <Pressable
+              disabled={loading}
+              style={[
+                styles.btn,
+                {
+                  backgroundColor: isDark
+                    ? Colors.darkModeSecondary
+                    : Colors.assestGreen,
+                },
+              ]}
+              onPress={async () => await handleSubmit()}
+            >
+              <Text>ADD APARTMENT</Text>
+            </Pressable>
           )}
-          
         </View>
       </ScrollView>
     </SafeAreaView>
   );
 }
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.background,
-    alignItems: "center",
-    justifyContent: "center",
     paddingTop: 30,
-    paddingBottom: 30,
+    paddingHorizontal: 20,
+    paddingBottom: 60,
   },
   input: {
     height: 50,
-    margin: 12,
+    marginBottom: 12,
     borderWidth: 1,
-    backgroundColor: "white",
-    width: 320,
-    borderRadius: 5,
+    borderColor: Colors.assestGray,
+    backgroundColor: Colors.assestWhite,
+    paddingHorizontal: 10,
+    width: "100%",
+    borderRadius: 8,
+    color: Colors.text,
   },
   btn: {
     backgroundColor: Colors.assestGreen,
-    width: 200,
+    width: "100%",
     height: 50,
     paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 8,
+    borderRadius: 10,
     alignItems: "center",
     justifyContent: "center",
-    display: "flex",
+    marginTop: 20,
   },
   image: {
-    width: 200,
-    height: 200,
+    width: 120,
+    height: 120,
+    borderRadius: 8,
+    marginHorizontal: 5,
+    marginVertical: 10,
   },
   text: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: "bold",
-    marginBottom: 10,
-    marginTop: 10,
+    marginBottom: 20,
+    color: Colors.secondary,
     textAlign: "center",
   },
   pickImageButton: {
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 10,
+    marginVertical: 10,
+    padding: 10,
+    backgroundColor: Colors.assestGreenThree,
+    borderRadius: 6,
   },
   txt: {
-    textDecorationLine: "underline",
+    color: Colors.text,
+    fontWeight: "600",
   },
   sub: {
     alignItems: "center",
@@ -292,7 +323,7 @@ const styles = StyleSheet.create({
   error: {
     color: Colors.warning,
     fontSize: 12,
-    marginLeft: 12,
-    marginBottom: 10,
+    marginBottom: 6,
+    marginLeft: 4,
   },
 });

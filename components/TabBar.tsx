@@ -1,9 +1,7 @@
 import { View, Platform, StyleSheet, Text } from "react-native";
 import { useLinkBuilder, useTheme } from "@react-navigation/native";
 import { PlatformPressable } from "@react-navigation/elements";
-import {
-  BottomTabBarProps,
-} from "@react-navigation/bottom-tabs";
+import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import React, { useEffect, useState } from "react";
 import HouseIcon from "@/assets/icons/house-01-svgrepo-com.svg";
 import HouseFilledIcon from "@/assets/icons/house-filled.svg";
@@ -13,15 +11,17 @@ import ExploreIcon from "@/assets/icons/explore-svgrepo-com.svg";
 import ExploreFilledIcon from "@/assets/icons/explore-fillled.svg";
 import ProfileIcon from "@/assets/icons/profile-svgrepo-com.svg";
 import ProfileFilledIcon from "@/assets/icons/profile-filled.svg";
-import CheckIcon from "@/assets/icons/check-to-slot-solid.svg";
-import Amount from "@/assets/icons/money-check-dollar-solid.svg"
-import Add from "@/assets/icons/plus-solid.svg"
+import CheckIcon from "@/assets/icons/check.svg";
+import CheckIconFilled from "@/assets/icons/check-filled.svg";
+import AmountIcon from "@/assets/icons/money.svg";
+import AmountIconFilled from "@/assets/icons/money-filled.svg";
+import AddIcon from "@/assets/icons/add.svg";
+import AddIconFilled from "@/assets/icons/add-filled.svg";
 import Colors from "@/components/colors";
 import { useThemes } from "@/components/themeContext";
 import { getAuth } from "firebase/auth";
 import auth, { db } from "@/services/firebase";
 import { doc, getDoc } from "firebase/firestore";
-
 
 export default function TabBar({
   state,
@@ -40,79 +40,102 @@ export default function TabBar({
       const userDocRef = doc(db, "Users", user.uid);
       const userDoc = await getDoc(userDocRef);
       setRole(userDoc.data()?.role);
-      if(role === "admin") {
+      if (role === "admin") {
         console.log("User role is admin");
       }
-      if(role === "buyer") {  
+      if (role === "buyer") {
         console.log("User role is buyer");
       }
-      if(role === "seller") {
+      if (role === "seller") {
         console.log("User role is seller");
-      } 
+      }
     }
-  }
+  };
   useEffect(() => {
     getUserRole();
   }, []);
 
-
   const icons = {
     index: {
       outline: (props: any) => <HouseIcon width={30} height={30} {...props} />,
-      filled: (props: any) => <HouseFilledIcon width={30} height={30} {...props} />,
+      filled: (props: any) => (
+        <HouseFilledIcon width={30} height={30} {...props} />
+      ),
     },
     explore: {
-      outline: (props: any) => <ExploreIcon width={30} height={30} {...props} />,
-      filled: (props: any) => <ExploreFilledIcon width={30} height={30} {...props} />,
+      outline: (props: any) => (
+        <ExploreIcon width={30} height={30} {...props} />
+      ),
+      filled: (props: any) => (
+        <ExploreFilledIcon width={30} height={30} {...props} />
+      ),
     },
     cart: {
       outline: (props: any) => <CartIcon width={30} height={30} {...props} />,
-      filled: (props: any) => <CartFilledIcon width={30} height={30} {...props} />,
+      filled: (props: any) => (
+        <CartFilledIcon width={30} height={30} {...props} />
+      ),
     },
     profile: {
-      outline: (props: any) => <ProfileIcon width={30} height={30} {...props} />,
-      filled: (props: any) => <ProfileFilledIcon width={30} height={30} {...props} />,
+      outline: (props: any) => (
+        <ProfileIcon width={30} height={30} {...props} />
+      ),
+      filled: (props: any) => (
+        <ProfileFilledIcon width={30} height={30} {...props} />
+      ),
     },
     addApartment: {
-      outline: (props: any) => <Add width={30} height={30} {...props} />,
-      filled: (props: any) => <Add width={30} height={30} {...props} />,
+      outline: (props: any) => <AddIcon width={30} height={30} {...props} />,
+      filled: (props: any) => (
+        <AddIconFilled width={30} height={30} {...props} />
+      ),
     },
     approve: {
-      outline: (props: any) => <CheckIcon width={30} height={30} {...props} />,  
-      filled: (props: any) => <CheckIcon width={30} height={30} {...props} />,
+      outline: (props: any) => <CheckIcon width={30} height={30} {...props} />,
+      filled: (props: any) => (
+        <CheckIconFilled width={30} height={30} {...props} />
+      ),
     },
     amount: {
-      outline: (props: any) => <Amount width={30} height={30} {...props} />,  
-      filled: (props: any) => <Amount width={30} height={30} {...props} />,
+      outline: (props: any) => <AmountIcon width={30} height={30} {...props} />,
+      filled: (props: any) => (
+        <AmountIconFilled width={30} height={30} {...props} />
+      ),
     },
   };
 
-  const filteredRoutes = state.routes.filter(route => {
+  const filteredRoutes = state.routes.filter((route) => {
     if (role === "admin") {
-      return ["amount", "approve","profile"].includes(route.name);
+      return ["amount", "approve", "profile"].includes(route.name);
     }
     if (role === "buyer") {
       return ["index", "explore", "cart", "profile"].includes(route.name);
     }
     if (role === "seller") {
-      return ["index", "explore", "addApartment", "profile"].includes(route.name);
+      return ["index", "explore", "addApartment", "profile"].includes(
+        route.name
+      );
     }
-    
+
     return false;
   });
 
-
-
   return (
-    <View style={[
-      styles.tabbar, 
-      { 
-        backgroundColor: isDark ? Colors.darkModePrimary : Colors.primary,
-        paddingBottom: Platform.OS === 'ios' ? 20 : 0
-      }
-    ]}>
+    <View
+      style={[
+        styles.tabbar,
+        {
+          backgroundColor: isDark ? Colors.darkModePrimary : Colors.primary,
+          paddingBottom: Platform.OS === "ios" ? 20 : 0,
+        },
+      ]}
+    >
       {filteredRoutes.map((route, index) => {
-        const isFocused = state.index === index;
+        // Find the actual index in the original state.routes array
+        const originalIndex = state.routes.findIndex(
+          (r) => r.key === route.key
+        );
+        const isFocused = state.index === originalIndex;
 
         const onPress = () => {
           const event = navigation.emit({
@@ -125,10 +148,9 @@ export default function TabBar({
           }
         };
 
-        const IconComponent = isFocused 
-          ? icons[route.name as keyof typeof icons]?.filled 
+        const IconComponent = isFocused
+          ? icons[route.name as keyof typeof icons]?.filled
           : icons[route.name as keyof typeof icons]?.outline;
-
 
         return (
           <PlatformPressable
@@ -136,10 +158,11 @@ export default function TabBar({
             onPress={onPress}
             style={styles.tabbarItem}
           >
-              {IconComponent &&
-               IconComponent({
-                color: isFocused ? Colors.assestWhite : Colors.assestGray,
-              })}
+            {IconComponent && (
+              <IconComponent
+                color={isFocused ? Colors.background : Colors.primary}
+              />
+            )}
           </PlatformPressable>
         );
       })}
@@ -154,8 +177,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: Colors.primary,
     paddingVertical: 10,
-    borderTopLeftRadius: 6,
-    borderTopRightRadius: 6,
   },
   tabbarItem: {
     flex: 1,
