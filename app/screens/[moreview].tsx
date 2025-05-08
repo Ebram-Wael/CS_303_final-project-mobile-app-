@@ -14,7 +14,7 @@ import React, { useEffect, useState, useRef, useLayoutEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { router, useLocalSearchParams } from "expo-router";
 import { db } from "@/services/firebase";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc ,updateDoc } from "firebase/firestore";
 import Heart from "@/assets/icons/heart-svgrepo-com.svg";
 import RedHeart from "@/assets/icons/heart-svgrepo-com (1).svg";
 import TopArrow from "@/assets/icons/top-arrow-5-svgrepo-com.svg";
@@ -22,6 +22,13 @@ import DMTopArrow from "@/assets/icons/top-arrow-5-svgrepo-com (1).svg";
 import DMDownArrow from "@/assets/icons/top-arrow-5-svgrepo-com_down.svg";
 import DownArrow from "@/assets/icons/down-arrow-5-svgrepo-com.svg";
 import DMHeart from '@/assets/icons/favorite_dark_mode.svg';
+import Star from '@/assets/icons/star-svgrepo-com.svg';
+import DMStar from '@/assets/icons/star_dark_mode.svg';
+import HalfStar from '@/assets/icons/star-half-svgrepo-com.svg';
+import DMHalfStar from '@/assets/icons/star-half_dark_mode.svg';
+import EmptyStar from '@/assets/icons/star-outline-svgrepo-com.svg';
+import DMEmptyStar from '@/assets/icons/star-outline_dark_mode.svg';
+
 
 import * as Notifications from "expo-notifications";
 import Colors from "@/components/colors";
@@ -53,7 +60,9 @@ const HouseDesc = ({ house }) => {
   const { theme } = useThemes();
   const isDark = theme === 'dark';
   const [isSeller ,setIsSeller] =useState(false)
-  
+  const [userRating, setUserRating] = useState(0);
+  const [currentRating, setCurrentRating] = useState(house.rating || 0);
+  const [ratingCount, setRatingCount] = useState(house.ratingCount || 0);
 
   useEffect(() => {
     requestNotificationPermissions();
@@ -182,6 +191,106 @@ const HouseDesc = ({ house }) => {
     }
   };
 
+  const handleRate = async (rating: number) => {
+    try {
+      
+      const newCount = ratingCount + 1;
+      const newAverage = ((currentRating * ratingCount) + rating) / newCount;
+      setUserRating(rating);
+      setCurrentRating(newAverage);
+      setRatingCount(newCount);
+      const houseRef = doc(db, "Apartments", house.id);
+      await updateDoc(houseRef, {
+        rating: newAverage,
+        ratingCount: newCount
+      });
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: "Thank you for rating!",
+          body: `You rated this property ${rating} stars`,
+          sound: "default",
+        },
+        trigger: null,
+      });
+    } catch (error) {
+      console.error("Error updating rating:", error);
+      Alert.alert("Error", "Failed to submit rating");
+    }
+  };
+
+  const renderStars = (rating: number, interactive = false) => {
+    const stars = [];
+    const fullStars = Math.floor(rating);
+    const hasHalfStar = rating % 1 >= 0.5;
+    
+    for (let i = 1; i <= 5; i++) {
+      if (i <= fullStars) {
+        stars.push(
+          interactive ? (
+            <Pressable key={i} onPress={() => handleRate(i)}>
+              {isDark ? (
+                <DMStar width={25} height={25} />
+              ) : (
+                <Star width={25} height={25} />
+              )}
+              </Pressable>
+          ) : (
+            isDark ? (
+              <DMStar key={i} width={20} height={20} />
+            ) : (
+              <Star key={i} width={20} height={20} />
+            )
+          )
+        );
+      } else if (i === fullStars + 1 && hasHalfStar) {
+        stars.push(
+          interactive ? (
+            <Pressable key={i} onPress={() => handleRate(i)}>
+              {isDark ? (
+                <DMHalfStar width={25} height={25} />
+              ) : (
+                <HalfStar width={25} height={25} />
+              )}
+            </Pressable>
+          ) : (
+            isDark ? (
+              <DMHalfStar key={i} width={20} height={20} />
+            ) : (
+              <HalfStar key={i} width={20} height={20} />
+            )
+          )
+        );
+      } else {
+        stars.push(
+          interactive ? (
+            <Pressable key={i} onPress={() => handleRate(i)}>
+              {isDark ? (
+                <DMEmptyStar width={25} height={25} />
+              ) : (
+                <EmptyStar width={25} height={25} />
+              )}
+            </Pressable>
+          ) : (
+            isDark ? (
+              <DMEmptyStar key={i} width={20} height={20} />
+            ) : (
+              <EmptyStar key={i} width={20} height={20} />
+            )
+          )
+        );
+      }
+    }
+    return (
+      <View style={styles.starContainer}>
+        {stars}
+        <Text style={[styles.ratingText, { color: isDark ? Colors.darkModeText : Colors.text }]}>
+          {currentRating.toFixed(1)} ({ratingCount} {ratingCount === 1 ? 'rating' : 'ratings'})
+          {userRating > 0 && ` • Your rating: ${userRating}`}
+        </Text>
+      </View>
+    );
+  };
+
   useEffect(() => {
     Animated.timing(animatedValue, {
       toValue: expanded ? 1 : 0,
@@ -246,6 +355,12 @@ const HouseDesc = ({ house }) => {
               Number of rooms:{" "}
               {house.num_bedrooms || "Unknown Number Of Rooms"}
             </Text>
+            <View style={styles.ratingSection}>
+              <Text style={[styles.rateTitle, { color: isDark ? Colors.darkModeText : Colors.text }]}>
+                Rate this property:
+              </Text>
+              {renderStars(userRating || currentRating, true)}
+            </View>
             <Text style={[styles.owner, { color: isDark ? Colors.assestGreen : Colors.assestBlue }]}>Contact: {owner}</Text>
             <View style={styles.buyNowStyles}>
             {!isSeller?
@@ -351,6 +466,25 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     color: Colors.assestGreen,
+  },
+  starContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 5,
+  },
+  ratingText: {
+    marginLeft: 5,
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  ratingSection: {
+    marginVertical: 10,
+    alignItems: 'center',
+  },
+  rateTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 5,
   },
   description: {
     fontSize: 16,
