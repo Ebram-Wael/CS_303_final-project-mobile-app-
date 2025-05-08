@@ -109,6 +109,10 @@ const HouseItem = ({ house }) => {
     if(house.status === "pending") {
       return null;
     }
+    
+    if(house.availability_status === "rented") {
+      return null;
+    }
 
   return (
     <Pressable
