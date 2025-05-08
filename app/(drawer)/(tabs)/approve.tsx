@@ -1,6 +1,6 @@
 import Colors from "@/components/colors";
 import { db } from "@/services/firebase";
-import { collection, doc, getDocs, query, updateDoc, where } from "firebase/firestore";
+import { collection, deleteDoc, doc, getDocs, query, updateDoc, where } from "firebase/firestore";
 import React, { useEffect ,useState } from "react";
 import { View, Text, StyleSheet, Pressable ,FlatList ,Image } from "react-native";
 
@@ -45,6 +45,17 @@ export default function ApproveApart() {
         }
     };
 
+    const disApprove= async (id) =>{
+        try{
+            const apartmentRef =doc(db ,"Apartments" ,id)
+            await deleteDoc (apartmentRef)
+            setPendingApart((prev)=> prev.filter((item)=>item.id !== id)); 
+        }catch (error){
+            console.error("error");
+        }
+    }
+
+
     return (
         <View style={styles.container}>
             {pendingApart.length === 0 && (
@@ -66,9 +77,14 @@ export default function ApproveApart() {
                         <Text style={styles.text}>Features: {item.features}</Text>
                         <Text style={styles.text}>Floor: {item.floor}</Text>
                         <Text style={styles.text}>Nearby: {item.nearby}</Text>
+                        <View style={{flexDirection:'row' ,justifyContent :'space-around' }}>
                         <Pressable onPress={() => approve(item.id)} style={styles.button}>
                             <Text style={styles.buttonText}>Approve</Text>
                         </Pressable>
+                        <Pressable onPress={()=>disApprove(item.id)} style ={[styles.button ,{ backgroundColor: 'red' }]} >
+                            <Text style={[styles.buttonText]} >DisApprove</Text>
+                        </Pressable>
+                        </View>
                     </View>
                 )}
             />
