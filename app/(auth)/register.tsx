@@ -223,7 +223,6 @@ const Register = () => {
             Create an Account So You Can Explore Our Apartment{" "}
           </Text>
         </View>
-        {/* <Image style={{width:200 ,height:200 ,alignSelf:'center'}} source={reg}/> */}
         <View style={{ display: "flex", flexDirection: "row", gap: 80 }}>
           <View style={styles.select}>
             <RadioButton.Android
@@ -232,7 +231,7 @@ const Register = () => {
               onPress={() => setSelectRole("buyer")}
               style={{ flex: 0.5 }}
             />
-            <Text style={styles.label}>I'm Customer</Text>
+            <Text style={styles.label}>I'm Student</Text>
           </View>
 
           <View style={styles.select}>

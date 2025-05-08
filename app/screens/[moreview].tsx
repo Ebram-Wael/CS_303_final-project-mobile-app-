@@ -12,7 +12,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useEffect, useState, useRef, useLayoutEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
-import { useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { db } from "@/services/firebase";
 import { doc, getDoc } from "firebase/firestore";
 import Heart from "@/assets/icons/heart-svgrepo-com.svg";
@@ -31,6 +31,7 @@ const defaultImage = "https://via.placeholder.com/150";
 const windowWidth = Dimensions.get("window").width;
 const windowHeight = Dimensions.get("window").height;
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getAuth } from "firebase/auth";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -51,6 +52,8 @@ const HouseDesc = ({ house }) => {
   const [owner, setOwner] = useState("");
   const { theme } = useThemes();
   const isDark = theme === 'dark';
+  const [isSeller ,setIsSeller] =useState(false)
+  
 
   useEffect(() => {
     requestNotificationPermissions();
@@ -84,6 +87,23 @@ const HouseDesc = ({ house }) => {
   const [pressHeart, setPressHeart] = useState(false);
   const animatedValue = useRef(new Animated.Value(0)).current;
   const [expanded, setExpanded] = useState(false);
+
+  const getRole =async ()=>{
+    const auth =getAuth();
+    const user =auth.currentUser;
+    if(user){
+      const userRef= doc(db,"Users" ,user.uid)
+      const snap =await getDoc(userRef);
+      if(snap.exists()){
+        setIsSeller(snap.data().role=== 'seller');
+      }
+    }
+
+  }
+
+  useEffect(() => {
+    getRole();
+  }, [])
 
   useEffect(() => {
     const checkFavorite = async () => {
@@ -155,6 +175,7 @@ const HouseDesc = ({ house }) => {
       const updatedCart = [...parsedCart, newItem];
   
       await AsyncStorage.setItem("cart", JSON.stringify(updatedCart));
+      router.push("/(drawer)/(tabs)/cart")
       console.log("Cart updated:", updatedCart);
     } catch (error) {
       console.error("Failed to add to cart:", error);
@@ -227,18 +248,21 @@ const HouseDesc = ({ house }) => {
             </Text>
             <Text style={[styles.owner, { color: isDark ? Colors.assestGreen : Colors.assestBlue }]}>Contact: {owner}</Text>
             <View style={styles.buyNowStyles}>
-              <Pressable onPress={handlePressOnHeart}>
-                {pressHeart ? (
-                  <RedHeart width={30} height={30} />
-                ) : (
-                  isDark ?
-                    (<DMHeart width={30} height={30} />)
-                    : <Heart width={30} height={30} />
-                )}
-              </Pressable>
-              <Pressable onPress={handleAddToCart} style={[styles.buyNowView, { backgroundColor: isDark ? Colors.assestBlue : Colors.text }]}>
-                <Text style={styles.buyNowText}>Buy Now!</Text>
-              </Pressable>
+            {!isSeller?
+              (<Pressable onPress={handlePressOnHeart}>
+              {pressHeart ? (
+                <RedHeart width={30} height={30} />
+              ) : (
+                isDark ?
+                  (<DMHeart width={30} height={30} />)
+                  : <Heart width={30} height={30} />
+              )}
+            </Pressable>) :null}
+
+              {!isSeller ?
+               (<Pressable onPress={handleAddToCart} style={[styles.buyNowView, { backgroundColor: isDark ? Colors.assestBlue : Colors.text }]}>
+               <Text style={styles.buyNowText}>Rent Now!</Text>
+             </Pressable>): null}
             </View>
           </Animated.View>
         ) : (
