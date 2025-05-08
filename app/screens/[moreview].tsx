@@ -37,6 +37,8 @@ Notifications.setNotificationHandler({
     shouldShowAlert: true,
     shouldPlaySound: true,
     shouldSetBadge: true,
+    shouldShowBanner: false,
+    shouldShowList: false,
   }),
 });
 async function requestNotificationPermissions() {

@@ -31,10 +31,12 @@ Notifications.setNotificationHandler({
     shouldShowAlert: true,
     shouldPlaySound: true,
     shouldSetBadge: true,
+    shouldShowBanner: false,
+    shouldShowList: false,
   }),
 });
 
-const Login = () => {
+export default function Login  () {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -262,4 +264,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Login;
+

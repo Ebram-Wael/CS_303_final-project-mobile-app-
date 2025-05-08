@@ -34,11 +34,13 @@ Notifications.setNotificationHandler({
     shouldShowAlert: true,
     shouldPlaySound: true,
     shouldSetBadge: true,
+    shouldShowBanner: false,
+    shouldShowList: false,
   }),
 });
 
 
-const Register = () => {
+export default function Register () {
   const navigation = useNavigation();
 
   async function requestNotificationPermissions() {
@@ -443,4 +445,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Register;
+
