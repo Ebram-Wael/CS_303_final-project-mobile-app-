@@ -58,32 +58,32 @@ export default function TabBar({
 
   const icons = {
     index: {
-      outline: (props: any) => <HouseIcon width={24} height={24} {...props} />,
-      filled: (props: any) => <HouseFilledIcon width={24} height={24} {...props} />,
+      outline: (props: any) => <HouseIcon width={30} height={30} {...props} />,
+      filled: (props: any) => <HouseFilledIcon width={30} height={30} {...props} />,
     },
     explore: {
-      outline: (props: any) => <ExploreIcon width={24} height={24} {...props} />,
-      filled: (props: any) => <ExploreFilledIcon width={24} height={24} {...props} />,
+      outline: (props: any) => <ExploreIcon width={30} height={30} {...props} />,
+      filled: (props: any) => <ExploreFilledIcon width={30} height={30} {...props} />,
     },
     cart: {
-      outline: (props: any) => <CartIcon width={24} height={24} {...props} />,
-      filled: (props: any) => <CartFilledIcon width={24} height={24} {...props} />,
+      outline: (props: any) => <CartIcon width={30} height={30} {...props} />,
+      filled: (props: any) => <CartFilledIcon width={30} height={30} {...props} />,
     },
     profile: {
-      outline: (props: any) => <ProfileIcon width={24} height={24} {...props} />,
-      filled: (props: any) => <ProfileFilledIcon width={24} height={24} {...props} />,
+      outline: (props: any) => <ProfileIcon width={30} height={30} {...props} />,
+      filled: (props: any) => <ProfileFilledIcon width={30} height={30} {...props} />,
     },
     addApartment: {
-      outline: (props: any) => <Add width={24} height={24} {...props} />,
-      filled: (props: any) => <Add width={24} height={24} {...props} />,
+      outline: (props: any) => <Add width={30} height={30} {...props} />,
+      filled: (props: any) => <Add width={30} height={30} {...props} />,
     },
     approve: {
-      outline: (props: any) => <CheckIcon width={24} height={24} {...props} />,  
-      filled: (props: any) => <CheckIcon width={24} height={24} {...props} />,
+      outline: (props: any) => <CheckIcon width={30} height={30} {...props} />,  
+      filled: (props: any) => <CheckIcon width={30} height={30} {...props} />,
     },
     amount: {
-      outline: (props: any) => <Amount width={24} height={24} {...props} />,  
-      filled: (props: any) => <Amount width={24} height={24} {...props} />,
+      outline: (props: any) => <Amount width={30} height={30} {...props} />,  
+      filled: (props: any) => <Amount width={30} height={30} {...props} />,
     },
   };
 
