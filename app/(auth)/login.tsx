@@ -18,13 +18,11 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { ActivityIndicator } from "react-native-paper";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import Colors from '@/components/colors';
+import Colors from "@/components/colors";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/services/firebase";
 
-import * as Notifications from 'expo-notifications';
-
-
+import * as Notifications from "expo-notifications";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -50,15 +48,15 @@ const Login = () => {
   async function requestNotificationPermissions() {
     if (Platform.OS !== "web") {
       const { status } = await Notifications.requestPermissionsAsync();
-      if (status !== 'granted') {
-        Alert.alert('Notification permissions not granted');
+      if (status !== "granted") {
+        Alert.alert("Notification permissions not granted");
       }
     }
   }
 
   useEffect(() => {
     requestNotificationPermissions();
-  }, [])
+  }, []);
 
   async function sendWelcomeNotification(username: string) {
     if (Platform.OS !== "web") {
@@ -66,14 +64,14 @@ const Login = () => {
         content: {
           title: "Welcome Back!",
           body: `Hello ${username}, it's great to see you again at Homy.`,
-          data: { screen: 'Home' },
+          data: { screen: "Home" },
         },
         trigger: null,
       });
     }
   }
   useEffect(() => {
-    const isEmailValid = email.includes('@');
+    const isEmailValid = email.includes("@");
     const isPasswordValid = password.length >= 8;
     setIsValid(isEmailValid && isPasswordValid);
   }, [email, password]);
@@ -83,24 +81,31 @@ const Login = () => {
     if (loading) return;
     setLoading(true);
     try {
-      const cardinality = await signInWithEmailAndPassword(auth, email, password);
+      const cardinality = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
       const user = cardinality.user;
       const docc = doc(db, "Users", user.uid);
       const userdoc = await getDoc(docc);
-      let userName ="";
+      let userName = "";
       if (userdoc.exists()) {
-        const data = userdoc.data()
+        const data = userdoc.data();
         userName = data.name;
       }
-      await AsyncStorage.setItem("userData", JSON.stringify({
-        uid: user.uid,
-        email: user.email,
-        name: name,
-        phone: user.phoneNumber,
-        imageurl: user.photoURL
-      }));
+      await AsyncStorage.setItem(
+        "userData",
+        JSON.stringify({
+          uid: user.uid,
+          email: user.email,
+          name: name,
+          phone: user.phoneNumber,
+          imageurl: user.photoURL,
+        })
+      );
       sendWelcomeNotification(userName);
-      setTimeout(() => router.replace('/(drawer)/(tabs)/profile'), 500);
+      setTimeout(() => router.replace("/(drawer)/(tabs)/profile"), 500);
     } catch (error) {
       if (error.code === "auth/invalid-credential") {
         Alert.alert("Invalid Password or email");
@@ -145,7 +150,9 @@ const Login = () => {
               onChangeText={(text) => setEmail(text)}
               value={email}
             />
-            <View style={[styles.inputContainer, { borderColor: borderColor1 }]}>
+            <View
+              style={[styles.inputContainer, { borderColor: borderColor1 }]}
+            >
               <TextInput
                 onFocus={() => setBorderColor1(Colors.secondary)}
                 onBlur={() => setBorderColor1(Colors.primary)}
@@ -172,14 +179,21 @@ const Login = () => {
             {loading ? (
               <ActivityIndicator size="small" color="white" />
             ) : (
-              <Text style={{ color: Colors.whiteText, fontSize: 18 }}>Login</Text>
+              <Text style={{ color: Colors.whiteText, fontSize: 18 }}>
+                Login
+              </Text>
             )}
           </Pressable>
 
           <View style={styles.join}>
             <Text> Create an Account?</Text>
             <Pressable onPress={() => router.push("/register")}>
-              <Text style={{ color: Colors.assestGreen, textDecorationLine: "underline" }}>
+              <Text
+                style={{
+                  color: Colors.assestGreen,
+                  textDecorationLine: "underline",
+                }}
+              >
                 Sign Up
               </Text>
             </Pressable>
@@ -200,6 +214,7 @@ const styles = StyleSheet.create({
   input: {
     height: 50,
     margin: 12,
+    padding: 10,
     borderWidth: 1,
     backgroundColor: "white",
     width: 320,
@@ -211,7 +226,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textAlign: "center",
     marginBottom: 20,
-    color: '#023336',
+    color: "#023336",
   },
   txt: {
     flexDirection: "row",

@@ -9,18 +9,22 @@ import {
   SafeAreaView,
   StatusBar,
 } from "react-native";
-import pic1 from "@/assets/images/homepic1.jpg";
-import pic2 from "@/assets/images/homepic2.jpg";
-import pic3 from "@/assets/images/homepic3.jpg";
-import pic4 from "@/assets/images/homepic4.jpg";
+const pic1 =
+  "https://res.cloudinary.com/dynw2az0g/image/upload/v1746736358/homepic4_vdrfxe.jpg";
+const pic2 =
+  "https://res.cloudinary.com/dynw2az0g/image/upload/v1746736358/homepic3_b0nbta.jpg";
+const pic3 =
+  "https://res.cloudinary.com/dynw2az0g/image/upload/v1746736357/homepic1_f47e75.jpg";
+const pic4 =
+  "https://res.cloudinary.com/dynw2az0g/image/upload/v1746736357/homepic2_aluftl.jpg";
 import FloatingMenuButton from "@/components/FloatingMenuButton";
-import Colors from '@/components/colors';
+import Colors from "@/components/colors";
 import { useRouter } from "expo-router";
-import { useThemes } from '@/components/themeContext';
+import { useThemes } from "@/components/themeContext";
 
 export default function index() {
   const { theme } = useThemes();
-  const isDark = theme === 'dark';
+  const isDark = theme === "dark";
 
   const [index, setIndex] = useState(0);
   const router = useRouter();
@@ -33,20 +37,49 @@ export default function index() {
   }, [index]);
   const images = [pic1, pic2, pic3, pic4];
   return (
-    <SafeAreaView style={[styles.cont, { backgroundColor: isDark ? Colors.darkModeBackground : Colors.background }]}>
-      <StatusBar barStyle="light-content" backgroundColor={isDark ? Colors.darkModePrimary : Colors.primary} />
+    <SafeAreaView
+      style={[
+        styles.cont,
+        {
+          backgroundColor: isDark
+            ? Colors.darkModeBackground
+            : Colors.background,
+        },
+      ]}
+    >
+      <StatusBar
+        barStyle="light-content"
+        backgroundColor={isDark ? Colors.darkModePrimary : Colors.primary}
+      />
       <FloatingMenuButton />
-      <Text style={[styles.mainHeading, { backgroundColor: isDark ? Colors.darkModePrimary : Colors.primary }]}>HOMY</Text>
+      <Text
+        style={[
+          styles.mainHeading,
+          { backgroundColor: isDark ? Colors.darkModePrimary : Colors.primary },
+        ]}
+      >
+        HOMY
+      </Text>
       <ScrollView style={styles.content}>
         <View>
-          <Text style={[styles.head, { color: isDark ? Colors.darkModeText : Colors.text }]}>
+          <Text
+            style={[
+              styles.head,
+              { color: isDark ? Colors.darkModeText : Colors.text },
+            ]}
+          >
             {" "}
             Find the Perfect Apartment for Students
           </Text>
         </View>
         <View>
-          <Image source={images[index]} style={styles.img} />
-          <Text style={[styles.txt, { color: isDark ? Colors.darkModeText : Colors.text }]}>
+          <Image source={{ uri: images[index] }} style={styles.img} />
+          <Text
+            style={[
+              styles.txt,
+              { color: isDark ? Colors.darkModeText : Colors.text },
+            ]}
+          >
             Looking for a comfortable and affordable place to stay? Homy makes
             apartment hunting easy for students! Whether you need a shared space
             or a private room, we connect you with the best housing options near
@@ -54,32 +87,103 @@ export default function index() {
           </Text>
         </View>
         <View>
-          <Text style={[styles.title, { color: isDark ? Colors.darkModeText : Colors.text }]}> Why Choose Homy?</Text>
-          <View style={[styles.underline, { backgroundColor: isDark ? Colors.darkModePrimary : Colors.primary }]} />
-          <Text style={[styles.listText, { color: isDark ? Colors.darkModeText : Colors.text }]}>
+          <Text
+            style={[
+              styles.title,
+              { color: isDark ? Colors.darkModeText : Colors.text },
+            ]}
+          >
+            {" "}
+            Why Choose Homy?
+          </Text>
+          <View
+            style={[
+              styles.underline,
+              {
+                backgroundColor: isDark
+                  ? Colors.darkModePrimary
+                  : Colors.primary,
+              },
+            ]}
+          />
+          <Text
+            style={[
+              styles.listText,
+              { color: isDark ? Colors.darkModeText : Colors.text },
+            ]}
+          >
             1: Student-Friendly Listings{"\n"}2: Smart Search Filters {"\n"}
             3: Roommate Matching{"\n"}4: Verified Listings{"\n"}5: Easy
             Communication
           </Text>
         </View>
         <View>
-          <Text style={[styles.title, { color: isDark ? Colors.darkModeText : Colors.text }]}>Start Your Search Today!</Text>
-          <View style={[styles.underline, { backgroundColor: isDark ? Colors.darkModePrimary : Colors.primary }]} />
-          <Text style={[styles.txt, { color: isDark ? Colors.darkModeText : Colors.text }]}>
+          <Text
+            style={[
+              styles.title,
+              { color: isDark ? Colors.darkModeText : Colors.text },
+            ]}
+          >
+            Start Your Search Today!
+          </Text>
+          <View
+            style={[
+              styles.underline,
+              {
+                backgroundColor: isDark
+                  ? Colors.darkModePrimary
+                  : Colors.primary,
+              },
+            ]}
+          />
+          <Text
+            style={[
+              styles.txt,
+              { color: isDark ? Colors.darkModeText : Colors.text },
+            ]}
+          >
             Join thousands of students who found their perfect home with Homy.
             Sign up now and take the stress out of apartment hunting!
           </Text>
         </View>
         <View>
-          <Text style={[styles.title, { color: isDark ? Colors.darkModeText : Colors.text }]}>
+          <Text
+            style={[
+              styles.title,
+              { color: isDark ? Colors.darkModeText : Colors.text },
+            ]}
+          >
             Your Home, Your Rules – Find it with Homy.
           </Text>
-          <View style={[styles.underline, { backgroundColor: isDark ? Colors.darkModePrimary : Colors.primary }]} />
-          <Text style={{ fontSize: 15, paddingHorizontal: 12, margin: 5, color: isDark ? Colors.darkModeText : Colors.text }}>
+          <View
+            style={[
+              styles.underline,
+              {
+                backgroundColor: isDark
+                  ? Colors.darkModePrimary
+                  : Colors.primary,
+              },
+            ]}
+          />
+          <Text
+            style={{
+              fontSize: 15,
+              paddingHorizontal: 12,
+              margin: 5,
+              color: isDark ? Colors.darkModeText : Colors.text,
+            }}
+          >
             Learn More about us by clicking the button below
           </Text>
           <Pressable
-            style={[styles.btn, { backgroundColor: isDark ? Colors.darkModeSecondary : Colors.assestGreen }]}
+            style={[
+              styles.btn,
+              {
+                backgroundColor: isDark
+                  ? Colors.darkModeSecondary
+                  : Colors.assestGreen,
+              },
+            ]}
             onPress={() => router.push("/(drawer)/AboutUs")}
           >
             <Text style={{ color: "white" }}>Click me!</Text>

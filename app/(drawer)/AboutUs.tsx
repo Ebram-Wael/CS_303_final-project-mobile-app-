@@ -1,18 +1,33 @@
 import React, { useRef } from "react";
-import { View, Text, StyleSheet, ScrollView, Image, Dimensions, Pressable } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  Image,
+  Dimensions,
+  Pressable,
+} from "react-native";
 import Swiper from "react-native-swiper";
 import Colors from "@/components/colors";
-import { useThemes } from '@/components/themeContext'
+import { useThemes } from "@/components/themeContext";
 
-import pro1 from "@/assets/images/photo_2025-04-11_16-10-28.jpg";
-import pro2 from "@/assets/images/photo_2025-01-09_17-47-33.jpg";
-import pro3 from "@/assets/images/photo_2025-04-11_16-21-47.jpg";
-import pro4 from "@/assets/images/photo_2025-04-11_16-15-25.jpg";
-import pro5 from "@/assets/images/photo_2025-04-11_16-15-28.jpg";
-import pro6 from "@/assets/images/photo_2025-04-11_16-18-13.jpg";
-import pro7 from "@/assets/images/kF6HU0XK.jpg";
-import pro8 from "@/assets/images/qEmHD5mC.jpg";
-
+const pro1 =
+  "https://res.cloudinary.com/dynw2az0g/image/upload/v1746733997/photo_2025-04-11_16-21-47_rmfhgo.jpg";
+const pro2 =
+  "https://res.cloudinary.com/dynw2az0g/image/upload/v1746733997/photo_2025-04-11_16-18-13_d2fwhk.jpg";
+const pro3 =
+  "https://res.cloudinary.com/dynw2az0g/image/upload/v1746733997/photo_2025-04-11_16-10-28_kxfej5.jpg";
+const pro4 =
+  "https://res.cloudinary.com/dynw2az0g/image/upload/v1746733996/photo_2025-01-09_17-47-33_ekh9ba.jpg";
+const pro5 =
+  "https://res.cloudinary.com/dynw2az0g/image/upload/v1746733996/qEmHD5mC_soawre.jpg";
+const pro6 =
+  "https://res.cloudinary.com/dynw2az0g/image/upload/v1746733996/photo_2025-04-11_16-15-28_od5yqi.jpg";
+const pro7 =
+  "https://res.cloudinary.com/dynw2az0g/image/upload/v1746733995/kF6HU0XK_dpfewf.jpg";
+const pro8 =
+  "https://res.cloudinary.com/dynw2az0g/image/upload/v1746733995/photo_2025-04-11_16-15-25_tkocax.jpg";
 
 const { width } = Dimensions.get("window");
 
@@ -23,30 +38,36 @@ export default function AboutUs() {
   const goPrev = () => swiperRef.current?.scrollBy(-1);
 
   const { theme } = useThemes();
-  const isDark = theme === 'dark';
+  const isDark = theme === "dark";
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor: isDark ? Colors.darkModeBackground : Colors.background }]}>
-
+    <ScrollView
+      style={[
+        styles.container,
+        {
+          backgroundColor: isDark
+            ? Colors.darkModeBackground
+            : Colors.background,
+        },
+      ]}
+    >
       <View style={styles.sliderWrapper}>
         <Swiper
           ref={swiperRef}
           autoplay={false}
-
           showsPagination={true}
           loop={true}
           height={220}
         >
-          <Image source={pro1} style={styles.image} />
-          <Image source={pro2} style={styles.image} />
-          <Image source={pro3} style={styles.image} />
-          <Image source={pro4} style={styles.image} />
-          <Image source={pro5} style={styles.image} />
-          <Image source={pro6} style={styles.image} />
-          <Image source={pro7} style={styles.image} />
-          <Image source={pro8} style={styles.image} />
+          <Image source={{ uri: pro1 }} style={styles.image} />
+          <Image source={{ uri: pro2 }} style={styles.image} />
+          <Image source={{ uri: pro3 }} style={styles.image} />
+          <Image source={{ uri: pro4 }} style={styles.image} />
+          <Image source={{ uri: pro5 }} style={styles.image} />
+          <Image source={{ uri: pro6 }} style={styles.image} />
+          <Image source={{ uri: pro7 }} style={styles.image} />
+          <Image source={{ uri: pro8 }} style={styles.image} />
         </Swiper>
-
 
         <Pressable style={styles.leftArrow} onPress={goPrev}>
           <Text style={styles.arrowText}>‹</Text>
@@ -60,16 +81,14 @@ export default function AboutUs() {
       <View style={styles.content}>
         <Text style={styles.heading}>Student Housing App</Text>
         <Text style={styles.paragraph}>
-          The Student Housing App is a mobile application designed to help students find and rent rooms easily...
+          The Student Housing App is a mobile application designed to help
+          students find and rent rooms easily...
         </Text>
 
         <Text style={styles.subheading}>Features</Text>
         <Text style={styles.paragraph}>
-          • User Authentication (Signup/Login) {"\n"}
-          • Room Listings with images {"\n"}
-          • Search & Filters {"\n"}
-          • Booking System {"\n"}
-          • Chat System
+          • User Authentication (Signup/Login) {"\n"}• Room Listings with images{" "}
+          {"\n"}• Search & Filters {"\n"}• Booking System {"\n"}• Chat System
         </Text>
 
         <Text style={styles.para}>Team Leader :</Text>
@@ -133,7 +152,7 @@ const styles = StyleSheet.create({
   content: {
     marginVertical: 15,
     padding: 20,
-    backgroundColor: "white",
+    backgroundColor: Colors.secondary,
     borderRadius: 10,
     elevation: 3,
     marginHorizontal: 15,
