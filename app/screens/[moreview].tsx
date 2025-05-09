@@ -350,7 +350,7 @@ const HouseDesc = ({ house }) => {
               : <DownArrow width={50} height={50} color={isDark ? Colors.darkModeText : "white"} />}
 
             <Text style={[styles.status, { color: isDark ? Colors.darkModeText : Colors.text }]}>{house.availability_status}</Text>
-            <Text style={[styles.price, { color: isDark ? Colors.assestBlue : Colors.assestGreen }]}>
+            <Text style={[styles.price, { color: isDark ? Colors.assestGreenTwo : Colors.assestGreen }]}>
               {house.rent > 0 ? `${house.rent}` : "Invalid Price"} EGP
             </Text>
             <Text style={[styles.address, { color: isDark ? Colors.darkModeText : Colors.text }]}>
@@ -373,7 +373,7 @@ const HouseDesc = ({ house }) => {
               </Text>
               {renderStars(userRating || currentRating, true)}
             </View>
-            <Text style={[styles.owner, { color: isDark ? Colors.assestGreen : Colors.assestBlue }]}>Contact: {owner}</Text>
+            <Text style={[styles.owner, { color: isDark ? Colors.assestGreen : Colors.assestGreen }]}>Contact: {owner}</Text>
             <View style={styles.buyNowStyles}>
             {!isSeller?
               (<Pressable onPress={handlePressOnHeart}>
@@ -387,7 +387,7 @@ const HouseDesc = ({ house }) => {
             </Pressable>) :null}
 
               {!isSeller ?
-               (<Pressable disabled={click} onPress={handleAddToCart} style={[styles.buyNowView, { backgroundColor: isDark ? Colors.assestBlue : Colors.text }]}>
+               (<Pressable disabled={click} onPress={handleAddToCart} style={[styles.buyNowView, { backgroundColor: isDark ? Colors.darkModeSecondary : Colors.assest }]}>
                <Text style={styles.buyNowText}>Rent Now!</Text>
              </Pressable>): null}
             </View>
