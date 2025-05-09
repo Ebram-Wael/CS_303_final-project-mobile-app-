@@ -104,6 +104,7 @@ const Login = () => {
           imageurl: user.photoURL,
         })
       );
+      await AsyncStorage.setItem("user_id", JSON.stringify(user.uid));
       sendWelcomeNotification(userName);
       setTimeout(() => router.replace("/(drawer)/(tabs)/profile"), 500);
     } catch (error) {

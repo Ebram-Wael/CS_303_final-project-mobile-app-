@@ -183,6 +183,7 @@ const Register = () => {
             university: university,
           })
         );
+        await AsyncStorage.setItem("user_id", JSON.stringify(user.uid));
       }
       Alert.alert("Your account has been created");
       sendWelcomeNotification(name);

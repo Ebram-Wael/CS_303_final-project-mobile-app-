@@ -8,14 +8,15 @@ import {
   TextInput,
   Button,
   Pressable,
+  ActivityIndicator,
 } from "react-native";
 import { BlurView } from "expo-blur";
 import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
 import { db } from "../services/firebase";
-import { black } from "react-native-paper/lib/typescript/styles/themes/v2/colors";
 
 interface Comment {
   id: string;
+  userName: string;
   text: string;
   userId: string;
   createdAt: any;
@@ -33,9 +34,12 @@ const CommentsModal: React.FC<CommentsModalProps> = ({
   apartmentId,
 }) => {
   const [comments, setComments] = useState<Comment[]>([]);
-  const [userName, setUserName] = useState("");
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     if (!apartmentId) return;
+
+    setLoading(true);
 
     const commentsRef = collection(db, "Apartments", apartmentId, "comments");
     const q = query(commentsRef, orderBy("createdAt", "desc"));
@@ -46,6 +50,7 @@ const CommentsModal: React.FC<CommentsModalProps> = ({
         ...(doc.data() as Omit<Comment, "id">),
       }));
       setComments(newComments);
+      setLoading(false);
     });
 
     return unsubscribe;
@@ -58,20 +63,28 @@ const CommentsModal: React.FC<CommentsModalProps> = ({
       <View style={styles.modalContent}>
         <Text style={styles.title}>Comments</Text>
 
-        <FlatList
-          data={comments}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={{ paddingBottom: 20 }}
-          renderItem={({ item }) => (
-            <View style={styles.comment}>
-              <Text style={styles.user}>{item.userId}</Text>
-              <Text style={styles.commentText}>{item.text}</Text>
-              <Text style={styles.commentTime}>
-                {item.createdAt.toDate().toLocaleString()}
-              </Text>
-            </View>
-          )}
-        />
+        {loading ? (
+          <ActivityIndicator
+            size="large"
+            color="#000"
+            style={{ marginTop: 20 }}
+          />
+        ) : (
+          <FlatList
+            data={comments}
+            keyExtractor={(item) => item.id}
+            contentContainerStyle={{ paddingBottom: 20 }}
+            renderItem={({ item }) => (
+              <View style={styles.comment}>
+                <Text style={styles.user}>{item.userName}</Text>
+                <Text style={styles.commentText}>{item.text}</Text>
+                <Text style={styles.commentTime}>
+                  {item.createdAt.toDate().toLocaleString()}
+                </Text>
+              </View>
+            )}
+          />
+        )}
 
         <Pressable onPress={onClose} style={styles.closeButton}>
           <Text style={styles.closeText}>Close</Text>
