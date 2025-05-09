@@ -47,7 +47,6 @@ const Profile = () => {
           setRole(userData.role);
           setImageUrl(userData.imageurl);
           setLoading(false);
-          console.log(userData.name)
         }
       } catch (error) {
         console.error("Error retrieving user data:", error);
@@ -63,11 +62,8 @@ const Profile = () => {
     if (user) {
       const userDocRef = doc(db, "Users", user.uid);
       const userDoc = await getDoc(userDocRef);
-      console.log(auth.currentUser?.uid);
       if (userDoc.exists()) {
-        const data = userDoc.data();
-        console.log("User data:", data);
-        
+        const data = userDoc.data();        
         setUserDetails(data);
         setName(data.name);
         setPhone(data.phone);
@@ -75,7 +71,6 @@ const Profile = () => {
         setRole(data.role);
         setImageUrl(data.imageurl);
         setLoading(false);
-        console.log(data.name);
         await AsyncStorage.setItem("userData", JSON.stringify(data));
       }
     }

@@ -25,17 +25,6 @@ import AddComment from "@/components/AddComment";
 import { useLocalSearchParams } from "expo-router";
 import Colors from "@/components/colors";
 
-const COLORS = {
-  primaryDark: "#023336",
-  primary: "#4DA674",
-  primaryLight: "#C1E6B7",
-  background: "#EAF8E7",
-  text: "#023336",
-  textLight: "#4DA674",
-  white: "#FFFFFF",
-  success: "#81C784",
-};
-
 const STORAGE_KEYS = {
   APARTMENTS: "apartmentData",
   OWNER: "owner",
@@ -53,26 +42,6 @@ const HouseItem = ({ house }) => {
   const [showComments, setShowComments] = useState(false);
   const [userName, setUserName] = useState("");
   useEffect(() => {
-    const fetchUserId = async () => {
-      try {
-        await AsyncStorage.getItem("user_id").then((value) => {
-          setUser_id(value);
-        });
-      } catch (error) {
-        console.error("Error fetching user_id:", error);
-      }
-    };
-    const getUserDetails = async () => {
-      try {
-        const storedUserData = await AsyncStorage.getItem("userData");
-        if (storedUserData) {
-          const userData = JSON.parse(storedUserData);
-          setUserName(userData.name);
-        }
-      } catch (error) {
-        console.error("Error retrieving user data:", error);
-      }
-    };
     const fetchOwner = async () => {
       if (!house.seller_id) {
         setOwner("No seller");
@@ -104,10 +73,35 @@ const HouseItem = ({ house }) => {
         }
       }
     };
-    getUserDetails();
-    fetchUserId();
     fetchOwner();
   }, [house.seller_id]);
+
+  useEffect(() => {
+    const fetchUserId = async () => {
+      try {
+        await AsyncStorage.getItem("user_id").then((value) => {
+          setUser_id(value);
+        });
+      } catch (error) {
+        console.error("Error fetching user_id:", error);
+      }
+    };
+    fetchUserId();
+  }, []);
+  useEffect(() => {
+    const getUserDetails = async () => {
+      try {
+        const storedUserData = await AsyncStorage.getItem("userData");
+        if (storedUserData) {
+          const userData = JSON.parse(storedUserData);
+          setUserName(userData.name);
+        }
+      } catch (error) {
+        console.error("Error retrieving user data:", error);
+      }
+    };
+    getUserDetails();
+  });
 
   const navigateToDetails = () => {
     Haptics.selectionAsync();
@@ -132,6 +126,9 @@ const HouseItem = ({ house }) => {
     house.image && house.image.length > 0 ? house.image[0] : null;
 
   if (house.status === "pending") {
+    return null;
+  }
+  if (house.availability_status === "rented") {
     return null;
   }
 
