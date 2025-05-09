@@ -16,6 +16,8 @@ import { router, useRouter } from "expo-router";
 import { db } from "@/services/firebase";
 import { useThemes } from "@/components/themeContext";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { collection, deleteDoc, doc, getDoc, getDocs, query, updateDoc, where } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
 
 interface CartItem {
   id: string;
@@ -36,45 +38,47 @@ const CartScreen = () => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const { theme } = useThemes();
   const isDark = theme === "dark";
+  const auth =getAuth();
+  const user =auth.currentUser;
 
-  useEffect(() => {
-    const fetchCart = async () => {
+  useEffect(()=>{
+    const fetch = async () => {
       try {
-        const cart = await AsyncStorage.getItem("cart");
-        if (cart) {
-          const parsedCart = JSON.parse(cart);
-          setCartItems(parsedCart);
-        }
-      } catch (error) {
-        console.error("Error loading cart", error);
+       const cartRef =collection(db ,'cart')
+       const q =query(cartRef ,where ('user_id' ,'==' ,user.uid))
+       const querySnapshot =await getDocs(q)
+       const items : CartItem []=[];
+       querySnapshot.forEach((item)=>{
+        items.push({id :item.id ,... item.data()} as CartItem)
+       })
+       setCartItems(items);
+      } catch (err) {
+        console.error('error fetching');
       }
-    };
-    fetchCart();
-  }, []);
+    }
+    fetch();
+  } ,[user])
 
-  const handleRemoveItem = async (id: string) => {
-    Alert.alert(
-      "Remove Item",
-      "Are you sure you want to remove this item from your cart?",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Remove",
-          style: "destructive",
-          onPress: async () => {
-            try {
-              const updatedCart = cartItems.filter((item) => item.id !== id);
-              await AsyncStorage.setItem("cart", JSON.stringify(updatedCart));
-              setCartItems(updatedCart);
-            } catch (error) {
-              console.error("Error removing item from cart", error);
-              Alert.alert("Error", "Failed to remove item from cart");
-            }
-          },
-        },
-      ]
-    );
-  };
+  const handleRemoveItem =async (id)=>{
+    try{
+      const cartRef =collection(db,'cart');
+      const q =query(cartRef ,where('id' ,'==' ,id))
+      const querySnapshot =await getDocs(q);
+      const newCart = cartItems.filter(item => item.id !== id); 
+      setCartItems(newCart);
+
+      querySnapshot.forEach(async (item)=>{
+        await deleteDoc(doc(db ,'cart' ,item.id));
+      })
+      
+    console.log("item removed from cart")
+
+    }
+    catch{
+      console.log('error to remove item from cart')
+    }
+    
+  }
 
   const handleClearCart = async () => {
     Alert.alert("Clear Cart", "Are you sure you want to remove all items?", [
@@ -177,7 +181,7 @@ const CartScreen = () => {
                     : Colors.assestGreen,
                 },
               ]}
-              onPress={() => router.push({ pathname: "/(drawer)/(tabs)" })}
+              onPress={() => router.push({ pathname: "/(drawer)/(tabs)/explore" })}
             >
               <Text style={styles.browseButtonText}>Browse Properties</Text>
             </Pressable>
@@ -448,9 +452,10 @@ const styles = StyleSheet.create({
   },
   summaryContainer: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    // justifyContent: 'space-around',
     alignItems: "center",
     marginBottom: 12,
+    marginLeft:20,
   },
   summaryText: {
     fontSize: 16,
@@ -459,6 +464,7 @@ const styles = StyleSheet.create({
   totalPrice: {
     fontSize: 20,
     fontWeight: "700",
+    paddingLeft:30
   },
   checkoutButton: {
     paddingVertical: 14,
