@@ -219,7 +219,7 @@ export default function AddApartment() {
           textAlignVertical="top"
         />
         {errorFeatures && <Text style={styles.error}>{errorFeatures}</Text>}
-        <Pressable style={styles.pickImageButton} onPress={pickImage}>
+        <Pressable style={[styles.pickImageButton,{backgroundColor:isDark?Colors.darkModeSecondary:Colors.assestGreenThree}]} onPress={pickImage}>
           <Text
             style={[
               styles.txt,
@@ -251,7 +251,7 @@ export default function AddApartment() {
               ]}
               onPress={async () => await handleSubmit()}
             >
-              <Text>ADD APARTMENT</Text>
+              <Text style={{color:isDark?Colors.darkModeText:Colors.text}}>ADD APARTMENT</Text>
             </Pressable>
           )}
         </View>

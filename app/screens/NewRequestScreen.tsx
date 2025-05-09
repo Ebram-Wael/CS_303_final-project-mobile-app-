@@ -19,6 +19,8 @@ import { Calendar } from "react-native-calendars";
 import { Camera } from "expo-camera";
 import auth from "@/services/firebase";
 import { onAuthStateChanged, User } from "firebase/auth";
+import { useThemes } from "@/components/themeContext";
+import Colors from "@/components/colors";
 interface Request {
   id: string;
   issueType: string;
@@ -46,6 +48,8 @@ const NewRequestScreen: React.FC<NewRequestScreenProps> = ({
   onNavigateBack,
   onNewRequestSubmitted,
 }) => {
+    const { theme } = useThemes();
+    const isDark = theme === "dark";
   const [selectedDate, setSelectedDate] = useState<string>("");
   const [showcalendar, setShowCalendar] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -164,9 +168,9 @@ const NewRequestScreen: React.FC<NewRequestScreenProps> = ({
     setShowCalendar(false);
   };
   return (
-    <ScrollView style={styles.formContainer}>
-      <Text style={styles.header}>Report an Issue</Text>
-      <Text style={styles.label}>
+    <ScrollView style={[styles.formContainer,{backgroundColor:isDark?Colors.darkModeBackground:Colors.background}]}>
+      <Text style={[styles.header,{color:isDark?Colors.darkModeText:Colors.text}]}>Report an Issue</Text>
+      <Text style={[styles.label,{color:isDark?Colors.darkModeText:Colors.text}]}>
         Issue Type <Text style={styles.star}>*</Text>
       </Text>
       <View style={styles.pickerContainer}>
@@ -184,7 +188,7 @@ const NewRequestScreen: React.FC<NewRequestScreenProps> = ({
         </Picker>
       </View>
 
-      <Text style={styles.label}>
+      <Text style={[styles.label,{color:isDark?Colors.darkModeText:Colors.text}]}>
         Description <Text style={styles.star}>*</Text>
       </Text>
       <TextInput
@@ -199,7 +203,7 @@ const NewRequestScreen: React.FC<NewRequestScreenProps> = ({
         }
       />
 
-      <Text style={styles.label}>Upload Photo (optional)</Text>
+      <Text style={[styles.label,{color:isDark?Colors.darkModeText:Colors.text}]}>Upload Photo (optional)</Text>
       <Pressable style={styles.uploadButton} onPress={handleImageUpload}>
         <Icon name="upload" size={24} color="#5E5E5E" />
         <Text style={styles.loadimage}>Tap to upload photo</Text>
@@ -211,9 +215,9 @@ const NewRequestScreen: React.FC<NewRequestScreenProps> = ({
         )}
       </Pressable>
 
-      <Text style={styles.label}>Preferred Date (optional)</Text>
+      <Text style={[styles.label,{color:isDark?Colors.darkModeText:Colors.text}]}>Preferred Date (optional)</Text>
       <Pressable
-        style={styles.dateInputContainer}
+        style={[styles.dateInputContainer,{backgroundColor:isDark?Colors.assestWhite:Colors.assestWhite}]}
         onPress={() => setShowCalendar(!showcalendar)}
       >
         <TextInput
@@ -227,7 +231,7 @@ const NewRequestScreen: React.FC<NewRequestScreenProps> = ({
           name="calendar"
           size={20}
           color="#5E5E5E"
-          style={styles.calendarIcon}
+          style={[styles.calendarIcon ,{backgroundColor:isDark?Colors.assestWhite:Colors.assestWhite}]}
         />
       </Pressable>
 
@@ -241,7 +245,7 @@ const NewRequestScreen: React.FC<NewRequestScreenProps> = ({
       )}
 
       <Pressable
-        style={[styles.submitButton, submitting && styles.disabledButton]}
+        style={[styles.submitButton, submitting && styles.disabledButton,{backgroundColor:isDark?Colors.darkModePrimary:Colors.primary}]}
         onPress={submitRequest}
         disabled={submitting}
       >
@@ -250,7 +254,7 @@ const NewRequestScreen: React.FC<NewRequestScreenProps> = ({
         </Text>
       </Pressable>
 
-      <Pressable style={styles.backButton} onPress={onNavigateBack}>
+      <Pressable style={[styles.backButton,{backgroundColor:isDark?Colors.darkModeSecondary:Colors.primary}]} onPress={onNavigateBack}>
         <Text style={styles.buttonText}>Back</Text>
       </Pressable>
 
@@ -261,18 +265,18 @@ const NewRequestScreen: React.FC<NewRequestScreenProps> = ({
       >
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
-            <Text style={styles.modalText}>Choose an option</Text>
+            <Text style={[styles.modalText,{color:isDark?Colors.darkModePrimary:Colors.text}]}>Choose an option</Text>
             <Pressable
               style={[styles.button, styles.buttonOpen]}
               onPress={selectImage}
             >
-              <Text style={styles.textStyle}>Choose from Gallery</Text>
+              <Text style={[styles.textStyle,,{backgroundColor:isDark?Colors.darkModePrimary:Colors.primary}]}>Choose from Gallery</Text>
             </Pressable>
             <Pressable
               style={[styles.button, styles.buttonOpen]}
               onPress={takePhoto}
             >
-              <Text style={styles.textStyle}>Take a Photo</Text>
+              <Text style={[styles.textStyle,,{backgroundColor:isDark?Colors.darkModeSecondary:Colors.primary}]}>Take a Photo</Text>
             </Pressable>
             <Pressable
               style={[styles.button, styles.buttonClose]}

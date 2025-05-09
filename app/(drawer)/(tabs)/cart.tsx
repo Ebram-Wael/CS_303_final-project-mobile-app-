@@ -144,7 +144,7 @@ const CartScreen = () => {
             <Text
               style={[
                 styles.clearButtonText,
-                { color: isDark ? Colors.assestBlue : Colors.assestGreen },
+                { color: isDark ? Colors.assestGreenTwo : Colors.assestGreen },
               ]}
             >
               Clear All
@@ -177,7 +177,7 @@ const CartScreen = () => {
                 styles.browseButton,
                 {
                   backgroundColor: isDark
-                    ? Colors.assestBlue
+                    ? Colors.assestGreenTwo
                     : Colors.assestGreen,
                 },
               ]}
@@ -193,7 +193,7 @@ const CartScreen = () => {
               style={[
                 styles.card,
                 {
-                  backgroundColor: isDark ? Colors.darkModeBackground : "#fff",
+                  backgroundColor: isDark ? Colors.darkModePrimary : "#fff",
                   shadowColor: isDark ? "#000" : "#000",
                 },
               ]}
@@ -213,7 +213,7 @@ const CartScreen = () => {
                   style={[
                     styles.price,
                     {
-                      color: isDark ? Colors.assestBlue : Colors.assestGreen,
+                      color: isDark ? Colors.assestGreenThree : Colors.assestGreen,
                     },
                   ]}
                 >
@@ -311,7 +311,7 @@ const CartScreen = () => {
               style={[
                 styles.totalPrice,
                 {
-                  color: isDark ? Colors.assestBlue : Colors.assestGreen,
+                  color: isDark ? Colors.assestGreenThree : Colors.assestGreen,
                 },
               ]}
             >
@@ -324,7 +324,7 @@ const CartScreen = () => {
               styles.checkoutButton,
               {
                 backgroundColor: isDark
-                  ? Colors.assestBlue
+                  ? Colors.darkModeSecondary
                   : Colors.assestGreen,
               },
             ]}

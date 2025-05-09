@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ThemeProvider } from "@/components/themeContext"; // Adjust the import as necessary
+import Colors from "@/components/colors";
 
 export default function RootLayout() {
   const [loading, setLoading] = useState(true);
@@ -63,7 +64,7 @@ export default function RootLayout() {
     return (
       <ThemeProvider>
         <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-          <ActivityIndicator size="large" />
+          <ActivityIndicator size="large" color={Colors.indicator} />
         </View>
       </ThemeProvider>
     );

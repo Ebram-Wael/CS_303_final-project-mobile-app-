@@ -4,8 +4,9 @@ import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import Slider from "@react-native-community/slider";
 import Checkbox from "expo-checkbox";
-
+import { useThemes } from '@/components/themeContext';
 import Colors from "@/components/colors";
+import { ColorProperties } from "react-native-reanimated/lib/typescript/Colors";
 
 type FilterOption = {
   id: string;
@@ -44,6 +45,8 @@ const Filters: React.FC<FilterComponentProps> = ({
   onApply,
   initialFilters,
 }) => {
+  const { theme } = useThemes();
+  const isDark = theme === 'dark';
   const [priceRange, setPriceRange] = useState(initialFilters.priceRange);
   const [categories, setCategories] = useState<FilterCategory[]>([
     {
@@ -133,32 +136,32 @@ const Filters: React.FC<FilterComponentProps> = ({
   return (
     <View style={styles.modalContainer}>
       <Pressable style={styles.modalBackdrop} onPress={onClose} />
-      <View style={styles.filterContainer}>
+      <View style={[styles.filterContainer,{ backgroundColor: isDark ? Colors.darkModeBackground : Colors.background }]}>
         <ScrollView showsVerticalScrollIndicator={false}>
           {/* Header */}
           <View style={styles.header}>
-            <Text style={styles.title}>Filter Properties</Text>
+            <Text style={[styles.title ,{ color: isDark ? Colors.darkModeText : "600" }]}>Filter Properties</Text>
             <Pressable
               onPress={onClose}
               style={({ pressed }) => pressed && styles.pressed}
             >
-              <Ionicons name="close" size={24} color={Colors.text} />
+              <Ionicons name="close" size={24} color={isDark?Colors.darkModeText:Colors.text} />
             </Pressable>
           </View>
 
           {/* Price Range */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Price Range (EGP)</Text>
-            <Text style={styles.priceText}>
+            <Text style={[styles.sectionTitle,{ color: isDark ? Colors.darkModeText : "600" }]}>Price Range (EGP)</Text>
+            <Text style={[styles.priceText,{ color: isDark ? Colors.assestWhite : Colors.primary }]}>
               {priceRange.min.toLocaleString()} -{" "}
               {priceRange.max.toLocaleString()}
             </Text>
             <Slider
               minimumValue={0}
               maximumValue={10000}
-              minimumTrackTintColor={Colors.primary}
-              maximumTrackTintColor={Colors.secondary}
-              thumbTintColor={Colors.primary}
+              minimumTrackTintColor={isDark?Colors.darkIndicator:Colors.primary}
+              maximumTrackTintColor={isDark?Colors.assestWhite:Colors.secondary}
+              thumbTintColor={isDark?Colors.darkIndicator:Colors.primary}
               step={500}
               value={priceRange.max}
               onValueChange={(value) =>
@@ -169,13 +172,14 @@ const Filters: React.FC<FilterComponentProps> = ({
           </View>
           {categories.map((category) => (
             <View key={category.id} style={styles.section}>
-              <Text style={styles.sectionTitle}>{category.name}</Text>
+              <Text style={[styles.sectionTitle,{color:isDark?Colors.darkModeText:"600"}]}>{category.name}</Text>
               <View style={styles.optionsContainer}>
                 {category.options.map((option) => (
                   <Pressable
                     key={option.id}
                     style={({ pressed }) => [
                       styles.option,
+                      {backgroundColor:isDark?Colors.darkModeSecondary:Colors.whiteText},
                       pressed && styles.pressed,
                       option.selected && styles.optionSelected,
                     ]}
@@ -190,6 +194,7 @@ const Filters: React.FC<FilterComponentProps> = ({
                     <Text
                       style={[
                         styles.optionText,
+                        {color:isDark?Colors.darkModeText:Colors.primary},
                         option.selected && styles.optionTextSelected,
                       ]}
                     >
@@ -216,6 +221,7 @@ const Filters: React.FC<FilterComponentProps> = ({
           <Pressable
             style={({ pressed }) => [
               styles.applyButton,
+              ,{backgroundColor: isDark ? Colors.darkModeSecondary : Colors.primary },
               pressed && styles.pressed,
             ]}
             onPress={handleApply}

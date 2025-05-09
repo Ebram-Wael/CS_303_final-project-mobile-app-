@@ -62,7 +62,7 @@ export default function OwnerDetails() {
 
   return (
     <ScrollView style={[styles.container,{backgroundColor:isDark?Colors.darkModeBackground:Colors.background}]}>
-      <Text style={styles.header}>Owner Details</Text>
+      <Text style={[styles.header,{color:isDark?Colors.darkModeText:Colors.text}]}>Owner Details</Text>
       {owner ? (
         <View style={styles.card}>
           {owner.image && (
@@ -97,7 +97,7 @@ export default function OwnerDetails() {
         <Text style={styles.errorText}>Owner details not found.</Text>
       )}
 
-      <Text style={styles.subHeader}>Properties Listed</Text>
+      <Text style={[styles.subHeader,{color:isDark?Colors.darkModeText:Colors.text}]}>Properties Listed</Text>
       {ownedHouses.length > 0 ? (
         ownedHouses.map((house) => (
           <Pressable
@@ -112,9 +112,9 @@ export default function OwnerDetails() {
             <View key={house.id} style={styles.houseCard}>
               <Image source={{ uri: house.image[0] }} style={styles.image} />
               <View style={styles.houseInfo}>
-                <Text style={styles.title}>{house.availability_status}</Text>
-                <Text style={styles.address}>{house.location}</Text>
-                <Text style={styles.price}>{house.rent} EGP</Text>
+                <Text style={[styles.title,{color:isDark?Colors.assestGreen:Colors.text}]}>{house.availability_status}</Text>
+                <Text style={[styles.address,{color:isDark?Colors.assestGray:Colors.assestGray}]}>{house.location}</Text>
+                <Text style={[styles.price,{color:isDark?Colors.assestGreenTwo:Colors.assestBlue}]}>{house.rent} EGP</Text>
               </View>
             </View>
           </Pressable>

@@ -22,6 +22,9 @@ import * as Notifications from "expo-notifications";
 import auth from "@/services/firebase";
 import { onAuthStateChanged, User } from "firebase/auth";
 import { useIsFocused } from "@react-navigation/native";
+import { useThemes } from "@/components/themeContext";
+import Colors from "@/components/colors";
+
 interface Request {
   id: string;
   issueType: string;
@@ -40,6 +43,8 @@ interface RequestsListScreenProps {
 const RequestsListScreen: React.FC<RequestsListScreenProps> = ({
   onNavigateToNewRequest,
 }) => {
+    const { theme } = useThemes();
+    const isDark = theme === "dark";
   const [requests, setRequests] = useState<Request[]>([]);
   const [loadingRequests, setLoadingRequests] = useState<boolean>(true);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -129,9 +134,9 @@ const RequestsListScreen: React.FC<RequestsListScreenProps> = ({
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <Text style={styles.header}>Maintenance Requests</Text>
+      <Text style={[styles.header,{color:isDark?Colors.darkModeText:Colors.text}]}>Maintenance Requests</Text>
       <Pressable
-        style={styles.newRequestButton}
+        style={[styles.newRequestButton,{backgroundColor:isDark?Colors.darkModeSecondary:Colors.primary}]}
         onPress={onNavigateToNewRequest}
       >
         <Text style={styles.buttonText}>Report New Issue</Text>
