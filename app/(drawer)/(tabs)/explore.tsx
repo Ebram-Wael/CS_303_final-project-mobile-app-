@@ -12,7 +12,15 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { db } from "@/services/firebase";
-import { collection, onSnapshot, doc, getDoc } from "firebase/firestore";
+import {
+  collection,
+  onSnapshot,
+  doc,
+  getDoc,
+  query,
+  where,
+  getDocs,
+} from "firebase/firestore";
 import { debounce } from "lodash";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useThemes } from "@/components/themeContext";
@@ -23,20 +31,10 @@ import * as Haptics from "expo-haptics";
 import { useLocalSearchParams } from "expo-router";
 import Colors from "@/components/colors";
 
-const COLORS = {
-  primaryDark: "#023336",
-  primary: "#4DA674",
-  primaryLight: "#C1E6B7",
-  background: "#EAF8E7",
-  text: "#023336",
-  textLight: "#4DA674",
-  white: "#FFFFFF",
-  success: "#81C784",
-};
-
 const STORAGE_KEYS = {
   APARTMENTS: "apartmentData",
   OWNER: "owner",
+  REVIEWS: "reviews",
 };
 
 import defaultImage from "@/assets/images/default.png";
@@ -47,6 +45,8 @@ const HouseItem = ({ house }) => {
   const router = useRouter();
   const [owner, setOwner] = useState("");
   const [ownerId, setOwnerId] = useState("");
+  const [averageRating, setAverageRating] = useState(0);
+  const [reviewCount, setReviewCount] = useState(0);
 
   useEffect(() => {
     const fetchOwner = async () => {
@@ -84,6 +84,68 @@ const HouseItem = ({ house }) => {
     fetchOwner();
   }, [house.seller_id]);
 
+  useEffect(() => {
+    const fetchReviews = async () => {
+      if (!house.id) return;
+
+      try {
+        // Try to get reviews from Firestore
+        const reviewsRef = collection(db, "Reviews");
+        const q = query(reviewsRef, where("apartment_id", "==", house.id));
+        const querySnapshot = await getDocs(q);
+
+        if (!querySnapshot.empty) {
+          let totalRating = 0;
+          let count = 0;
+
+          querySnapshot.forEach((doc) => {
+            const reviewData = doc.data();
+            if (reviewData.rating) {
+              totalRating += reviewData.rating;
+              count++;
+            }
+          });
+
+          if (count > 0) {
+            setAverageRating(totalRating / count);
+            setReviewCount(count);
+          }
+        } else {
+          // If no reviews in Firestore, check AsyncStorage as fallback
+          try {
+            const storedReviews = await AsyncStorage.getItem(
+              STORAGE_KEYS.REVIEWS
+            );
+            if (storedReviews) {
+              const parsedReviews = JSON.parse(storedReviews);
+              const houseReviews = parsedReviews.filter(
+                (review) => review.apartment_id === house.id
+              );
+
+              if (houseReviews.length > 0) {
+                const totalRating = houseReviews.reduce(
+                  (sum, review) => sum + review.rating,
+                  0
+                );
+                setAverageRating(totalRating / houseReviews.length);
+                setReviewCount(houseReviews.length);
+              }
+            }
+          } catch (storageError) {
+            console.error(
+              "Error retrieving reviews from storage:",
+              storageError
+            );
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching reviews:", error);
+      }
+    };
+
+    fetchReviews();
+  }, [house.id]);
+
   const navigateToDetails = () => {
     Haptics.selectionAsync();
     router.push({
@@ -102,17 +164,61 @@ const HouseItem = ({ house }) => {
     }
   };
 
-  // Fix: Safely access the image array
   const houseImage =
     house.image && house.image.length > 0 ? house.image[0] : null;
 
-    if(house.status === "pending") {
-      return null;
+  if (house.status === "pending") {
+    return null;
+  }
+
+  if (house.availability_status === "rented") {
+    return null;
+  }
+
+  const renderRatingStars = () => {
+    const stars = [];
+    const fullStars = Math.floor(averageRating);
+    const hasHalfStar = averageRating - fullStars >= 0.5;
+
+    for (let i = 0; i < fullStars; i++) {
+      stars.push(
+        <MaterialIcons
+          key={`full-${i}`}
+          name="star"
+          size={16}
+          color="#FFD700"
+          style={styles.starIcon}
+        />
+      );
     }
-    
-    if(house.availability_status === "rented") {
-      return null;
+
+    if (hasHalfStar) {
+      stars.push(
+        <MaterialIcons
+          key="half"
+          name="star-half"
+          size={16}
+          color="#FFD700"
+          style={styles.starIcon}
+        />
+      );
     }
+
+    const emptyCount = 5 - fullStars - (hasHalfStar ? 1 : 0);
+    for (let i = 0; i < emptyCount; i++) {
+      stars.push(
+        <MaterialIcons
+          key={`empty-${i}`}
+          name="star-outline"
+          size={16}
+          color="#FFD700"
+          style={styles.starIcon}
+        />
+      );
+    }
+
+    return stars;
+  };
 
   return (
     <Pressable
@@ -122,7 +228,11 @@ const HouseItem = ({ house }) => {
       <View
         style={[
           styles.card,
-          { backgroundColor: isDark ? Colors.darkModePrimary : Colors.assestWhite },
+          {
+            backgroundColor: isDark
+              ? Colors.darkModePrimary
+              : Colors.assestWhite,
+          },
         ]}
       >
         <View style={styles.cardHeader}>
@@ -163,7 +273,11 @@ const HouseItem = ({ house }) => {
             <Text
               style={[
                 styles.detailText,
-                { color: isDark ? Colors.assestGreenThree : Colors.assestGreenTwo },
+                {
+                  color: isDark
+                    ? Colors.assestGreenThree
+                    : Colors.assestGreenTwo,
+                },
               ]}
             >
               {house.num_bedrooms || "N/A"} Beds
@@ -178,12 +292,35 @@ const HouseItem = ({ house }) => {
             <Text
               style={[
                 styles.detailText,
-                { color: isDark ? Colors.assestGreenThree : Colors.assestGreenTwo },
+                {
+                  color: isDark
+                    ? Colors.assestGreenThree
+                    : Colors.assestGreenTwo,
+                },
               ]}
             >
               Floor {house.floor || "N/A"}
             </Text>
           </View>
+        </View>
+
+        {/* Reviews Section */}
+        <View style={styles.reviewsContainer}>
+          <View style={styles.starsContainer}>{renderRatingStars()}</View>
+          <Text
+            style={[
+              styles.reviewCount,
+              {
+                color: isDark ? Colors.assestGreenThree : Colors.assestGreenTwo,
+              },
+            ]}
+          >
+            {reviewCount > 0
+              ? `${averageRating.toFixed(1)} (${reviewCount} ${
+                  reviewCount === 1 ? "review" : "reviews"
+                })`
+              : "No reviews yet"}
+          </Text>
         </View>
 
         <View style={styles.footer}>
@@ -208,7 +345,11 @@ const HouseItem = ({ house }) => {
               <View
                 style={[
                   styles.availabilityBadge,
-                  { backgroundColor: isDark ? Colors.assestGreenTwo : Colors.assestGreenTwo },
+                  {
+                    backgroundColor: isDark
+                      ? Colors.assestGreenTwo
+                      : Colors.assestGreenTwo,
+                  },
                 ]}
               >
                 <Text style={styles.availabilityText}>Available</Text>
@@ -219,7 +360,9 @@ const HouseItem = ({ house }) => {
           <Text
             style={[
               styles.price,
-              { color: isDark ? Colors.assestGreenThree : Colors.assestGreenTwo },
+              {
+                color: isDark ? Colors.assestGreenThree : Colors.assestGreenTwo,
+              },
             ]}
           >
             {house.rent > 0 ? `${house.rent.toLocaleString()}` : "N/A"} EGP
@@ -259,7 +402,7 @@ export default function HouseList() {
 
     if (location || maxPrice || bedrooms || nearby) {
       const newFilters = {
-        ...filters, // Keep existing filter values
+        ...filters,
         locations: location ? [location] : filters.locations,
         priceRange: {
           min: 0,
@@ -341,7 +484,7 @@ export default function HouseList() {
         } finally {
           setIsLoading(false);
         }
-        return () => { };
+        return () => {};
       }
     };
 
@@ -457,8 +600,20 @@ export default function HouseList() {
   const renderContent = useMemo(() => {
     if (isLoading) {
       return (
-        <View style={[styles.loadingContainer, { backgroundColor: isDark ? Colors.darkModeBackground : Colors.background }]}>
-          <ActivityIndicator size="large" color={isDark ? Colors.darkIndicator : Colors.indicator} />
+        <View
+          style={[
+            styles.loadingContainer,
+            {
+              backgroundColor: isDark
+                ? Colors.darkModeBackground
+                : Colors.background,
+            },
+          ]}
+        >
+          <ActivityIndicator
+            size="large"
+            color={isDark ? Colors.darkIndicator : Colors.indicator}
+          />
         </View>
       );
     }
@@ -474,7 +629,9 @@ export default function HouseList() {
           <Text
             style={[
               styles.loadingText,
-              { color: isDark ? Colors.assestGreenThree : Colors.assestGreenTwo },
+              {
+                color: isDark ? Colors.assestGreenThree : Colors.assestGreenTwo,
+              },
             ]}
           >
             No houses match your search
@@ -492,7 +649,11 @@ export default function HouseList() {
     <View
       style={[
         styles.container,
-        { backgroundColor: isDark ? Colors.darkModeBackground : Colors.background },
+        {
+          backgroundColor: isDark
+            ? Colors.darkModeBackground
+            : Colors.background,
+        },
       ]}
     >
       <SafeAreaView edges={["top"]} style={styles.headerContainer}>
@@ -508,12 +669,18 @@ export default function HouseList() {
       <View
         style={[
           styles.searchContainer,
-          { backgroundColor: isDark ? Colors.darkModePrimary : Colors.assestWhite },
+          {
+            backgroundColor: isDark
+              ? Colors.darkModePrimary
+              : Colors.assestWhite,
+          },
         ]}
       >
         <TextInput
           placeholder="Search location, features, price..."
-          placeholderTextColor={isDark ? Colors.assestGreenThree : Colors.assestGreenTwo}
+          placeholderTextColor={
+            isDark ? Colors.assestGreenThree : Colors.assestGreenTwo
+          }
           clearButtonMode="while-editing"
           style={[
             styles.searchBox,
@@ -612,7 +779,7 @@ const styles = StyleSheet.create({
     resizeMode: "cover",
   },
   detailsContainer: {
-    marginBottom: 12,
+    marginBottom: 8,
   },
   detailRow: {
     flexDirection: "row",
@@ -625,6 +792,21 @@ const styles = StyleSheet.create({
   },
   detailIcon: {
     marginLeft: 12,
+  },
+  reviewsContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  starsContainer: {
+    flexDirection: "row",
+    marginRight: 6,
+  },
+  starIcon: {
+    marginRight: 2,
+  },
+  reviewCount: {
+    fontSize: 14,
   },
   footer: {
     flexDirection: "row",
