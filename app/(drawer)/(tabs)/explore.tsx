@@ -295,7 +295,11 @@ const HouseItem = ({ house }) => {
             apartmentId={house.id}
           />
         </Pressable>
-        <AddComment apartmentId={house.id} userId={user_id} userName={userName}></AddComment>
+        <AddComment
+          apartmentId={house.id}
+          userId={user_id}
+          userName={userName}
+        ></AddComment>
       </View>
     </SafeAreaView>
   );

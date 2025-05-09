@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { View, Text, Pressable, StyleSheet, ScrollView } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
@@ -28,7 +28,7 @@ type FilterComponentProps = {
     locations: string[];
     status: string[];
     propertyType: string[];
-    floors: string[]; // Added floor filter
+    floors: string[];
   }) => void;
   initialFilters: {
     priceRange: { min: number; max: number };
@@ -36,10 +36,10 @@ type FilterComponentProps = {
     locations: string[];
     status: string[];
     propertyType: string[];
-    floors: string[]; // Added floor filter
+    floors: string[];
   };
-  availableLocations?: string[]; // For dynamic location options
-  availableFloors?: string[]; // For dynamic floor options
+  availableLocations?: string[];
+  availableFloors?: string[];
 };
 
 const Filters: React.FC<FilterComponentProps> = ({
@@ -53,121 +53,112 @@ const Filters: React.FC<FilterComponentProps> = ({
   const { theme } = useThemes();
   const isDark = theme === "dark";
   const [priceRange, setPriceRange] = useState(initialFilters.priceRange);
-  const [categories, setCategories] = useState<FilterCategory[]>([
-    {
-      id: "bedrooms",
-      name: "Bedrooms",
-      options: [
-        {
-          id: "1",
-          label: "1 Bedroom",
-          selected: initialFilters.bedrooms.includes("1"),
-        },
-        {
-          id: "2",
-          label: "2 Bedrooms",
-          selected: initialFilters.bedrooms.includes("2"),
-        },
-        {
-          id: "3",
-          label: "3 Bedrooms",
-          selected: initialFilters.bedrooms.includes("3"),
-        },
-        {
-          id: "4+",
-          label: "4+ Bedrooms",
-          selected: initialFilters.bedrooms.includes("4+"),
-        },
-      ],
-    },
-    {
-      id: "status",
-      name: "Status",
-      options: [
-        {
-          id: "Available",
-          label: "Available",
-          selected: initialFilters.status.includes("Available"),
-        },
-        {
-          id: "Unavailable",
-          label: "Unavailable",
-          selected: initialFilters.status.includes("Unavailable"),
-        },
-        {
-          id: "Rented",
-          label: "Rented",
-          selected: initialFilters.status.includes("Rented"),
-        },
-      ],
-    },
-    {
-      id: "propertyType",
-      name: "Property Type",
-      options: [
-        {
-          id: "Apartment",
-          label: "Apartment",
-          selected: initialFilters.propertyType.includes("Apartment"),
-        },
-        {
-          id: "House",
-          label: "House",
-          selected: initialFilters.propertyType.includes("House"),
-        },
-        {
-          id: "Condo",
-          label: "Condo",
-          selected: initialFilters.propertyType.includes("Condo"),
-        },
-        {
-          id: "Studio",
-          label: "Studio",
-          selected: initialFilters.propertyType.includes("Studio"),
-        },
-      ],
-    },
-    {
-      id: "locations",
-      name: "Locations",
-      options: [],
-    },
-    {
-      id: "floors",
-      name: "Floor",
-      options: [],
-    },
-  ]);
+  const [categories, setCategories] = useState<FilterCategory[]>([]);
 
-  // Initialize dynamic location and floor options when component mounts or when available options change
+  // Initialize categories only once when component mounts or when initialFilters change
   useEffect(() => {
-    setCategories((prevCategories) =>
-      prevCategories.map((category) => {
-        if (category.id === "locations") {
-          return {
-            ...category,
-            options: availableLocations.map((location) => ({
-              id: location,
-              label: location,
-              selected: initialFilters.locations.includes(location),
-            })),
-          };
-        } else if (category.id === "floors") {
-          return {
-            ...category,
-            options: availableFloors.map((floor) => ({
-              id: floor,
-              label: floor,
-              selected: initialFilters.floors.includes(floor),
-            })),
-          };
-        }
-        return category;
-      })
-    );
-  }, [availableLocations, availableFloors, initialFilters]);
+    // Define static categories
+    const staticCategories: FilterCategory[] = [
+      {
+        id: "bedrooms",
+        name: "Bedrooms",
+        options: [
+          {
+            id: "1",
+            label: "1 Bedroom",
+            selected: initialFilters.bedrooms.includes("1"),
+          },
+          {
+            id: "2",
+            label: "2 Bedrooms",
+            selected: initialFilters.bedrooms.includes("2"),
+          },
+          {
+            id: "3",
+            label: "3 Bedrooms",
+            selected: initialFilters.bedrooms.includes("3"),
+          },
+          {
+            id: "4+",
+            label: "4+ Bedrooms",
+            selected: initialFilters.bedrooms.includes("4+"),
+          },
+        ],
+      },
+      {
+        id: "status",
+        name: "Status",
+        options: [
+          {
+            id: "Available",
+            label: "Available",
+            selected: initialFilters.status.includes("Available"),
+          },
+          {
+            id: "Unavailable",
+            label: "Unavailable",
+            selected: initialFilters.status.includes("Unavailable"),
+          },
+          {
+            id: "Rented",
+            label: "Rented",
+            selected: initialFilters.status.includes("Rented"),
+          },
+        ],
+      },
+      {
+        id: "propertyType",
+        name: "Property Type",
+        options: [
+          {
+            id: "Apartment",
+            label: "Apartment",
+            selected: initialFilters.propertyType.includes("Apartment"),
+          },
+          {
+            id: "House",
+            label: "House",
+            selected: initialFilters.propertyType.includes("House"),
+          },
+          {
+            id: "Condo",
+            label: "Condo",
+            selected: initialFilters.propertyType.includes("Condo"),
+          },
+          {
+            id: "Studio",
+            label: "Studio",
+            selected: initialFilters.propertyType.includes("Studio"),
+          },
+        ],
+      },
+      // Add dynamic categories with initial empty options
+      {
+        id: "locations",
+        name: "Locations",
+        options: availableLocations.map((location) => ({
+          id: location,
+          label: location,
+          selected: initialFilters.locations.includes(location),
+        })),
+      },
+      {
+        id: "floors",
+        name: "Floor",
+        options: availableFloors.map((floor) => ({
+          id: floor,
+          label: floor,
+          selected: initialFilters.floors.includes(floor),
+        })),
+      },
+    ];
 
-  const toggleOption = (categoryId: string, optionId: string) => {
+    setCategories(staticCategories);
+    setPriceRange(initialFilters.priceRange);
+  }, [initialFilters]);
+
+  // Memoize toggleOption to prevent re-creation on every render
+  const toggleOption = useCallback((categoryId: string, optionId: string) => {
     Haptics.selectionAsync();
     setCategories((prevCategories) =>
       prevCategories.map((category) =>
@@ -183,9 +174,9 @@ const Filters: React.FC<FilterComponentProps> = ({
           : category
       )
     );
-  };
+  }, []);
 
-  const handleApply = () => {
+  const handleApply = useCallback(() => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
 
     const selectedFilters = {
@@ -219,9 +210,9 @@ const Filters: React.FC<FilterComponentProps> = ({
 
     onApply(selectedFilters);
     onClose();
-  };
+  }, [categories, priceRange, onApply, onClose]);
 
-  const handleReset = () => {
+  const handleReset = useCallback(() => {
     Haptics.selectionAsync();
     setPriceRange({ min: 0, max: 10000 });
     setCategories((prevCategories) =>
@@ -233,7 +224,7 @@ const Filters: React.FC<FilterComponentProps> = ({
         })),
       }))
     );
-  };
+  }, []);
 
   if (!visible) return null;
 
