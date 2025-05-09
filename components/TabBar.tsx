@@ -32,28 +32,30 @@ export default function TabBar({
   const isDark = theme === "dark";
 
   const [role, setRole] = useState();
+  const [load ,setLoading] =useState(true)
 
   const getUserRole = async () => {
+   try{
     const auth = getAuth();
     const user = auth.currentUser;
     if (user) {
       const userDocRef = doc(db, "Users", user.uid);
       const userDoc = await getDoc(userDocRef);
       setRole(userDoc.data()?.role);
-      if (role === "admin") {
-        console.log("User role is admin");
-      }
-      if (role === "buyer") {
-        console.log("User role is buyer");
-      }
-      if (role === "seller") {
-        console.log("User role is seller");
-      }
+    }
+    }catch (error){
+        console.log(error)
+    }finally{
+      setLoading(false)
+      
     }
   };
   useEffect(() => {
     getUserRole();
   }, []);
+
+  if(load)return
+  if(!role)return
 
   const icons = {
     index: {
