@@ -71,7 +71,6 @@ const Profile = () => {
         setRole(data.role);
         setImageUrl(data.imageurl);
         setLoading(false);
-        console.log(data.name);
         await AsyncStorage.setItem("userData", JSON.stringify(data));
       }
     }
