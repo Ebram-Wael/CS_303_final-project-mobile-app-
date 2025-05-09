@@ -47,7 +47,6 @@ const Profile = () => {
           setRole(userData.role);
           setImageUrl(userData.imageurl);
           setLoading(false);
-          console.log(userData.name)
         }
       } catch (error) {
         console.error("Error retrieving user data:", error);
@@ -63,11 +62,8 @@ const Profile = () => {
     if (user) {
       const userDocRef = doc(db, "Users", user.uid);
       const userDoc = await getDoc(userDocRef);
-      console.log(auth.currentUser?.uid);
       if (userDoc.exists()) {
         const data = userDoc.data();
-        console.log("User data:", data);
-        
         setUserDetails(data);
         setName(data.name);
         setPhone(data.phone);
@@ -82,8 +78,10 @@ const Profile = () => {
   };
 
   const requestPermissions = async () => {
-    const { status: cameraStatus } = await Camera.requestCameraPermissionsAsync();
-    const { status: mediaStatus } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    const { status: cameraStatus } =
+      await Camera.requestCameraPermissionsAsync();
+    const { status: mediaStatus } =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (cameraStatus !== "granted" || mediaStatus !== "granted") {
       alert("You need to enable camera and media permissions.");
     }
@@ -115,23 +113,27 @@ const Profile = () => {
   };
 
   const deleteImage = async () => {
-    Alert.alert("Delete Profile Picture", "Are you sure you want to delete the profile picture?", [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Delete",
-        onPress: async () => {
-          setImageUrl(null);
-          try {
-            const userDocRef = doc(db, "Users", auth.currentUser?.uid || "");
-            await updateDoc(userDocRef, { imageurl: null });
-            Alert.alert("Success", "Profile picture deleted successfully!");
-          } catch (error) {
-            console.error("Error deleting image:", error);
-            Alert.alert("Error", "Failed to delete profile picture.");
-          }
+    Alert.alert(
+      "Delete Profile Picture",
+      "Are you sure you want to delete the profile picture?",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          onPress: async () => {
+            setImageUrl(null);
+            try {
+              const userDocRef = doc(db, "Users", auth.currentUser?.uid || "");
+              await updateDoc(userDocRef, { imageurl: null });
+              Alert.alert("Success", "Profile picture deleted successfully!");
+            } catch (error) {
+              console.error("Error deleting image:", error);
+              Alert.alert("Error", "Failed to delete profile picture.");
+            }
+          },
         },
-      },
-    ]);
+      ]
+    );
   };
 
   const onImagePress = () => {
@@ -156,29 +158,33 @@ const Profile = () => {
   };
 
   const handleDeleteAccount = () => {
-    Alert.alert("Confirm Deletion", "Are you sure you want to delete your account? This action cannot be undone.", [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Delete",
-        style: "destructive",
-        onPress: async () => {
-          try {
-            const user = auth.currentUser;
-            if (user) {
-              const userDocRef = doc(db, "Users", user.uid);
-              await updateDoc(userDocRef, { deleted: true });
-              await AsyncStorage.clear();
-              await user.delete();
-              Alert.alert("Deleted", "Your account has been deleted.");
-              router.replace("/");
+    Alert.alert(
+      "Confirm Deletion",
+      "Are you sure you want to delete your account? This action cannot be undone.",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              const user = auth.currentUser;
+              if (user) {
+                const userDocRef = doc(db, "Users", user.uid);
+                await updateDoc(userDocRef, { deleted: true });
+                await AsyncStorage.clear();
+                await user.delete();
+                Alert.alert("Deleted", "Your account has been deleted.");
+                router.replace("/");
+              }
+            } catch (error) {
+              console.error("Delete account error:", error);
+              Alert.alert("Error", "Failed to delete account.");
             }
-          } catch (error) {
-            console.error("Delete account error:", error);
-            Alert.alert("Error", "Failed to delete account.");
-          }
+          },
         },
-      },
-    ]);
+      ]
+    );
   };
 
   return (
@@ -194,7 +200,16 @@ const Profile = () => {
         </View>
       ) : (
         <View style={styles.container}>
-          <View style={[styles.header, { backgroundColor: isDark ? Colors.darkModePrimary : Colors.primary }]}>
+          <View
+            style={[
+              styles.header,
+              {
+                backgroundColor: isDark
+                  ? Colors.darkModePrimary
+                  : Colors.primary,
+              },
+            ]}
+          >
             <View style={styles.headerTopRow}>
               <Pressable onPress={handleLogout}>
                 <Feather name="log-out" size={24} color="white" />
@@ -218,27 +233,78 @@ const Profile = () => {
 
           <View style={styles.infoContainer}>
             <View style={styles.infoRow}>
-              <Feather name="settings" size={24} color={isDark ? Colors.darkModeText : Colors.text} />
-              <Text style={[styles.infoText, { color: isDark ? Colors.darkModeText : Colors.text }]}>{role}</Text>
+              <Feather
+                name="settings"
+                size={24}
+                color={isDark ? Colors.darkModeText : Colors.text}
+              />
+              <Text
+                style={[
+                  styles.infoText,
+                  { color: isDark ? Colors.darkModeText : Colors.text },
+                ]}
+              >
+                {role}
+              </Text>
             </View>
 
             <View style={styles.infoRow}>
-              <Feather name="user" size={24} color={isDark ? Colors.darkModeText : Colors.text} />
-              <Text style={[styles.infoText, { color: isDark ? Colors.darkModeText : Colors.text }]}>{name}</Text>
+              <Feather
+                name="user"
+                size={24}
+                color={isDark ? Colors.darkModeText : Colors.text}
+              />
+              <Text
+                style={[
+                  styles.infoText,
+                  { color: isDark ? Colors.darkModeText : Colors.text },
+                ]}
+              >
+                {name}
+              </Text>
             </View>
 
             <View style={styles.infoRow}>
-              <Feather name="phone" size={24} color={isDark ? Colors.darkModeText : Colors.text} />
-              <Text style={[styles.infoText, { color: isDark ? Colors.darkModeText : Colors.text }]}>{phone}</Text>
+              <Feather
+                name="phone"
+                size={24}
+                color={isDark ? Colors.darkModeText : Colors.text}
+              />
+              <Text
+                style={[
+                  styles.infoText,
+                  { color: isDark ? Colors.darkModeText : Colors.text },
+                ]}
+              >
+                {phone}
+              </Text>
             </View>
 
             <View style={styles.infoRow}>
-              <Feather name="mail" size={24} color={isDark ? Colors.darkModeText : Colors.text} />
-              <Text style={[styles.infoText, { color: isDark ? Colors.darkModeText : Colors.text }]}>{email}</Text>
+              <Feather
+                name="mail"
+                size={24}
+                color={isDark ? Colors.darkModeText : Colors.text}
+              />
+              <Text
+                style={[
+                  styles.infoText,
+                  { color: isDark ? Colors.darkModeText : Colors.text },
+                ]}
+              >
+                {email}
+              </Text>
             </View>
 
             <Pressable
-              style={[styles.editButton, { backgroundColor: isDark ? Colors.darkModePrimary : Colors.primary }]}
+              style={[
+                styles.editButton,
+                {
+                  backgroundColor: isDark
+                    ? Colors.darkModePrimary
+                    : Colors.primary,
+                },
+              ]}
               onPress={() => router.push("../../screens/edit-profile")}
             >
               <Text style={styles.buttonText}>Edit profile</Text>

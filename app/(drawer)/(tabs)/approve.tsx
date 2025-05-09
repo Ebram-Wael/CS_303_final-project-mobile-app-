@@ -12,7 +12,6 @@ export default function ApproveApart() {
         const fetchPending = async () => {
             const orders = await getPendingAPart();
             setPendingApart(orders);
-            console.log(orders);
         };
         fetchPending();
     }, []);

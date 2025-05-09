@@ -193,7 +193,6 @@ const Register = () => {
     } catch (error) {
       if (error.code === "auth/email-already-in-use") {
         setTimeout(() => router.push("/login"), 2000);
-        console.log(error.code);
         Alert.alert("you already have an account");
       } else {
         Alert.alert("The email address you entered is incorrect, try again.");
