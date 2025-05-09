@@ -52,6 +52,16 @@ export default function index() {
         backgroundColor={isDark ? Colors.darkModePrimary : Colors.primary}
       />
       <FloatingMenuButton />
+      <Text
+        style={[
+          styles.mainHeading,
+          {
+            backgroundColor: isDark ? Colors.darkModePrimary : Colors.primary,
+          },
+        ]}
+      >
+        HOMY
+      </Text>
       <ScrollView style={styles.content}>
         <View>
           <Text
@@ -204,6 +214,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.primary,
     marginBottom: 10,
     padding: 12,
+    marginTop: -34,
   },
   content: {
     padding: 16,
