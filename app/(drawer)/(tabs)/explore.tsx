@@ -12,15 +12,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { db } from "@/services/firebase";
-import {
-  collection,
-  onSnapshot,
-  doc,
-  getDoc,
-  query,
-  where,
-  getDocs,
-} from "firebase/firestore";
+import { collection, onSnapshot, doc, getDoc } from "firebase/firestore";
 import { debounce } from "lodash";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useThemes } from "@/components/themeContext";
@@ -28,13 +20,25 @@ import FilterIcon from "@/assets/icons/filter.svg";
 import Filters from "@/components/Filters";
 import { MaterialIcons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
+import CommentsModal from "@/components/CommentsModal";
+import AddComment from "@/components/AddComment";
 import { useLocalSearchParams } from "expo-router";
 import Colors from "@/components/colors";
+
+const COLORS = {
+  primaryDark: "#023336",
+  primary: "#4DA674",
+  primaryLight: "#C1E6B7",
+  background: "#EAF8E7",
+  text: "#023336",
+  textLight: "#4DA674",
+  white: "#FFFFFF",
+  success: "#81C784",
+};
 
 const STORAGE_KEYS = {
   APARTMENTS: "apartmentData",
   OWNER: "owner",
-  REVIEWS: "reviews",
 };
 
 import defaultImage from "@/assets/images/default.png";
@@ -45,10 +49,18 @@ const HouseItem = ({ house }) => {
   const router = useRouter();
   const [owner, setOwner] = useState("");
   const [ownerId, setOwnerId] = useState("");
-  const [averageRating, setAverageRating] = useState(0);
-  const [reviewCount, setReviewCount] = useState(0);
-
+  const [user_id, setUser_id] = useState("");
+  const [showComments, setShowComments] = useState(false);
   useEffect(() => {
+    const fetchUserId = async () => {
+      try {
+        await AsyncStorage.getItem("user_id").then((value) => {
+          setUser_id(value);
+        });
+      } catch (error) {
+        console.error("Error fetching user_id:", error);
+      }
+    };
     const fetchOwner = async () => {
       if (!house.seller_id) {
         setOwner("No seller");
@@ -80,71 +92,9 @@ const HouseItem = ({ house }) => {
         }
       }
     };
-
+    fetchUserId();
     fetchOwner();
   }, [house.seller_id]);
-
-  useEffect(() => {
-    const fetchReviews = async () => {
-      if (!house.id) return;
-
-      try {
-        // Try to get reviews from Firestore
-        const reviewsRef = collection(db, "Reviews");
-        const q = query(reviewsRef, where("apartment_id", "==", house.id));
-        const querySnapshot = await getDocs(q);
-
-        if (!querySnapshot.empty) {
-          let totalRating = 0;
-          let count = 0;
-
-          querySnapshot.forEach((doc) => {
-            const reviewData = doc.data();
-            if (reviewData.rating) {
-              totalRating += reviewData.rating;
-              count++;
-            }
-          });
-
-          if (count > 0) {
-            setAverageRating(totalRating / count);
-            setReviewCount(count);
-          }
-        } else {
-          // If no reviews in Firestore, check AsyncStorage as fallback
-          try {
-            const storedReviews = await AsyncStorage.getItem(
-              STORAGE_KEYS.REVIEWS
-            );
-            if (storedReviews) {
-              const parsedReviews = JSON.parse(storedReviews);
-              const houseReviews = parsedReviews.filter(
-                (review) => review.apartment_id === house.id
-              );
-
-              if (houseReviews.length > 0) {
-                const totalRating = houseReviews.reduce(
-                  (sum, review) => sum + review.rating,
-                  0
-                );
-                setAverageRating(totalRating / houseReviews.length);
-                setReviewCount(houseReviews.length);
-              }
-            }
-          } catch (storageError) {
-            console.error(
-              "Error retrieving reviews from storage:",
-              storageError
-            );
-          }
-        }
-      } catch (error) {
-        console.error("Error fetching reviews:", error);
-      }
-    };
-
-    fetchReviews();
-  }, [house.id]);
 
   const navigateToDetails = () => {
     Haptics.selectionAsync();
@@ -164,6 +114,7 @@ const HouseItem = ({ house }) => {
     }
   };
 
+  // Fix: Safely access the image array
   const houseImage =
     house.image && house.image.length > 0 ? house.image[0] : null;
 
@@ -171,205 +122,164 @@ const HouseItem = ({ house }) => {
     return null;
   }
 
-  if (house.availability_status === "rented") {
-    return null;
-  }
-
-  const renderRatingStars = () => {
-    const stars = [];
-    const fullStars = Math.floor(averageRating);
-    const hasHalfStar = averageRating - fullStars >= 0.5;
-
-    for (let i = 0; i < fullStars; i++) {
-      stars.push(
-        <MaterialIcons
-          key={`full-${i}`}
-          name="star"
-          size={16}
-          color="#FFD700"
-          style={styles.starIcon}
-        />
-      );
-    }
-
-    if (hasHalfStar) {
-      stars.push(
-        <MaterialIcons
-          key="half"
-          name="star-half"
-          size={16}
-          color="#FFD700"
-          style={styles.starIcon}
-        />
-      );
-    }
-
-    const emptyCount = 5 - fullStars - (hasHalfStar ? 1 : 0);
-    for (let i = 0; i < emptyCount; i++) {
-      stars.push(
-        <MaterialIcons
-          key={`empty-${i}`}
-          name="star-outline"
-          size={16}
-          color="#FFD700"
-          style={styles.starIcon}
-        />
-      );
-    }
-
-    return stars;
-  };
-
   return (
-    <Pressable
-      onPress={navigateToDetails}
-      style={({ pressed }) => [styles.cardContainer, pressed && styles.pressed]}
-    >
-      <View
-        style={[
-          styles.card,
-          {
-            backgroundColor: isDark
-              ? Colors.darkModePrimary
-              : Colors.assestWhite,
-          },
+    <SafeAreaView>
+      <Pressable
+        onPress={navigateToDetails}
+        style={({ pressed }) => [
+          styles.cardContainer,
+          pressed && styles.pressed,
         ]}
       >
-        <View style={styles.cardHeader}>
-          <Text
-            style={[
-              styles.title,
-              { color: isDark ? Colors.assestWhite : Colors.assest },
-            ]}
-          >
-            {house.features || house.property_type || "House"}
-          </Text>
-        </View>
-
-        <Text
+        <View
           style={[
-            styles.address,
-            { color: isDark ? Colors.assestGreenThree : Colors.assestGreenTwo },
+            styles.card,
+            {
+              backgroundColor: isDark
+                ? Colors.darkModePrimary
+                : Colors.assestWhite,
+            },
           ]}
         >
-          {house.location || "Unknown Location"}
-        </Text>
-
-        <View style={styles.imageContainer}>
-          <Image
-            source={{ uri: houseImage || defaultImage }}
-            style={styles.image}
-            defaultSource={defaultImage}
-          />
-        </View>
-
-        <View style={styles.detailsContainer}>
-          <View style={styles.detailRow}>
-            <MaterialIcons
-              name="hotel"
-              size={18}
-              color={isDark ? Colors.assestGreenThree : Colors.assestGreenTwo}
-            />
+          <View style={styles.cardHeader}>
             <Text
               style={[
-                styles.detailText,
-                {
-                  color: isDark
-                    ? Colors.assestGreenThree
-                    : Colors.assestGreenTwo,
-                },
+                styles.title,
+                { color: isDark ? Colors.assestWhite : Colors.assest },
               ]}
             >
-              {house.num_bedrooms || "N/A"} Beds
-            </Text>
-
-            <MaterialIcons
-              name="layers"
-              size={18}
-              color={isDark ? Colors.assestGreenThree : Colors.assestGreenTwo}
-              style={styles.detailIcon}
-            />
-            <Text
-              style={[
-                styles.detailText,
-                {
-                  color: isDark
-                    ? Colors.assestGreenThree
-                    : Colors.assestGreenTwo,
-                },
-              ]}
-            >
-              Floor {house.floor || "N/A"}
+              {house.features || house.property_type || "House"}
             </Text>
           </View>
-        </View>
 
-        {/* Reviews Section */}
-        <View style={styles.reviewsContainer}>
-          <View style={styles.starsContainer}>{renderRatingStars()}</View>
           <Text
             style={[
-              styles.reviewCount,
+              styles.address,
               {
                 color: isDark ? Colors.assestGreenThree : Colors.assestGreenTwo,
               },
             ]}
           >
-            {reviewCount > 0
-              ? `${averageRating.toFixed(1)} (${reviewCount} ${
-                  reviewCount === 1 ? "review" : "reviews"
-                })`
-              : "No reviews yet"}
+            {house.location || "Unknown Location"}
           </Text>
-        </View>
 
-        <View style={styles.footer}>
-          <View style={styles.footerLeft}>
-            <View style={styles.ownerContainer}>
+          <View style={styles.imageContainer}>
+            <Image
+              source={{ uri: houseImage || defaultImage }}
+              style={styles.image}
+              defaultSource={defaultImage}
+            />
+          </View>
+
+          <View style={styles.detailsContainer}>
+            <View style={styles.detailRow}>
+              <MaterialIcons
+                name="hotel"
+                size={18}
+                color={isDark ? Colors.assestGreenThree : Colors.assestGreenTwo}
+              />
               <Text
                 style={[
-                  styles.owner,
-                  { color: isDark ? Colors.assestWhite : Colors.assest },
-                ]}
-              >
-                Owner:{" "}
-              </Text>
-              <Pressable onPress={navigateToOwner}>
-                <Text style={{ color: Colors.assestGreenTwo }}>
-                  {owner || "Unknown"}
-                </Text>
-              </Pressable>
-            </View>
-
-            {house.availability_status === "Available" && (
-              <View
-                style={[
-                  styles.availabilityBadge,
+                  styles.detailText,
                   {
-                    backgroundColor: isDark
-                      ? Colors.assestGreenTwo
+                    color: isDark
+                      ? Colors.assestGreenThree
                       : Colors.assestGreenTwo,
                   },
                 ]}
               >
-                <Text style={styles.availabilityText}>Available</Text>
-              </View>
-            )}
+                {house.num_bedrooms || "N/A"} Beds
+              </Text>
+
+              <MaterialIcons
+                name="layers"
+                size={18}
+                color={isDark ? Colors.assestGreenThree : Colors.assestGreenTwo}
+                style={styles.detailIcon}
+              />
+              <Text
+                style={[
+                  styles.detailText,
+                  {
+                    color: isDark
+                      ? Colors.assestGreenThree
+                      : Colors.assestGreenTwo,
+                  },
+                ]}
+              >
+                Floor {house.floor || "N/A"}
+              </Text>
+            </View>
           </View>
 
-          <Text
-            style={[
-              styles.price,
-              {
-                color: isDark ? Colors.assestGreenThree : Colors.assestGreenTwo,
-              },
-            ]}
-          >
-            {house.rent > 0 ? `${house.rent.toLocaleString()}` : "N/A"} EGP
-          </Text>
+          <View style={styles.footer}>
+            <View style={styles.footerLeft}>
+              <View style={styles.ownerContainer}>
+                <Text
+                  style={[
+                    styles.owner,
+                    { color: isDark ? Colors.assestWhite : Colors.assest },
+                  ]}
+                >
+                  Owner:{" "}
+                </Text>
+                <Pressable onPress={navigateToOwner}>
+                  <Text style={{ color: Colors.assestGreenTwo }}>
+                    {owner || "Unknown"}
+                  </Text>
+                </Pressable>
+              </View>
+
+              {house.availability_status === "Available" && (
+                <View
+                  style={[
+                    styles.availabilityBadge,
+                    {
+                      backgroundColor: isDark
+                        ? Colors.assestGreenTwo
+                        : Colors.assestGreenTwo,
+                    },
+                  ]}
+                >
+                  <Text style={styles.availabilityText}>Available</Text>
+                </View>
+              )}
+            </View>
+
+            <Text
+              style={[
+                styles.price,
+                {
+                  color: isDark
+                    ? Colors.assestGreenThree
+                    : Colors.assestGreenTwo,
+                },
+              ]}
+            >
+              {house.rent > 0 ? `${house.rent.toLocaleString()}` : "N/A"} EGP
+            </Text>
+          </View>
         </View>
+      </Pressable>
+      <View style={[
+            styles.commetns,
+            {
+              backgroundColor: isDark
+                ? Colors.darkModePrimary
+                : Colors.assestWhite,
+            },
+          ]}>
+        <Pressable style={styles.commentIcon} onPress={() => setShowComments(true)}>
+          <MaterialIcons name="comment" size={20} color="black"></MaterialIcons>
+          <CommentsModal
+            visible={showComments}
+            onClose={() => setShowComments(false)}
+            apartmentId={house.id}
+          />
+        </Pressable>
+        <AddComment apartmentId={house.id} userId={user_id}></AddComment>
       </View>
-    </Pressable>
+    </SafeAreaView>
   );
 };
 
@@ -402,7 +312,7 @@ export default function HouseList() {
 
     if (location || maxPrice || bedrooms || nearby) {
       const newFilters = {
-        ...filters,
+        ...filters, // Keep existing filter values
         locations: location ? [location] : filters.locations,
         priceRange: {
           min: 0,
@@ -739,10 +649,12 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   cardContainer: {
+    marginTop: 15,
     marginBottom: 15,
   },
   card: {
     padding: 16,
+    
     borderRadius: 16,
     elevation: 2,
     shadowColor: "#000",
@@ -779,7 +691,7 @@ const styles = StyleSheet.create({
     resizeMode: "cover",
   },
   detailsContainer: {
-    marginBottom: 8,
+    marginBottom: 12,
   },
   detailRow: {
     flexDirection: "row",
@@ -792,21 +704,6 @@ const styles = StyleSheet.create({
   },
   detailIcon: {
     marginLeft: 12,
-  },
-  reviewsContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 10,
-  },
-  starsContainer: {
-    flexDirection: "row",
-    marginRight: 6,
-  },
-  starIcon: {
-    marginRight: 2,
-  },
-  reviewCount: {
-    fontSize: 14,
   },
   footer: {
     flexDirection: "row",
@@ -878,5 +775,23 @@ const styles = StyleSheet.create({
   pressed: {
     opacity: 0.7,
     transform: [{ scale: 0.98 }],
+  },
+  commetns: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingLeft: "10%",
+    borderRadius: 16,
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  commentIcon: {
+    marginBottom: 8,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
