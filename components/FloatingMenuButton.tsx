@@ -9,7 +9,7 @@ export default function FloatingMenuButton() {
     <Pressable
       style={{
         position: "relative",
-        top: "5%",
+        top: "3%",
         left: "6%",
         backgroundColor: "transparent",
         width: 33,
@@ -17,10 +17,11 @@ export default function FloatingMenuButton() {
         borderRadius: 25,
         justifyContent: "center",
         alignItems: "center",
+        zIndex: 20,
       }}
       onPress={() => navigation.dispatch({ type: "OPEN_DRAWER" })}
     >
-      <Icon name="bars" size={25} color={Colors.primary} />
+      <Icon name="bars" size={25} color={Colors.whiteText} />
     </Pressable>
   );
 }
