@@ -9,6 +9,7 @@ import {
   Pressable,
   Alert,
   SafeAreaView,
+  ActivityIndicator,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { db } from "@/services/firebase";
@@ -17,6 +18,7 @@ import RedHeart from "@/assets/icons/heart-svgrepo-com (1).svg";
 import * as Notifications from "expo-notifications";
 import Colors from "@/components/colors";
 import { useThemes } from "@/components/themeContext";
+import { useRouter } from "expo-router";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -25,7 +27,7 @@ Notifications.setNotificationHandler({
     shouldSetBadge: true,
   }),
 });
-import { useRouter } from "expo-router";
+
 async function requestNotificationPermissions() {
   const { status } = await Notifications.requestPermissionsAsync();
   if (status !== "granted") {
@@ -41,7 +43,6 @@ interface HouseData {
   rent: number;
   location: string;
 }
-
 interface FavoriteItemProps {
   favoriteId: string;
   onRemove: (id: string) => void;
@@ -54,17 +55,29 @@ const FavoriteItem: React.FC<FavoriteItemProps> = ({
   onPress,
 }) => {
   const [house, setHouse] = useState<HouseData | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const router = useRouter();
 
   useEffect(() => {
     requestNotificationPermissions();
     const fetchFavoriteHouse = async () => {
-      const docRef = doc(db, "Apartments", favoriteId);
-      const docSnap = await getDoc(docRef);
-      if (docSnap.exists()) {
-        const data = docSnap.data() as Omit<HouseData, "id">;
-        setHouse({ id: docSnap.id, ...data } as HouseData);
-      } else {
-        console.log("No such document!");
+      setLoading(true);
+      try {
+        const docRef = doc(db, "Apartments", favoriteId);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          const data = docSnap.data() as Omit<HouseData, "id">;
+          setHouse({ id: docSnap.id, ...data } as HouseData);
+        } else {
+          console.log("No such document!");
+          setHouse(null);
+        }
+      } catch (error) {
+        console.error("Error fetching house data:", error);
+
+        setHouse(null);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -91,6 +104,16 @@ const FavoriteItem: React.FC<FavoriteItemProps> = ({
       console.error("Failed to update favorites", error);
     }
   };
+
+  if (loading) {
+    return (
+      <View style={styles.favoriteItem}>
+        <View style={styles.favoriteImage}>
+          <ActivityIndicator size="large" color={Colors.assestGreen} />
+        </View>
+      </View>
+    );
+  }
 
   if (!house) {
     return null;
@@ -130,7 +153,6 @@ const FavoriteScreen: React.FC = () => {
   const { theme } = useThemes();
   const isDark = theme === "dark";
   const router = useRouter();
-
   const [favoriteIds, setFavoriteIds] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -164,6 +186,55 @@ const FavoriteScreen: React.FC = () => {
       params: { moreview: id },
     });
   };
+
+  if (loading) {
+    return (
+      <SafeAreaView
+        style={[
+          styles.safeArea,
+          {
+            backgroundColor: isDark
+              ? Colors.darkModeBackground
+              : Colors.background,
+          },
+        ]}
+      >
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={Colors.assestGreen} />
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (favoriteIds.length === 0) {
+    return (
+      <SafeAreaView
+        style={[
+          styles.safeArea,
+          {
+            backgroundColor: isDark
+              ? Colors.darkModeBackground
+              : Colors.background,
+          },
+        ]}
+      >
+        <View style={styles.emptyContainer}>
+          <View style={styles.centeredContent}>
+            <RedHeart width={50} height={50} />
+            <Text
+              style={[
+                styles.emptyText,
+                { color: isDark ? Colors.darkModeText : Colors.text },
+              ]}
+            >
+              No favorites found. Add some to see them here!
+            </Text>
+          </View>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView
       style={[
@@ -211,6 +282,13 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+  centeredContent: {
+    alignItems: "center",
+  },
+  emptyText: {
+    marginTop: 10,
+    textAlign: "center",
+  },
   listContainer: {
     padding: 10,
   },
@@ -228,6 +306,8 @@ const styles = StyleSheet.create({
     height: 90,
     borderRadius: 5,
     marginRight: 12,
+    justifyContent: "center",
+    alignItems: "center",
   },
   favoriteDetails: {
     flex: 1,
