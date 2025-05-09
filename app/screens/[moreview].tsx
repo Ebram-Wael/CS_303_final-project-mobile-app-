@@ -92,6 +92,26 @@ const HouseDesc = ({ house }) => {
     fetchOwner();
   }, [house.seller_id]);
 
+  useEffect(() => {
+    const loadUserRating = async () => {
+      if (user) {
+        try {
+          const ratingsRef = collection(db, "Apartments", house.id, "ratings");
+          const userRatingQuery = query(ratingsRef, where("userId", "==", user.uid));
+          const querySnapshot = await getDocs(userRatingQuery);
+
+          if (!querySnapshot.empty) {
+            setUserRating(querySnapshot.docs[0].data().rating);
+          }
+        } catch (error) {
+          console.error("Error loading user rating:", error);
+        }
+      }
+    };
+ 
+    loadUserRating();
+  }, [user, house.id]);
+
   useLayoutEffect(() => {
     navigation.setOptions({ headerShown: false });
   }, [navigation]);
@@ -203,22 +223,50 @@ const HouseDesc = ({ house }) => {
     }
   }
 
+  
   const handleRate = async (rating: number) => {
     try {
-      
-      const newCount = ratingCount + 1;
-      const newAverage = ((currentRating * ratingCount) + rating) / newCount;
-      setUserRating(rating);
-      setCurrentRating(newAverage);
-      setRatingCount(newCount);
+      if (!user) {
+        Alert.alert("Error", "You need to be logged in to rate");
+        return;
+      }
+
       const houseRef = doc(db, "Apartments", house.id);
+      const ratingsRef = collection(db, "Apartments", house.id, "ratings");
+      const userRatingQuery = query(ratingsRef, where("userId", "==", user.uid));
+      const querySnapshot = await getDocs(userRatingQuery);
+
+      let newAverage = currentRating;
+      let newCount = ratingCount;
+      if (querySnapshot.empty) {
+        
+        await addDoc(ratingsRef, {
+          userId: user.uid,
+          rating: rating,
+          createdAt: new Date()
+        });
+        newCount = ratingCount + 1;
+        newAverage = ((currentRating * ratingCount) + rating) / newCount;
+      } else {
+        const docRef = querySnapshot.docs[0].ref;
+        const oldRating = querySnapshot.docs[0].data().rating;
+        await updateDoc(docRef, {
+          rating: rating,
+          updatedAt: new Date()
+        });
+        newAverage = ((currentRating * ratingCount) - oldRating + rating) / ratingCount;
+      }
       await updateDoc(houseRef, {
         rating: newAverage,
         ratingCount: newCount
       });
+
+      setUserRating(rating);
+      setCurrentRating(newAverage);
+      setRatingCount(newCount);
       await Notifications.scheduleNotificationAsync({
         content: {
-          title: "Thank you for rating!",
+          title: querySnapshot.empty ? "Thank you for rating!" : "Rating updated!",
           body: `You rated this property ${rating} stars`,
           sound: "default",
         },
