@@ -13,6 +13,8 @@ import {
 import { BlurView } from "expo-blur";
 import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
 import { db } from "../services/firebase";
+import { useThemes } from '@/components/themeContext';
+import Colors from '@/components/colors';
 
 interface Comment {
   id: string;
@@ -35,6 +37,8 @@ const CommentsModal: React.FC<CommentsModalProps> = ({
 }) => {
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
+  const { theme } = useThemes();
+  const isDark = theme === 'dark';
 
   useEffect(() => {
     if (!apartmentId) return;
@@ -60,8 +64,8 @@ const CommentsModal: React.FC<CommentsModalProps> = ({
     <Modal visible={visible} transparent animationType="slide">
       <BlurView intensity={50} tint="dark" style={StyleSheet.absoluteFill} />
 
-      <View style={styles.modalContent}>
-        <Text style={styles.title}>Comments</Text>
+      <View style={[styles.modalContent, { backgroundColor: isDark ? Colors.darkModePrimary : "rgba(255,255,255,0.95)" }]}>
+        <Text style={[styles.title,{color: isDark ? Colors.darkModeText : Colors.text }]}>Comments</Text>
 
         {loading ? (
           <ActivityIndicator
@@ -86,7 +90,7 @@ const CommentsModal: React.FC<CommentsModalProps> = ({
           />
         )}
 
-        <Pressable onPress={onClose} style={styles.closeButton}>
+        <Pressable onPress={onClose} style={[styles.closeButton , {backgroundColor: isDark ? Colors.darkModeSecondary : Colors.assestGreenTwo }]}>
           <Text style={styles.closeText}>Close</Text>
         </Pressable>
       </View>
@@ -99,44 +103,51 @@ export default CommentsModal;
 const styles = StyleSheet.create({
   modalContent: {
     flex: 1,
-    marginTop: 100,
-    backgroundColor: "rgba(255,255,255,0.95)",
-    padding: 16,
+    marginTop: 80,
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    overflow: 'hidden',
   },
   title: {
-    fontSize: 15,
-    fontWeight: "bold",
-    marginBottom: 12,
+    fontSize: 20,
+    fontWeight: "600",
     textAlign: "center",
+    marginBottom: 16,
   },
   comment: {
-    backgroundColor: "#f2f2f2",
-    borderRadius: 10,
-    padding: 10,
+    backgroundColor: "#e6e6e6",
+    borderRadius: 12,
+    padding: 12,
     marginVertical: 6,
   },
-  commentText: {
-    margin: 4,
-    color: "black",
-    fontSize: 24,
-  },
-  commentTime: {
-    color: "#999",
-    fontSize: 12,
-  },
   user: {
-    fontWeight: "bold",
+    fontWeight: "600",
+    fontSize: 14,
+    color: "#333",
     marginBottom: 4,
   },
+  commentText: {
+    fontSize: 16,
+    color: "#000",
+    marginBottom: 6,
+  },
+  commentTime: {
+    fontSize: 12,
+    color: "#777",
+    textAlign: "right",
+  },
   closeButton: {
-    marginTop: 10,
-    padding: 12,
-    backgroundColor: "#333",
-    borderRadius: 8,
+    marginTop: 20,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 10,
     alignItems: "center",
   },
   closeText: {
-    color: "white",
     fontSize: 16,
+    fontWeight: "500",
+    color: "#fff",
   },
 });

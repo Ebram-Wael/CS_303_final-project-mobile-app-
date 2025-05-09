@@ -11,11 +11,12 @@ import {
   ActivityIndicator,
 } from "react-native";
 import Colors from "@/components/colors";
-import { addDoc, collection, doc, updateDoc , query ,getDocs, where, deleteDoc} from "firebase/firestore";
+import { addDoc, collection, doc, updateDoc, query, getDocs, where, deleteDoc } from "firebase/firestore";
 import { db } from "@/services/firebase";
 import { useLocalSearchParams } from "expo-router";
 import { getAuth } from "firebase/auth";
 import { Picker } from '@react-native-picker/picker';
+import { useThemes } from "@/components/themeContext";
 
 const PurchaseForm = () => {
   const [name, setName] = useState("");
@@ -27,8 +28,11 @@ const PurchaseForm = () => {
   const [cvv, setCvv] = useState("");
 
   const [semester, setSemester] = useState("");
-  const [startDate, setStartDate] = useState(""); 
-  const [endDate, setEndDate] = useState(""); 
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+
+  const { theme } = useThemes();
+  const isDark = theme === "dark";
 
   const search = useLocalSearchParams();
   const apartmentid = search?.apartmentid;
@@ -55,8 +59,8 @@ const PurchaseForm = () => {
         apartmentid: apartmentid,
         rent: rent,
         semester: semester,
-        startDate: startDate,  
-        endDate: endDate,      
+        startDate: startDate,
+        endDate: endDate,
         name: name,
         address: address,
         phoneNumber: phoneNumber,
@@ -85,8 +89,8 @@ const PurchaseForm = () => {
   const semesterOptions = ["First Semester", "Second Semester"];
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>🛒 Checkout</Text>
+    <ScrollView contentContainerStyle={[styles.container,{backgroundColor:isDark?Colors.darkModeBackground:Colors.background}]}>
+      <Text style={[styles.title,{color:isDark?Colors.darkModeText:"#333"}]}>🛒 Checkout</Text>
 
       <TextInput
         placeholder="Full Name"
@@ -108,7 +112,7 @@ const PurchaseForm = () => {
         keyboardType="phone-pad"
       />
 
-      <Text style={styles.sectionTitle}>Select Semester</Text>
+      <Text style={[styles.sectionTitle,{color:isDark?Colors.darkModeText:"#555"}]}>Select Semester</Text>
       <Picker
         selectedValue={semester}
         onValueChange={(itemValue) => setSemester(itemValue)}
@@ -138,7 +142,7 @@ const PurchaseForm = () => {
         </View>
       )}
 
-      <Text style={styles.sectionTitle}>Select Payment Method</Text>
+      <Text style={[styles.sectionTitle,{color:isDark?Colors.darkModeText:"#555"}]}>Select Payment Method</Text>
       <Picker
         selectedValue={paymentMethod}
         onValueChange={(itemValue) => setPaymentMethod(itemValue)}
@@ -177,7 +181,7 @@ const PurchaseForm = () => {
           style={{ marginTop: 20 }}
         />
       ) : (
-        <Pressable style={styles.confirmButton} onPress={handlePurchase}>
+        <Pressable style={[styles.confirmButton,{backgroundColor:isDark?Colors.darkModeSecondary:"#333"}]} onPress={handlePurchase}>
           <Text style={styles.confirmText}>Confirm</Text>
         </Pressable>
       )}

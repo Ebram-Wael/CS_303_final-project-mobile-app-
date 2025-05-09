@@ -8,7 +8,7 @@ const Colors = {
   darkModePrimary: "#1E1E2E",
   darkModeSecondary: "#313244",
   darkModeBackground: "#181825",
-  darkModeText: "#D9E0EE",
+  darkModeText: "#FFFFFF",
 
   assestGray: "#777777",
   assestBlue: "#89B4FA",

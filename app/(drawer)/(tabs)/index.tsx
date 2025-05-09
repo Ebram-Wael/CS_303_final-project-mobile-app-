@@ -62,14 +62,16 @@ export default function index() {
       >
         HOMY
       </Text>
-      <ScrollView style={styles.content}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        style={styles.content}>
         <View>
           <Text
             style={[
               styles.head,
               {
                 color: isDark ? Colors.darkModeText : Colors.text,
-                marginTop: 70,
+                // marginTop: 10,
                 width: "90%",
               },
             ]}
@@ -187,7 +189,7 @@ export default function index() {
               {
                 backgroundColor: isDark
                   ? Colors.darkModeSecondary
-                  : Colors.assestGreen,
+                  : Colors.assestGreenTwo,
               },
             ]}
             onPress={() => router.push("/(drawer)/AboutUs")}

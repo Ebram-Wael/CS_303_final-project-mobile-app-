@@ -335,7 +335,7 @@ const Register = () => {
             ) : null}
           </View>
           <Pressable
-            style={[styles.btn, { opacity: valid ? 1 : 0.5 }]}
+            style={styles.btn}
             onPress={handleSignup}
             disabled={!valid}
           >
@@ -354,7 +354,7 @@ const Register = () => {
             <Pressable onPress={() => router.push("/login")}>
               <Text
                 style={{
-                  color: Colors.assestGreen,
+                  color: Colors.assestGray,
                   textDecorationLine: "underline",
                 }}
               >
@@ -430,12 +430,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingVertical: 8,
     paddingHorizontal: 20,
-    backgroundColor: Colors.assestGreenThree,
+    backgroundColor: Colors.background,
     borderRadius: 6,
     marginBottom: 20,
   },
   btn: {
-    backgroundColor: Colors.assestGreen,
+    backgroundColor: Colors.primary,
     paddingVertical: 14,
     borderRadius: 10,
     width: "100%",

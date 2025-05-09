@@ -238,7 +238,7 @@ const Profile = () => {
             </View>
 
             <Pressable
-              style={[styles.editButton, { backgroundColor: isDark ? Colors.darkModePrimary : Colors.primary }]}
+              style={[styles.editButton, { backgroundColor: isDark ? Colors.darkModeSecondary : Colors.primary }]}
               onPress={() => router.push("../../screens/edit-profile")}
             >
               <Text style={styles.buttonText}>Edit profile</Text>
