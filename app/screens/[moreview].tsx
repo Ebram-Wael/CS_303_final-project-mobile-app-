@@ -14,7 +14,7 @@ import React, { useEffect, useState, useRef, useLayoutEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { router, useLocalSearchParams } from "expo-router";
 import { db } from "@/services/firebase";
-import { doc, getDoc ,updateDoc } from "firebase/firestore";
+import { addDoc, collection, doc, getDoc ,getDocs,query,updateDoc, where } from "firebase/firestore";
 import Heart from "@/assets/icons/heart-svgrepo-com.svg";
 import RedHeart from "@/assets/icons/heart-svgrepo-com (1).svg";
 import TopArrow from "@/assets/icons/top-arrow-5-svgrepo-com.svg";
@@ -63,6 +63,10 @@ const HouseDesc = ({ house }) => {
   const [userRating, setUserRating] = useState(0);
   const [currentRating, setCurrentRating] = useState(house.rating || 0);
   const [ratingCount, setRatingCount] = useState(house.ratingCount || 0);
+  const [click ,setClick]=useState(false)
+  const auth =getAuth();
+  const user =auth.currentUser;
+
 
   useEffect(() => {
     requestNotificationPermissions();
@@ -166,13 +170,22 @@ const HouseDesc = ({ house }) => {
     }
   };
 
-  const handleAddToCart =async ()=>{
-    try {
-      const existingCart = await AsyncStorage.getItem("cart");
-      const parsedCart = existingCart ? JSON.parse(existingCart) : [];
-  
-      const newItem = {
-        id: house.id,
+  const handleAddToCart = async()=>{
+    setClick(true);
+    try{
+    const cartRef = (collection(db, 'cart'));
+    const q = query(cartRef, where('id', '==', house.id) ,where ("user_id" ,'==' ,user.uid));
+    const querySnapshot = await getDocs(q);
+    console.log (user.uid)
+
+    if (!querySnapshot.empty) {
+      console.log("Item already in cart");
+      Alert.alert("ITEM ALREADY IN CART")
+      return; 
+    }
+    await addDoc(cartRef, 
+      { 
+        id :house.id ,
         image: house.image[0], 
         rent: house.rent,
         location: house.location,
@@ -180,16 +193,15 @@ const HouseDesc = ({ house }) => {
         floor: house.floor,
         unit_number: house.unit_number,
         num_bedrooms: house.num_bedrooms,
-      };
-      const updatedCart = [...parsedCart, newItem];
-  
-      await AsyncStorage.setItem("cart", JSON.stringify(updatedCart));
+        seller_id :house.seller_id,
+        user_id :user.uid 
+
+      }); 
       router.push("/(drawer)/(tabs)/cart")
-      console.log("Cart updated:", updatedCart);
-    } catch (error) {
-      console.error("Failed to add to cart:", error);
+    }catch (error){
+      console.log("failed to add to cart")
     }
-  };
+  }
 
   const handleRate = async (rating: number) => {
     try {
@@ -375,7 +387,7 @@ const HouseDesc = ({ house }) => {
             </Pressable>) :null}
 
               {!isSeller ?
-               (<Pressable onPress={handleAddToCart} style={[styles.buyNowView, { backgroundColor: isDark ? Colors.assestBlue : Colors.text }]}>
+               (<Pressable disabled={click} onPress={handleAddToCart} style={[styles.buyNowView, { backgroundColor: isDark ? Colors.assestBlue : Colors.text }]}>
                <Text style={styles.buyNowText}>Rent Now!</Text>
              </Pressable>): null}
             </View>
