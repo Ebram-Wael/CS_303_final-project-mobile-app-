@@ -67,6 +67,11 @@ const PurchaseForm = () => {
         const apartdocRef = doc(db, "Apartments", apartmentid);
         await updateDoc(apartdocRef, { availability_status: "rented" });
       }
+      const q = query(collection(db, 'cart'), where("id", "==", apartmentid), where("user_id", "==", user.uid));
+      const querySnapshot = await getDocs(q);
+      querySnapshot.forEach(async (item) => {
+        await deleteDoc(doc(db, "cart", item.id));
+      });
 
       Alert.alert("Success", "Purchase completed successfully!");
     } catch (error) {
