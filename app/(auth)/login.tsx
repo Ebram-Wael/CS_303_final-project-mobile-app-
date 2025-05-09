@@ -239,7 +239,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   btn: {
-    backgroundColor: Colors.assestGreen,
+    backgroundColor: Colors.primary,
     padding: 10,
     borderRadius: 5,
     width: 250,
