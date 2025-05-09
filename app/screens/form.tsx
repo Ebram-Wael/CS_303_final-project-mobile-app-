@@ -3,7 +3,6 @@ import {
   View,
   Text,
   TextInput,
-  TouchableOpacity,
   Alert,
   StyleSheet,
   ScrollView,
@@ -11,12 +10,20 @@ import {
   ActivityIndicator,
 } from "react-native";
 import Colors from "@/components/colors";
-import { addDoc, collection, doc, updateDoc, query, getDocs, where, deleteDoc } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  doc,
+  updateDoc,
+  getDocs,
+  query,
+  where,
+  deleteDoc,
+} from "firebase/firestore";
 import { db } from "@/services/firebase";
 import { useLocalSearchParams } from "expo-router";
 import { getAuth } from "firebase/auth";
-import { Picker } from '@react-native-picker/picker';
-import { useThemes } from "@/components/themeContext";
+import { Picker } from "@react-native-picker/picker";
 
 const PurchaseForm = () => {
   const [name, setName] = useState("");
@@ -26,13 +33,9 @@ const PurchaseForm = () => {
   const [loading, setLoading] = useState(false);
   const [cardNumber, setCardNumber] = useState("");
   const [cvv, setCvv] = useState("");
-
   const [semester, setSemester] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-
-  const { theme } = useThemes();
-  const isDark = theme === "dark";
 
   const search = useLocalSearchParams();
   const apartmentid = search?.apartmentid;
@@ -43,43 +46,77 @@ const PurchaseForm = () => {
   const user = auth.currentUser;
 
   const handlePurchase = async () => {
-    if (!name || !address || !phoneNumber || !paymentMethod || !semester || !startDate || !endDate) {
+    if (
+      !name ||
+      !address ||
+      !phoneNumber ||
+      !paymentMethod ||
+      !semester ||
+      !startDate ||
+      !endDate
+    ) {
       return Alert.alert("⚠️ Error", "Please fill all the fields.");
     }
 
-    if (paymentMethod === "Credit Card" && (!cardNumber || !cvv)) {
-      return Alert.alert("⚠️ Error", "Please enter card details.");
+   if (!/^\d{11}$/.test(phoneNumber)) {
+  return Alert.alert("⚠️ Error", "Phone number must be exactly 11 digits.");
+}
+
+
+    if (/\d/.test(name)) {
+      return Alert.alert("⚠️ Error", "Name should not contain numbers.");
+    }
+
+    const dateRegex = /^\d{1,2}\/\d{1,2}\/\d{4}$/;
+    if (!dateRegex.test(startDate) || !dateRegex.test(endDate)) {
+      return Alert.alert("⚠️ Error", "Dates must be in the format DD/MM/YYYY.");
+    }
+
+    if (paymentMethod === "Credit Card") {
+      if (!/^\d{16}$/.test(cardNumber)) {
+        return Alert.alert("⚠️ Error", "Card number must be 16 digits.");
+      }
+      if (!/^\d{3,4}$/.test(cvv)) {
+        return Alert.alert("⚠️ Error", "CVV must be 3 or 4 digits.");
+      }
     }
 
     try {
       setLoading(true);
+
       await addDoc(collection(db, "rented"), {
-        sellerid: sellerid,
+        sellerid,
         buyerid: user?.uid,
-        apartmentid: apartmentid,
-        rent: rent,
-        semester: semester,
-        startDate: startDate,
-        endDate: endDate,
-        name: name,
-        address: address,
-        phoneNumber: phoneNumber,
-        paymentMethod: paymentMethod,
+        apartmentid,
+        rent,
+        semester,
+        startDate,
+        endDate,
+        name,
+        address,
+        phoneNumber,
+        paymentMethod,
       });
 
       if (typeof apartmentid === "string") {
         const apartdocRef = doc(db, "Apartments", apartmentid);
         await updateDoc(apartdocRef, { availability_status: "rented" });
       }
-      const q = query(collection(db, 'cart'), where("id", "==", apartmentid), where("user_id", "==", user.uid));
+
+      const q = query(
+        collection(db, "cart"),
+        where("id", "==", apartmentid),
+        where("user_id", "==", user.uid)
+      );
       const querySnapshot = await getDocs(q);
       querySnapshot.forEach(async (item) => {
         await deleteDoc(doc(db, "cart", item.id));
       });
 
-      Alert.alert("Success", "Purchase completed successfully!");
+      Alert.alert("✅ Success", "Purchase completed successfully!");
     } catch (error) {
       console.error("Error: ", error);
+      Alert.alert("❌ Error", "Something went wrong during the purchase.");
     } finally {
       setLoading(false);
     }
@@ -89,14 +126,17 @@ const PurchaseForm = () => {
   const semesterOptions = ["First Semester", "Second Semester"];
 
   return (
-    <ScrollView contentContainerStyle={[styles.container,{backgroundColor:isDark?Colors.darkModeBackground:Colors.background}]}>
-      <Text style={[styles.title,{color:isDark?Colors.darkModeText:"#333"}]}>🛒 Checkout</Text>
+    <ScrollView contentContainerStyle={styles.container}>
+      <Text style={styles.title}>🛒 Checkout</Text>
 
       <TextInput
         placeholder="Full Name"
         style={styles.input}
         value={name}
-        onChangeText={setName}
+        onChangeText={(text) => {
+          const clean = text.replace(/[0-9]/g, "");
+          setName(clean);
+        }}
       />
       <TextInput
         placeholder="Shipping Address"
@@ -108,11 +148,14 @@ const PurchaseForm = () => {
         placeholder="Phone Number"
         style={styles.input}
         value={phoneNumber}
-        onChangeText={setPhoneNumber}
+        onChangeText={(text) => {
+          const digitsOnly = text.replace(/[^0-9]/g, "");
+          setPhoneNumber(digitsOnly);
+        }}
         keyboardType="phone-pad"
       />
 
-      <Text style={[styles.sectionTitle,{color:isDark?Colors.darkModeText:"#555"}]}>Select Semester</Text>
+      <Text style={styles.sectionTitle}>Select Semester</Text>
       <Picker
         selectedValue={semester}
         onValueChange={(itemValue) => setSemester(itemValue)}
@@ -127,22 +170,29 @@ const PurchaseForm = () => {
       {semester !== "" && (
         <View style={styles.dateContainer}>
           <TextInput
-            placeholder="Start Date"
+            placeholder="Start Date (e.g. 2/5/2025)"
             style={[styles.input, styles.dateInput]}
             value={startDate}
-            onChangeText={setStartDate}
+            onChangeText={(text) => {
+              const formatted = text.replace(/[^0-9/]/g, "");
+              setStartDate(formatted);
+            }}
+            keyboardType="numbers-and-punctuation"
           />
-          <Text style={styles.dateSeparator}></Text>
           <TextInput
-            placeholder="End Date"
+            placeholder="End Date (e.g. 30/6/2025)"
             style={[styles.input, styles.dateInput]}
             value={endDate}
-            onChangeText={setEndDate}
+            onChangeText={(text) => {
+              const formatted = text.replace(/[^0-9/]/g, "");
+              setEndDate(formatted);
+            }}
+            keyboardType="numbers-and-punctuation"
           />
         </View>
       )}
 
-      <Text style={[styles.sectionTitle,{color:isDark?Colors.darkModeText:"#555"}]}>Select Payment Method</Text>
+      <Text style={styles.sectionTitle}>Select Payment Method</Text>
       <Picker
         selectedValue={paymentMethod}
         onValueChange={(itemValue) => setPaymentMethod(itemValue)}
@@ -160,14 +210,20 @@ const PurchaseForm = () => {
             placeholder="Card Number"
             style={[styles.input, styles.cardInput]}
             value={cardNumber}
-            onChangeText={setCardNumber}
+            onChangeText={(text) => {
+              const digitsOnly = text.replace(/[^0-9]/g, "");
+              setCardNumber(digitsOnly);
+            }}
             keyboardType="numeric"
           />
           <TextInput
             placeholder="CVV"
             style={[styles.input, styles.cardInput]}
             value={cvv}
-            onChangeText={setCvv}
+            onChangeText={(text) => {
+              const digitsOnly = text.replace(/[^0-9]/g, "");
+              setCvv(digitsOnly);
+            }}
             keyboardType="numeric"
             secureTextEntry
           />
@@ -181,7 +237,7 @@ const PurchaseForm = () => {
           style={{ marginTop: 20 }}
         />
       ) : (
-        <Pressable style={[styles.confirmButton,{backgroundColor:isDark?Colors.darkModeSecondary:"#333"}]} onPress={handlePurchase}>
+        <Pressable style={styles.confirmButton} onPress={handlePurchase}>
           <Text style={styles.confirmText}>Confirm</Text>
         </Pressable>
       )}
@@ -246,11 +302,6 @@ const styles = StyleSheet.create({
   },
   dateInput: {
     width: "49%",
-  },
-  dateSeparator: {
-    alignSelf: "center",
-    fontSize: 18,
-    marginHorizontal: 5,
   },
   cardContainer: {
     flexDirection: "row",
