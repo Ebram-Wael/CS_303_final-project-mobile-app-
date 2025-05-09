@@ -11,8 +11,10 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Icon from "react-native-vector-icons/FontAwesome";
 import Colors from "@/components/colors";
-import { router, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
+import { collection, deleteDoc, doc, getDoc, getDocs, query, updateDoc, where } from "firebase/firestore";
 import { db } from "@/services/firebase";
+import { getAuth } from "firebase/auth";
 
 interface CartItem {
   id: string;
@@ -32,30 +34,46 @@ const CartScreen = () => {
   const [seller_id, setSellerId] = useState("");
   const [apartmentid, setApartmentId] = useState("");
   const [price, setPrice] = useState(0);
+  const auth =getAuth();
+  const user =auth.currentUser;
 
-  useEffect(() => {
-    const fetchCart = async () => {
+  useEffect(()=>{
+    const fetch = async () => {
       try {
-        const cart = await AsyncStorage.getItem("cart");
-        if (cart) {
-          const parsedCart = JSON.parse(cart);
-          setApartmentId(parsedCart[0].id);
-          setPrice(parsedCart[0].rent);
-          setSellerId(parsedCart[0].seller_id);
-          setCartItems(parsedCart);
-        }
-      } catch (error) {
-        console.error("Error loading cart", error);
+       const cartRef =collection(db ,'cart')
+       const q =query(cartRef ,where ('user_id' ,'==' ,user.uid))
+       const querySnapshot =await getDocs(q)
+       const items : CartItem []=[];
+       querySnapshot.forEach((item)=>{
+        items.push({id :item.id ,... item.data()} as CartItem)
+       })
+       setCartItems(items);
+      } catch (err) {
+        console.error('error fetching');
       }
-    };
-    fetchCart();
-  }, []);
+    }
+    fetch();
+  } ,[user])
+  const handleRemoveItem =async (id)=>{
+    try{
+      const cartRef =collection(db,'cart');
+      const q =query(cartRef ,where('id' ,'==' ,id))
+      const querySnapshot =await getDocs(q);
+      const newCart = cartItems.filter(item => item.id !== id); 
+      setCartItems(newCart);
 
-  const handleRemoveItem = async (id: string) => {
-    const updatedCart = cartItems.filter((item) => item.id !== id);
-    setCartItems(updatedCart);
-    await AsyncStorage.setItem("cart", JSON.stringify(updatedCart));
-  };
+      querySnapshot.forEach(async (item)=>{
+        await deleteDoc(doc(db ,'cart' ,item.id));
+      })
+      
+    console.log("item removed from cart")
+
+    }
+    catch{
+      console.log('error to remove item from cart')
+    }
+    
+  }
 
   const handleClearCart = async () => {
     Alert.alert("Clear Cart", "Are you sure you want to remove all items?", [

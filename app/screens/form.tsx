@@ -61,14 +61,18 @@ const PurchaseForm = () => {
         address: address,
         phoneNumber: phoneNumber,
         paymentMethod: paymentMethod,
+        
       });
+      console.log (`seller id ${sellerid} , rent ${rent} ` )
 
       if (typeof apartmentid === "string") {
         const apartdocRef = doc(db, "Apartments", apartmentid);
         await updateDoc(apartdocRef, { availability_status: "rented" });
       }
+      
 
       Alert.alert("Success", "Purchase completed successfully!");
+      console.log("done ")
     } catch (error) {
       console.error("Error: ", error);
     } finally {
