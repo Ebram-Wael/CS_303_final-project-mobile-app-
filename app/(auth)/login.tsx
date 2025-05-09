@@ -70,6 +70,7 @@ const Login = () => {
       });
     }
   }
+  
   useEffect(() => {
     const isEmailValid = email.includes("@");
     const isPasswordValid = password.length >= 8;
