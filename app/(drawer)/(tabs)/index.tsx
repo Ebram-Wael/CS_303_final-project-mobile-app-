@@ -52,20 +52,16 @@ export default function index() {
         backgroundColor={isDark ? Colors.darkModePrimary : Colors.primary}
       />
       <FloatingMenuButton />
-      <Text
-        style={[
-          styles.mainHeading,
-          { backgroundColor: isDark ? Colors.darkModePrimary : Colors.primary },
-        ]}
-      >
-        HOMY
-      </Text>
       <ScrollView style={styles.content}>
         <View>
           <Text
             style={[
               styles.head,
-              { color: isDark ? Colors.darkModeText : Colors.text },
+              {
+                color: isDark ? Colors.darkModeText : Colors.text,
+                marginTop: 70,
+                width: "90%",
+              },
             ]}
           >
             {" "}

@@ -261,15 +261,20 @@ const HouseItem = ({ house }) => {
           </View>
         </View>
       </Pressable>
-      <View style={[
-            styles.commetns,
-            {
-              backgroundColor: isDark
-                ? Colors.darkModePrimary
-                : Colors.assestWhite,
-            },
-          ]}>
-        <Pressable style={styles.commentIcon} onPress={() => setShowComments(true)}>
+      <View
+        style={[
+          styles.commetns,
+          {
+            backgroundColor: isDark
+              ? Colors.darkModePrimary
+              : Colors.assestWhite,
+          },
+        ]}
+      >
+        <Pressable
+          style={styles.commentIcon}
+          onPress={() => setShowComments(true)}
+        >
           <MaterialIcons name="comment" size={20} color="black"></MaterialIcons>
           <CommentsModal
             visible={showComments}
@@ -305,6 +310,7 @@ export default function HouseList() {
     status: [],
     nearby: [],
     propertyType: [],
+    floors: [],
   });
 
   useEffect(() => {
@@ -312,7 +318,7 @@ export default function HouseList() {
 
     if (location || maxPrice || bedrooms || nearby) {
       const newFilters = {
-        ...filters, // Keep existing filter values
+        ...filters,
         locations: location ? [location] : filters.locations,
         priceRange: {
           min: 0,
@@ -361,6 +367,7 @@ export default function HouseList() {
             status: [],
             propertyType: [],
             nearby: nearby ? [nearby] : [],
+            floors: [],
           };
           setFilters(initialFilters);
           handleSearch(searchQuery, initialFilters);
@@ -462,6 +469,12 @@ export default function HouseList() {
         results = results.filter(
           (house) =>
             house.location && currentFilters.locations.includes(house.location)
+        );
+      }
+
+      if (currentFilters.floors && currentFilters.floors.length > 0) {
+        results = results.filter(
+          (house) => house.floor && currentFilters.floors.includes(house.floor)
         );
       }
 
@@ -654,7 +667,7 @@ const styles = StyleSheet.create({
   },
   card: {
     padding: 16,
-    
+
     borderRadius: 16,
     elevation: 2,
     shadowColor: "#000",

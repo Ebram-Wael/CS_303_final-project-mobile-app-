@@ -1,22 +1,25 @@
 const Colors = {
   primary: "#023336",
-  secondary: "#Eaf8e7",
+  secondary: "#EAF8E7",
   background: "#EAF8E7",
-  whiteText: "white",
+  whiteText: "#FFFFFF",
   text: "#2A2438",
-  darkModePrimary: "#062925",
-  darkModeSecondary: "#044A42",
-  darkModeBackground: "#02110F",
-  darkModeText: "white",
-  assestGray: "#777",
-  assestBlue: "#007bff",
-  assestGreen: "#28a745",
-  assestGreenTwo:"#4DA674",
-  assestGreenThree:"#C1E6B7",
-  assestWhite:"#FFFFFF",
-  assest:"#023336",
-  warning: "red",
+
+  darkModePrimary: "#1E1E2E",
+  darkModeSecondary: "#313244",
+  darkModeBackground: "#181825",
+  darkModeText: "#D9E0EE",
+
+  assestGray: "#777777",
+  assestBlue: "#89B4FA",
+  assestGreen: "#A6E3A1",
+  assestGreenTwo: "#4DA674",
+  assestGreenThree: "#C1E6B7",
+  assestWhite: "#FFFFFF",
+  assest: "#023336",
+  warning: "#F38BA8",
   indicator: "#4DA674",
-  darkIndicator:"#044A42"
+  darkIndicator: "#89DCEB",
 };
+
 export default Colors;

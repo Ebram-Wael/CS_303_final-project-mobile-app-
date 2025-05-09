@@ -1,9 +1,16 @@
 import React from "react";
-import { StyleSheet, View, Text, Pressable, Image, ScrollView } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Text,
+  Pressable,
+  Image,
+  ScrollView,
+} from "react-native";
 import { useRouter } from "expo-router";
 import { useNavigation } from "@react-navigation/native";
 import { useLayoutEffect } from "react";
-import Colors from '@/components/colors';
+import Colors from "@/components/colors";
 
 const Firstpage = () => {
   const router = useRouter();
@@ -16,15 +23,12 @@ const Firstpage = () => {
     // <ScrollView>
     <View style={styles.cont}>
       {/* <Image style={styles.img} source={logo} /> */}
-      <View style ={{alignItems:'center' ,marginTop:40}} >
+      <View style={{ alignItems: "center", marginTop: 40 }}>
         <Text style={styles.title}>Welcome To Homy</Text>
       </View>
       <Text style={styles.txt}>Easily Find the Home That Fits You</Text>
       <View style={{ height: 300 }}>
-        <Pressable
-          style={styles.btn}
-          onPress={() => router.replace("/login")}
-        >
+        <Pressable style={styles.btn} onPress={() => router.replace("/login")}>
           <Text style={{ color: "white" }}>Login</Text>
         </Pressable>
         <Pressable
@@ -57,12 +61,11 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingTop: 30,
     alignSelf: "center",
-    marginTop: '20%',
-  
+    marginTop: "20%",
   },
   btn: {
     display: "flex",
-    backgroundColor: Colors.assestGreen,
+    backgroundColor: Colors.primary,
     width: 250,
     height: 50,
     justifyContent: "center",

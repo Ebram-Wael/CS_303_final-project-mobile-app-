@@ -1,13 +1,14 @@
 import { Pressable } from "react-native";
 import { useNavigation } from "expo-router";
 import Icon from "react-native-vector-icons/FontAwesome";
+import Colors from "@/components/colors";
 export default function FloatingMenuButton() {
   const navigation = useNavigation();
 
   return (
     <Pressable
       style={{
-        position: "absolute",
+        position: "relative",
         top: "5%",
         left: "6%",
         backgroundColor: "transparent",
@@ -16,11 +17,10 @@ export default function FloatingMenuButton() {
         borderRadius: 25,
         justifyContent: "center",
         alignItems: "center",
-        zIndex: 10,
       }}
       onPress={() => navigation.dispatch({ type: "OPEN_DRAWER" })}
     >
-      <Icon name="bars" size={25} color="white" />
+      <Icon name="bars" size={25} color={Colors.primary} />
     </Pressable>
   );
 }
