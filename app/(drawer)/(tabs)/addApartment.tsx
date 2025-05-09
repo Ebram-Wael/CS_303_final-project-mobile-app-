@@ -167,7 +167,7 @@ export default function AddApartment() {
       ]}
     >
       <ScrollView showsVerticalScrollIndicator={false}>
-        <Text style={styles.text}> Add your Apartment </Text>
+        <Text style={[styles.text,{color:isDark?Colors.darkModeText:Colors.text}]}> Add your Apartment </Text>
 
         <TextInput
           style={styles.input}
@@ -238,7 +238,7 @@ export default function AddApartment() {
             {
               backgroundColor: isDark
                 ? Colors.darkModeSecondary
-                : Colors.assestGreenThree,
+                : Colors.assestGreen,
             },
           ]}
           onPress={pickImage}
@@ -278,7 +278,7 @@ export default function AddApartment() {
                 {
                   backgroundColor: isDark
                     ? Colors.darkModeSecondary
-                    : Colors.assestGreen,
+                    : Colors.assestGreenTwo,
                 },
               ]}
               onPress={handleSubmit}

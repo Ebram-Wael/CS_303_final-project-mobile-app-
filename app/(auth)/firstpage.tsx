@@ -65,7 +65,7 @@ const styles = StyleSheet.create({
   },
   btn: {
     display: "flex",
-    backgroundColor: Colors.primary,
+    backgroundColor: Colors.assestGreenTwo,
     width: 250,
     height: 50,
     justifyContent: "center",
@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
   },
   btnRegister: {
     display: "flex",
-    backgroundColor: Colors.primary,
+    backgroundColor: Colors.assestGreenTwo,
     width: 250,
     height: 50,
     justifyContent: "center",

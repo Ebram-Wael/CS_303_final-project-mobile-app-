@@ -21,8 +21,8 @@ export default function OwnerDetails() {
   const router = useRouter();
   const [owner, setOwner] = useState<any>(null);
   const [ownedHouses, setOwnedHouses] = useState<any[]>([]);
-   const { theme } = useThemes();
-    const isDark = theme === 'dark';
+  const { theme } = useThemes();
+  const isDark = theme === 'dark';
 
   useEffect(() => {
     const fetchOwner = async () => {
@@ -112,7 +112,7 @@ export default function OwnerDetails() {
             <View key={house.id} style={styles.houseCard}>
               <Image source={{ uri: house.image[0] }} style={styles.image} />
               <View style={styles.houseInfo}>
-                <Text style={[styles.title,{color:isDark?Colors.assestGreen:Colors.text}]}>{house.availability_status}</Text>
+                <Text style={[styles.title,{color:isDark?Colors.text:Colors.text}]}>{house.availability_status}</Text>
                 <Text style={[styles.address,{color:isDark?Colors.assestGray:Colors.assestGray}]}>{house.location}</Text>
                 <Text style={[styles.price,{color:isDark?Colors.assestGreenTwo:Colors.assestBlue}]}>{house.rent} EGP</Text>
               </View>

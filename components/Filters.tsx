@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { View, Text, Pressable, StyleSheet, ScrollView } from "react-native";
+import { View, Text, Pressable, StyleSheet, ScrollView, Platform } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import Slider from "@react-native-community/slider";
@@ -159,26 +159,29 @@ const Filters: React.FC<FilterComponentProps> = ({
 
   // Memoize toggleOption to prevent re-creation on every render
   const toggleOption = useCallback((categoryId: string, optionId: string) => {
-    Haptics.selectionAsync();
+    if (Platform.OS !== 'web') {
+      Haptics.selectionAsync();
+    }
     setCategories((prevCategories) =>
       prevCategories.map((category) =>
         category.id === categoryId
           ? {
-              ...category,
-              options: category.options.map((option) =>
-                option.id === optionId
-                  ? { ...option, selected: !option.selected }
-                  : option
-              ),
-            }
+            ...category,
+            options: category.options.map((option) =>
+              option.id === optionId
+                ? { ...option, selected: !option.selected }
+                : option
+            ),
+          }
           : category
       )
     );
   }, []);
 
   const handleApply = useCallback(() => {
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-
+    if (Platform.OS !== 'web') {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    }
     const selectedFilters = {
       priceRange,
       bedrooms:
@@ -213,8 +216,9 @@ const Filters: React.FC<FilterComponentProps> = ({
   }, [categories, priceRange, onApply, onClose]);
 
   const handleReset = useCallback(() => {
-    Haptics.selectionAsync();
-    setPriceRange({ min: 0, max: 10000 });
+    if (Platform.OS !== 'web') {
+      Haptics.selectionAsync();
+    } setPriceRange({ min: 0, max: 10000 });
     setCategories((prevCategories) =>
       prevCategories.map((category) => ({
         ...category,
