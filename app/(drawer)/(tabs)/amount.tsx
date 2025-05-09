@@ -23,15 +23,15 @@ export default function amount() {
             const data = doc.data();
             const paymentMethod = get(data, "paymentMethod");
             const rent = Number(get(data, "rent"));
-            total += rent;
+            total += rent*0.1;
             if (paymentMethod === "PayPal") {
-                p+=rent;
+                p+=rent*0.1;
             } else if (paymentMethod === "Credit Card") {
-                c+=rent
+                c+=rent*0.1;
             } else if (paymentMethod === "Cash on Delivery") {
-                d+=rent
+                d+=rent*0.1;
             } else if (paymentMethod === "Bank Transfer") {
-                b+=rent
+                b+=rent*0.1
             }
         })
         setTotalAmount(total);
