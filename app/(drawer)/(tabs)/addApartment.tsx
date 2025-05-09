@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   TextInput,
@@ -11,7 +11,6 @@ import {
   SafeAreaView,
   ActivityIndicator,
 } from "react-native";
-import { useState, useEffect } from "react";
 import { addDoc, collection } from "firebase/firestore";
 import { db } from "@/services/firebase";
 import * as ImagePicker from "expo-image-picker";
@@ -30,11 +29,9 @@ export default function AddApartment() {
   const [numBedrooms, setNumBedrooms] = useState("");
   const [features, setFeatures] = useState("");
   const [floor, setFloor] = useState("");
-  const [image, setImage] = useState([]);
+  const [image, setImage] = useState<string[]>([]);
   const [nearby, setNearby] = useState("");
   const [status, setStatus] = useState("pending");
-  const auth = getAuth();
-  const user = auth.currentUser;
 
   const [errorNum, setErorrorNum] = useState("");
   const [errorPrice, setErrorPrice] = useState("");
@@ -45,10 +42,12 @@ export default function AddApartment() {
   const [errorFloor, setErrorFloor] = useState("");
   const [errorNearby, setErrorNearby] = useState("");
 
+  const auth = getAuth();
+  const user = auth.currentUser;
   const router = useRouter();
-
   const { theme } = useThemes();
   const isDark = theme === "dark";
+
   useEffect(() => {
     if (user) {
       setSellerId(user.uid);
@@ -57,8 +56,8 @@ export default function AddApartment() {
 
   const validateInputs = () => {
     let isValid = true;
-    if (loading) return;
-    setLoading(true);
+
+    // Reset all errors
     setErorrorNum("");
     setErrorPrice("");
     setErrorLocation("");
@@ -66,7 +65,8 @@ export default function AddApartment() {
     setErrorImage("");
     setErrorFeatures("");
     setErrorFloor("");
-    setErrorNearby;
+    setErrorNearby("");
+
     if (!unitNum) {
       setErorrorNum("Please enter unit number");
       isValid = false;
@@ -99,13 +99,14 @@ export default function AddApartment() {
       setErrorNearby("Please enter nearby");
       isValid = false;
     }
+
     return isValid;
   };
 
   const handleSubmit = async () => {
-    if (!validateInputs()) {
-      return;
-    }
+    if (!validateInputs()) return;
+
+    setLoading(true);
     try {
       await addDoc(collection(db, "Apartments"), {
         unit_number: unitNum,
@@ -120,8 +121,10 @@ export default function AddApartment() {
         nearby: nearby,
         status: status,
       });
-      Alert.alert("we gonna review your apartment and get back to you");
-      setLoading(false);
+
+      Alert.alert("We will review your apartment and get back to you");
+
+      // Reset form fields
       setunitNum("");
       setPrice("");
       setLocation("");
@@ -131,11 +134,14 @@ export default function AddApartment() {
       setFeatures("");
       setFloor("");
       setNearby("");
+
       router.push("/(drawer)/(tabs)/explore");
     } catch (error) {
       console.log("Error adding document: ", error);
     }
+    setLoading(false);
   };
+
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -148,6 +154,7 @@ export default function AddApartment() {
       setImage([...image, ...result.assets.map((img) => img.uri)]);
     }
   };
+
   return (
     <SafeAreaView
       style={[
@@ -161,33 +168,37 @@ export default function AddApartment() {
     >
       <ScrollView showsVerticalScrollIndicator={false}>
         <Text style={styles.text}> Add your Apartment </Text>
+
         <TextInput
           style={styles.input}
           placeholder="Enter unit Number"
           value={unitNum}
-          onChangeText={(text) => setunitNum(text)}
+          onChangeText={setunitNum}
         />
         {errorNum && <Text style={styles.error}>{errorNum}</Text>}
+
         <TextInput
           style={styles.input}
           placeholder="Enter price"
           value={price}
-          onChangeText={(text) => setPrice(text)}
+          onChangeText={setPrice}
           keyboardType="numeric"
         />
         {errorPrice && <Text style={styles.error}>{errorPrice}</Text>}
+
         <TextInput
           style={styles.input}
           placeholder="Enter location"
           value={location}
-          onChangeText={(text) => setLocation(text)}
+          onChangeText={setLocation}
         />
         {errorLocation && <Text style={styles.error}>{errorLocation}</Text>}
+
         <TextInput
           style={styles.input}
           placeholder="Enter num bedrooms"
           value={numBedrooms}
-          onChangeText={(text) => setNumBedrooms(text)}
+          onChangeText={setNumBedrooms}
           keyboardType="numeric"
         />
         {errorNumBedrooms && (
@@ -198,15 +209,16 @@ export default function AddApartment() {
           style={styles.input}
           placeholder="Enter floor"
           value={floor}
-          onChangeText={(text) => setFloor(text)}
+          onChangeText={setFloor}
           keyboardType="numeric"
         />
         {errorFloor && <Text style={styles.error}>{errorFloor}</Text>}
+
         <TextInput
           style={styles.input}
           placeholder="Enter nearby"
           value={nearby}
-          onChangeText={(text) => setNearby(text)}
+          onChangeText={setNearby}
         />
         {errorNearby && <Text style={styles.error}>{errorNearby}</Text>}
 
@@ -214,12 +226,23 @@ export default function AddApartment() {
           style={styles.input}
           placeholder="Enter features"
           value={features}
-          onChangeText={(text) => setFeatures(text)}
+          onChangeText={setFeatures}
           multiline={true}
           textAlignVertical="top"
         />
         {errorFeatures && <Text style={styles.error}>{errorFeatures}</Text>}
-        <Pressable style={[styles.pickImageButton,{backgroundColor:isDark?Colors.darkModeSecondary:Colors.assestGreenThree}]} onPress={pickImage}>
+
+        <Pressable
+          style={[
+            styles.pickImageButton,
+            {
+              backgroundColor: isDark
+                ? Colors.darkModeSecondary
+                : Colors.assestGreenThree,
+            },
+          ]}
+          onPress={pickImage}
+        >
           <Text
             style={[
               styles.txt,
@@ -229,12 +252,21 @@ export default function AddApartment() {
             Upload Image
           </Text>
         </Pressable>
+
         <ScrollView horizontal>
           {image.map((uri, index) => (
-            <Image key={index} source={{ uri }} style={styles.image} />
+            <Pressable
+              key={index}
+              onLongPress={() =>
+                setImage(image.filter((_, i) => i !== index))
+              }
+            >
+              <Image source={{ uri }} style={styles.image} />
+            </Pressable>
           ))}
         </ScrollView>
         {errorImage && <Text style={styles.error}>{errorImage}</Text>}
+
         <View style={styles.sub}>
           {loading ? (
             <ActivityIndicator size="small" color="white" />
@@ -249,9 +281,13 @@ export default function AddApartment() {
                     : Colors.assestGreen,
                 },
               ]}
-              onPress={async () => await handleSubmit()}
+              onPress={handleSubmit}
             >
-              <Text style={{color:isDark?Colors.darkModeText:Colors.text}}>ADD APARTMENT</Text>
+              <Text
+                style={{ color: isDark ? Colors.darkModeText : Colors.text }}
+              >
+                ADD APARTMENT
+              </Text>
             </Pressable>
           )}
         </View>
@@ -280,7 +316,6 @@ const styles = StyleSheet.create({
     color: Colors.text,
   },
   btn: {
-    backgroundColor: Colors.assestGreen,
     width: "100%",
     height: 50,
     paddingVertical: 12,
@@ -308,7 +343,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginVertical: 10,
     padding: 10,
-    backgroundColor: Colors.assestGreenThree,
     borderRadius: 6,
   },
   txt: {

@@ -11,7 +11,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import Colors from "@/components/colors";
-import { addDoc, collection, doc, updateDoc } from "firebase/firestore";
+import { addDoc, collection, doc, updateDoc , query ,getDocs, where, deleteDoc} from "firebase/firestore";
 import { db } from "@/services/firebase";
 import { useLocalSearchParams } from "expo-router";
 import { getAuth } from "firebase/auth";
