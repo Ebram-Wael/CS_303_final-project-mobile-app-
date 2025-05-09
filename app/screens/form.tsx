@@ -123,7 +123,7 @@ const PurchaseForm = () => {
 
       Alert.alert("Success", "Purchase completed successfully!");
       router.push({
-        pathname: "/screens/LeaseAgreementScreen",
+        pathname: "/screens/:LeaseAgreementScreen",
 
         params: {
           sellerid: sellerid,
