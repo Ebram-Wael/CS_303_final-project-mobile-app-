@@ -14,9 +14,10 @@ import { db } from "../services/firebase";
 interface AddCommentProps {
   apartmentId: string;
   userId: string;
+  userName: string
 }
 
-const AddComment: React.FC<AddCommentProps> = ({ apartmentId, userId }) => {
+const AddComment: React.FC<AddCommentProps> = ({ apartmentId, userId ,userName}) => {
   const [commentText, setCommentText] = useState<string>("");
 
   const handleSubmit = async () => {
@@ -26,6 +27,7 @@ const AddComment: React.FC<AddCommentProps> = ({ apartmentId, userId }) => {
       const commentsRef = collection(db, "Apartments", apartmentId, "comments");
       await addDoc(commentsRef, {
         userId: userId,
+        userName: userName,
         text: commentText.trim(),
         createdAt: serverTimestamp(),
       });

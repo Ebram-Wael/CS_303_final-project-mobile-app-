@@ -51,6 +51,7 @@ const HouseItem = ({ house }) => {
   const [ownerId, setOwnerId] = useState("");
   const [user_id, setUser_id] = useState("");
   const [showComments, setShowComments] = useState(false);
+  const [userName, setUserName] = useState("");
   useEffect(() => {
     const fetchUserId = async () => {
       try {
@@ -59,6 +60,17 @@ const HouseItem = ({ house }) => {
         });
       } catch (error) {
         console.error("Error fetching user_id:", error);
+      }
+    };
+    const getUserDetails = async () => {
+      try {
+        const storedUserData = await AsyncStorage.getItem("userData");
+        if (storedUserData) {
+          const userData = JSON.parse(storedUserData);
+          setUserName(userData.name);
+        }
+      } catch (error) {
+        console.error("Error retrieving user data:", error);
       }
     };
     const fetchOwner = async () => {
@@ -92,6 +104,7 @@ const HouseItem = ({ house }) => {
         }
       }
     };
+    getUserDetails();
     fetchUserId();
     fetchOwner();
   }, [house.seller_id]);
@@ -277,7 +290,7 @@ const HouseItem = ({ house }) => {
             apartmentId={house.id}
           />
         </Pressable>
-        <AddComment apartmentId={house.id} userId={user_id}></AddComment>
+        <AddComment apartmentId={house.id} userId={user_id} userName={userName}></AddComment>
       </View>
     </SafeAreaView>
   );
