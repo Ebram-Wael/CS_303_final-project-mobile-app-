@@ -55,14 +55,12 @@ export default function Layout() {
           drawerStyle: {
             width: 250,
             paddingTop: 20,
-            backgroundColor: isDark ? Colors.darkModeBackground :"white",
+            backgroundColor: isDark ? Colors.darkModeBackground : "white",
           },
-          drawerActiveTintColor:"#4DA674",
+          drawerActiveTintColor: "#4DA674",
           headerShown: false,
           headerLeft: () => (
-            <Pressable
-              onPress={() => navigation.toggleDrawer()}
-            ></Pressable>
+            <Pressable onPress={() => navigation.toggleDrawer()}></Pressable>
           ),
         })}
         drawerContent={(props) => {
@@ -74,7 +72,7 @@ export default function Layout() {
                 (route) =>
                   !(seller
                     ? route.name === "FavoritesScreen"
-                    : route.name === "addApartment")
+                    : route.name === "myRooms")
               ),
             },
           };
@@ -84,7 +82,6 @@ export default function Layout() {
             </View>
           );
         }}
-
       >
         <Drawer.Screen
           name="(tabs)"
@@ -105,12 +102,8 @@ export default function Layout() {
             drawerLabelStyle: {
               color: isDark ? Colors.darkModeText : Colors.text,
             },
-            drawerIcon: ({size }) => (
-              <Ionicons
-                name="settings-outline"
-                size={size}
-                color={"#4DA674"}
-              />
+            drawerIcon: ({ size }) => (
+              <Ionicons name="settings-outline" size={size} color={"#4DA674"} />
             ),
           }}
         />
@@ -130,12 +123,11 @@ export default function Layout() {
             ),
           }}
         />
-
         {seller ? (
           <Drawer.Screen
-            name="addApartment"
+            name="myRooms"
             options={{
-              drawerLabel: "Add Apartment",
+              drawerLabel: "My Rooms",
               drawerLabelStyle: {
                 color: isDark ? Colors.darkModeText : Colors.text,
               },
@@ -157,11 +149,7 @@ export default function Layout() {
                 color: isDark ? Colors.darkModeText : Colors.text,
               },
               drawerIcon: ({ size }) => (
-                <Ionicons
-                  name="heart-outline"
-                  size={size}
-                  color={"#4DA674"}
-                />
+                <Ionicons name="heart-outline" size={size} color={"#4DA674"} />
               ),
             }}
           />
