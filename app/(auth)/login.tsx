@@ -174,7 +174,7 @@ const Login = () => {
           </View>
 
           <Pressable
-            style={[styles.btn, { opacity: isValid ? 1 : 0.5 }]}
+            style={styles.btn}
             onPress={handleLogIN}
             disabled={!isValid}
           >
@@ -192,7 +192,7 @@ const Login = () => {
             <Pressable onPress={() => router.push("/register")}>
               <Text
                 style={{
-                  color: Colors.assestGreen,
+                  color: Colors.assestGray,
                   textDecorationLine: "underline",
                 }}
               >

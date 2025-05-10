@@ -177,7 +177,7 @@ const CartScreen = () => {
                 styles.browseButton,
                 {
                   backgroundColor: isDark
-                    ? Colors.assestGreenTwo
+                    ? Colors.darkModeSecondary
                     : Colors.assestGreen,
                 },
               ]}

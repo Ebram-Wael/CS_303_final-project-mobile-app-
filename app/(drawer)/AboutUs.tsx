@@ -78,24 +78,24 @@ export default function AboutUs() {
         </Pressable>
       </View>
 
-      <View style={styles.content}>
-        <Text style={styles.heading}>Student Housing App</Text>
-        <Text style={styles.paragraph}>
+      <View style={[styles.content,{backgroundColor:isDark?Colors.darkModeBackground:Colors.background}]}>
+        <Text style={[styles.heading,{color:isDark?Colors.whiteText:Colors.text}]}>Student Housing App</Text>
+        <Text style={[styles.paragraph,{color:isDark?Colors.whiteText:Colors.text}]}>
           The Student Housing App is a mobile application designed to help
           students find and rent rooms easily...
         </Text>
 
-        <Text style={styles.subheading}>Features</Text>
-        <Text style={styles.paragraph}>
+        <Text style={[styles.subheading,{color:isDark?Colors.whiteText:Colors.text}]}>Features</Text>
+        <Text style={[styles.paragraph,{color:isDark?Colors.whiteText:Colors.text}]}>
           • User Authentication (Signup/Login) {"\n"}• Room Listings with images{" "}
           {"\n"}• Search & Filters {"\n"}• Booking System {"\n"}• Chat System
         </Text>
 
-        <Text style={styles.para}>Team Leader :</Text>
-        <Text style={styles.member}>Malak Sobhy</Text>
+        <Text style={[styles.para,{color:isDark?Colors.whiteText:Colors.text}]}>Team Leader :</Text>
+        <Text style={[styles.member,{color:isDark?Colors.whiteText:Colors.text}]}>Malak Sobhy</Text>
 
-        <Text style={styles.para}>Team Members :</Text>
-        <Text style={styles.member}>
+        <Text style={[styles.para,{color:isDark?Colors.whiteText:Colors.text}]}>Team Members :</Text>
+        <Text style={[styles.member,,{color:isDark?Colors.whiteText:Colors.text}]}>
           1- Esraa Hassan{"\n"}
           2- Abanoub Refaat{"\n"}
           3- Ebram Wael{"\n"}

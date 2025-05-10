@@ -8,6 +8,7 @@ import {
   ScrollView,
   TextInput,
   ActivityIndicator,
+  Platform,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
@@ -104,7 +105,9 @@ const HouseItem = ({ house }) => {
   });
 
   const navigateToDetails = () => {
-    Haptics.selectionAsync();
+    if (Platform.OS !== "web") {
+      Haptics.selectionAsync();
+    }
     router.push({
       pathname: "/screens/[moreview]",
       params: { moreview: house.id },
@@ -113,7 +116,9 @@ const HouseItem = ({ house }) => {
 
   const navigateToOwner = () => {
     if (ownerId) {
-      Haptics.selectionAsync();
+      if (Platform.OS !== "web") {
+        Haptics.selectionAsync();
+      }
       router.push({
         pathname: "/screens/owner",
         params: { ownerId },
@@ -133,7 +138,14 @@ const HouseItem = ({ house }) => {
   }
 
   return (
-    <SafeAreaView>
+    <SafeAreaView
+      style={[
+        styles.Containers,
+        {
+          backgroundColor: isDark ? Colors.darkModePrimary : Colors.assestWhite,
+        },
+      ]}
+    >
       <Pressable
         onPress={navigateToDetails}
         style={({ pressed }) => [
@@ -285,7 +297,11 @@ const HouseItem = ({ house }) => {
           style={styles.commentIcon}
           onPress={() => setShowComments(true)}
         >
-          <MaterialIcons name="comment" size={20} color="black"></MaterialIcons>
+          <MaterialIcons
+            name="comment"
+            size={20}
+            color={isDark ? Colors.darkModeText : Colors.text}
+          ></MaterialIcons>
           <CommentsModal
             visible={showComments}
             onClose={() => setShowComments(false)}
@@ -631,7 +647,9 @@ export default function HouseList() {
         />
         <Pressable
           onPress={() => {
-            Haptics.selectionAsync();
+            if (Platform.OS !== "web") {
+              Haptics.selectionAsync();
+            }
             setShowFilters(true);
           }}
           style={({ pressed }) => [
@@ -675,19 +693,29 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingBottom: 20,
   },
-  cardContainer: {
+  Containers: {
     marginTop: 15,
     marginBottom: 15,
-  },
-  card: {
-    padding: 16,
-
+    padding: 5,
     borderRadius: 16,
-    elevation: 2,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
+  },
+  cardContainer: {
+    // marginTop: 15,
+    // marginBottom: 15,
+    // padding: 5,
+    // shadowColor: "#000",
+    // shadowOffset: { width: 0, height: 2 },
+    // shadowOpacity: 0.1,
+    
+    
+  },
+  card: {
+    padding: 16,
+    elevation: 2,
   },
   cardHeader: {
     flexDirection: "row",
@@ -809,12 +837,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     paddingLeft: "10%",
-    borderRadius: 16,
-    elevation: 2,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    
   },
   commentIcon: {
     marginBottom: 8,

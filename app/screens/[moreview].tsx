@@ -438,7 +438,27 @@ const HouseDesc = ({ house }) => {
                (<Pressable disabled={click} onPress={handleAddToCart} style={[styles.buyNowView, { backgroundColor: isDark ? Colors.darkModeSecondary : Colors.assest }]}>
                <Text style={styles.buyNowText}>Rent Now!</Text>
              </Pressable>): null}
+            {!isSeller ? (
+       <Pressable
+        onPress={() =>
+        router.push({
+          pathname: "/screens/Chat",
+          params: {
+            houseid: house.id,
+            sid: house.seller_id,
+            userid: user.uid,
+          },
+        })
+      }
+      style={[styles.buyNowView, { backgroundColor: isDark ? Colors.assestBlue : Colors.assest }]}
+    >
+      <Text style={styles.buyNowText}>Contact Me</Text>
+    </Pressable>
+  ) : null}
             </View>
+
+
+            
           </Animated.View>
         ) : (
           <View style={[styles.moreDetails, , { backgroundColor: isDark ? Colors.darkModeBackground : "white" }]}>
@@ -594,13 +614,14 @@ const styles = StyleSheet.create({
     bottom: 0,
     width: "100%",
   },
-  buyNowStyles: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    columnGap: 15,
-    marginTop: 10,
-  },
+ buyNowStyles: {
+  flexDirection: "column", 
+  alignItems: "center",
+  justifyContent: "center",
+  rowGap: 10, 
+  marginTop: 10,
+},
+
   buyNowView: {
     flex: 1,
     backgroundColor: Colors.text,
