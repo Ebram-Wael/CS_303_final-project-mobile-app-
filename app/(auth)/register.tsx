@@ -12,6 +12,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  StatusBar,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { createUserWithEmailAndPassword } from "firebase/auth";
@@ -202,6 +203,7 @@ const Register = () => {
 
   return (
     <SafeAreaView style={styles.container}>
+      <StatusBar backgroundColor={Colors.background} barStyle="dark-content" />
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1 }}

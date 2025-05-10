@@ -16,7 +16,16 @@ import { router, useRouter } from "expo-router";
 import { db } from "@/services/firebase";
 import { useThemes } from "@/components/themeContext";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { collection, deleteDoc, doc, getDoc, getDocs, query, updateDoc, where } from "firebase/firestore";
+import {
+  collection,
+  deleteDoc,
+  doc,
+  getDoc,
+  getDocs,
+  query,
+  updateDoc,
+  where,
+} from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 
 interface CartItem {
@@ -38,47 +47,44 @@ const CartScreen = () => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const { theme } = useThemes();
   const isDark = theme === "dark";
-  const auth =getAuth();
-  const user =auth.currentUser;
+  const auth = getAuth();
+  const user = auth.currentUser;
 
-  useEffect(()=>{
+  useEffect(() => {
     const fetch = async () => {
       try {
-       const cartRef =collection(db ,'cart')
-       const q =query(cartRef ,where ('user_id' ,'==' ,user.uid))
-       const querySnapshot =await getDocs(q)
-       const items : CartItem []=[];
-       querySnapshot.forEach((item)=>{
-        items.push({id :item.id ,... item.data()} as CartItem)
-       })
-       setCartItems(items);
+        const cartRef = collection(db, "cart");
+        const q = query(cartRef, where("user_id", "==", user.uid));
+        const querySnapshot = await getDocs(q);
+        const items: CartItem[] = [];
+        querySnapshot.forEach((item) => {
+          items.push({ id: item.id, ...item.data() } as CartItem);
+        });
+        setCartItems(items);
       } catch (err) {
-        console.error('error fetching');
+        console.error("error fetching");
       }
-    }
+    };
     fetch();
-  } ,[user])
+  }, [user]);
 
-  const handleRemoveItem =async (id)=>{
-    try{
-      const cartRef =collection(db,'cart');
-      const q =query(cartRef ,where('id' ,'==' ,id))
-      const querySnapshot =await getDocs(q);
-      const newCart = cartItems.filter(item => item.id !== id); 
+  const handleRemoveItem = async (id) => {
+    try {
+      const cartRef = collection(db, "cart");
+      const q = query(cartRef, where("id", "==", id));
+      const querySnapshot = await getDocs(q);
+      const newCart = cartItems.filter((item) => item.id !== id);
       setCartItems(newCart);
 
-      querySnapshot.forEach(async (item)=>{
-        await deleteDoc(doc(db ,'cart' ,item.id));
-      })
-      
-    console.log("item removed from cart")
+      querySnapshot.forEach(async (item) => {
+        await deleteDoc(doc(db, "cart", item.id));
+      });
 
+      console.log("item removed from cart");
+    } catch {
+      console.log("error to remove item from cart");
     }
-    catch{
-      console.log('error to remove item from cart')
-    }
-    
-  }
+  };
 
   const handleClearCart = async () => {
     Alert.alert("Clear Cart", "Are you sure you want to remove all items?", [
@@ -181,9 +187,18 @@ const CartScreen = () => {
                     : Colors.assestGreen,
                 },
               ]}
-              onPress={() => router.push({ pathname: "/(drawer)/(tabs)/explore" })}
+              onPress={() =>
+                router.push({ pathname: "/(drawer)/(tabs)/explore" })
+              }
             >
-              <Text style={styles.browseButtonText}>Browse Properties</Text>
+              <Text
+                style={[
+                  styles.browseButtonText,
+                  isDark ? { color: Colors.darkModeText } : { color: "#fff" },
+                ]}
+              >
+                Browse Properties
+              </Text>
             </Pressable>
           </View>
         ) : (
@@ -213,7 +228,9 @@ const CartScreen = () => {
                   style={[
                     styles.price,
                     {
-                      color: isDark ? Colors.assestGreenThree : Colors.assestGreen,
+                      color: isDark
+                        ? Colors.assestGreenThree
+                        : Colors.assestGreen,
                     },
                   ]}
                 >
@@ -385,9 +402,10 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 20,
     borderRadius: 8,
+    backgroundColor: Colors.assestGreenTwo,
   },
   browseButtonText: {
-    color: "#fff",
+    color: Colors.primary,
     fontSize: 16,
     fontWeight: "600",
   },
@@ -455,7 +473,7 @@ const styles = StyleSheet.create({
     // justifyContent: 'space-around',
     alignItems: "center",
     marginBottom: 12,
-    marginLeft:20,
+    marginLeft: 20,
   },
   summaryText: {
     fontSize: 16,
@@ -464,7 +482,7 @@ const styles = StyleSheet.create({
   totalPrice: {
     fontSize: 20,
     fontWeight: "700",
-    paddingLeft:30
+    paddingLeft: 30,
   },
   checkoutButton: {
     paddingVertical: 14,

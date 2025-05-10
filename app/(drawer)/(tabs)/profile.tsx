@@ -6,6 +6,7 @@ import {
   Pressable,
   Alert,
   ActivityIndicator,
+  StatusBar,
   Image,
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
@@ -193,6 +194,10 @@ const Profile = () => {
         backgroundColor: isDark ? Colors.darkModeBackground : Colors.background,
       }}
     >
+      <StatusBar
+        barStyle={isDark ? "dark-content" : "light-content"}
+        backgroundColor={isDark ? Colors.darkModePrimary : Colors.primary}
+      />
       {loading ? (
         <View style={styles.loaderContainer}>
           <ActivityIndicator size="large" color={Colors.assestGreen} />
