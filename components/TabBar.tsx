@@ -65,11 +65,11 @@ export default function TabBar({
             console.log("User role found:", userData?.role);
             setRole(userData?.role || "buyer");
           } else {
-            console.log("No user document found");
+            // console.log("No user document found");
             setRole("buyer");
           }
         } else {
-          console.log("No auth user - setting default role");
+          // console.log("No auth user - setting default role");
           setRole("buyer");
         }
       } catch (error) {
@@ -134,11 +134,9 @@ export default function TabBar({
     if (role === "seller") {
       return ["index", "explore", "addApartment", "profile"];
     }
-    // Default tabs as fallback
     return defaultTabs;
   };
 
-  // Determine which routes to display
   const tabsToShow = loading ? defaultTabs : visibleTabs(role);
   const filteredRoutes = state.routes.filter((route) =>
     tabsToShow.includes(route.name)
@@ -160,7 +158,6 @@ export default function TabBar({
         </View>
       )}
       {filteredRoutes.map((route, index) => {
-        // Find the actual index in the original state.routes array
         const originalIndex = state.routes.findIndex(
           (r) => r.key === route.key
         );
@@ -206,7 +203,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: Colors.primary,
     paddingVertical: 10,
-    position: "relative", // For positioning loading overlay
+    position: "relative",
   },
   tabbarItem: {
     flex: 1,
