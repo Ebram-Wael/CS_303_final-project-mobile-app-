@@ -53,9 +53,9 @@ const AddComment: React.FC<AddCommentProps> = ({
       style={[
         styles.container,
         {
-          backgroundColor: isDark
-            ? Colors.darkModeBackground
-            : Colors.assestWhite,
+          // backgroundColor: isDark
+          //   ? Colors.darkModeBackground
+          //   : Colors.assestWhite,
         },
       ]}
     >
