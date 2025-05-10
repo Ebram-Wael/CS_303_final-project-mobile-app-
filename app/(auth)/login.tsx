@@ -117,7 +117,7 @@ const Login = () => {
       } else if (error.code === "auth/missing-password") {
         Alert.alert("Password is required");
       } else {
-        Alert.alert("Email is required");
+        // Alert.alert("Email is required");
       }
     }
   };
