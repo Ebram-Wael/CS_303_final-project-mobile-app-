@@ -144,7 +144,7 @@ const CartScreen = () => {
             <Text
               style={[
                 styles.clearButtonText,
-                { color: isDark ? Colors.assestGreenTwo : Colors.assestGreen },
+                { color: isDark ? Colors.assestGreenTwo : Colors.assestGreenTwo },
               ]}
             >
               Clear All
@@ -178,7 +178,7 @@ const CartScreen = () => {
                 {
                   backgroundColor: isDark
                     ? Colors.darkModeSecondary
-                    : Colors.assestGreen,
+                    : Colors.assestGreenTwo,
                 },
               ]}
               onPress={() => router.push({ pathname: "/(drawer)/(tabs)/explore" })}
@@ -213,7 +213,7 @@ const CartScreen = () => {
                   style={[
                     styles.price,
                     {
-                      color: isDark ? Colors.assestGreenThree : Colors.assestGreen,
+                      color: isDark ? Colors.assestGreenThree : Colors.assestGreenTwo,
                     },
                   ]}
                 >
@@ -226,7 +226,7 @@ const CartScreen = () => {
                         name="bed"
                         size={14}
                         color={
-                          isDark ? Colors.darkModeText : Colors.darkModeText
+                          isDark ? Colors.darkModeText : Colors.text
                         }
                       />
                       <Text
@@ -235,7 +235,7 @@ const CartScreen = () => {
                           {
                             color: isDark
                               ? Colors.darkModeText
-                              : Colors.darkModeText,
+                              : Colors.text,
                           },
                         ]}
                       >
@@ -249,7 +249,7 @@ const CartScreen = () => {
                         name="building"
                         size={14}
                         color={
-                          isDark ? Colors.darkModeText : Colors.darkModeText
+                          isDark ? Colors.darkModeText : Colors.text
                         }
                       />
                       <Text
@@ -258,7 +258,7 @@ const CartScreen = () => {
                           {
                             color: isDark
                               ? Colors.darkModeText
-                              : Colors.darkModeText,
+                              : Colors.text,
                           },
                         ]}
                       >
@@ -311,7 +311,7 @@ const CartScreen = () => {
               style={[
                 styles.totalPrice,
                 {
-                  color: isDark ? Colors.assestGreenThree : Colors.assestGreen,
+                  color: isDark ? Colors.assestGreenThree : Colors.assestGreenTwo,
                 },
               ]}
             >
@@ -325,7 +325,7 @@ const CartScreen = () => {
               {
                 backgroundColor: isDark
                   ? Colors.darkModeSecondary
-                  : Colors.assestGreen,
+                  : Colors.assestGreenTwo,
               },
             ]}
             onPress={handleCheckout}

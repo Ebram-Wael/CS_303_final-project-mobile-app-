@@ -4,6 +4,8 @@ import { collection, getDocs, query, where, doc, deleteDoc } from "firebase/fire
 import { useEffect, useState } from "react";
 import { View, Text, FlatList, Image, StyleSheet, Pressable, Alert, ActivityIndicator } from "react-native";
 import EditApartmentModal from "@/components/EditApartmentModal";
+import Colors from "@/components/colors";
+import { useThemes } from "@/components/themeContext";
 
 export default function MyRoom() {
   const auth = getAuth();
@@ -12,6 +14,8 @@ export default function MyRoom() {
   const [selectedApartment, setSelectedApartment] = useState(null);
   const [isModalVisible, setModalVisible] = useState(false);
   const [isLoading, setLoading] = useState(false);
+  const { theme } = useThemes();
+  const isDark = theme === "dark";
 
   useEffect(() => {
     if (user) fetchApartments();
@@ -68,12 +72,12 @@ export default function MyRoom() {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container,{backgroundColor:isDark?Colors.darkModeBackground:Colors.background}]}>
       {isLoading ? (
         <ActivityIndicator size="large" color={'green'} />
       ) : rooms.length === 0 ? (
-        <View style={styles.noApartments}>
-          <Text style={styles.noText}>No Apartments</Text>
+        <View style={[styles.noApartments,{backgroundColor:isDark?Colors.darkModeBackground:Colors.background}]}>
+          <Text style={[styles.noText,{color:isDark?Colors.darkModeText:Colors.assestGray}]}>No Apartments</Text>
         </View>
       ) : (
         <FlatList
@@ -81,21 +85,21 @@ export default function MyRoom() {
           keyExtractor={(item) => item.id}
           showsVerticalScrollIndicator={false}
           renderItem={({ item }) => (
-            <View style={styles.card}>
+            <View style={[styles.card,{backgroundColor:isDark?Colors.darkModePrimary:Colors.assestWhite}]}>
               <Image source={{ uri: item.image[0] }} style={styles.image} />
-              <Text style={styles.title}>Unit Number: {item.unit_number}</Text>
-              <Text style={styles.text}>Price: {item.rent}</Text>
-              <Text style={styles.text}>Location: {item.location}</Text>
-              <Text style={styles.text}>Bedrooms: {item.num_bedrooms}</Text>
-              <Text style={styles.text}>Features: {item.features}</Text>
-              <Text style={styles.text}>Floor: {item.floor}</Text>
-              <Text style={styles.text}>Nearby: {item.nearby}</Text>
+              <Text style={[styles.title,{color:isDark?Colors.darkModeText:Colors.text}]}>Unit Number: {item.unit_number}</Text>
+              <Text style={[styles.text,{color:isDark?Colors.darkModeText:Colors.text}]}>Price: {item.rent}</Text>
+              <Text style={[styles.text,{color:isDark?Colors.darkModeText:Colors.text}]}>Location: {item.location}</Text>
+              <Text style={[styles.text,{color:isDark?Colors.darkModeText:Colors.text}]}>Bedrooms: {item.num_bedrooms}</Text>
+              <Text style={[styles.text,{color:isDark?Colors.darkModeText:Colors.text}]}>Features: {item.features}</Text>
+              <Text style={[styles.text,{color:isDark?Colors.darkModeText:Colors.text}]}>Floor: {item.floor}</Text>
+              <Text style={[styles.text,{color:isDark?Colors.darkModeText:Colors.text}]}>Nearby: {item.nearby}</Text>
               <Pressable
                 onPress={() => {
                   setSelectedApartment(item);
                   setModalVisible(true);
                 }}
-                style={styles.button}
+                style={[styles.button,{backgroundColor:isDark?Colors.darkModeSecondary:Colors.assestGreenTwo}]}
               >
                 <Text style={{ color: "#fff" }}>Edit</Text>
               </Pressable>

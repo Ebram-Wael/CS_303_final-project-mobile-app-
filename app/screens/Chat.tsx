@@ -28,6 +28,7 @@ import * as ImagePicker from "expo-image-picker";
 import { getAuth } from "firebase/auth";
 import Colors from "@/components/colors";
 import { useLocalSearchParams } from "expo-router";
+import { useThemes } from "@/components/themeContext";
 
 export default function Chat() {
   const [messages, setMessages] = useState<any[]>([]);
@@ -36,7 +37,8 @@ export default function Chat() {
   const [loading, setLoading] = useState(true);
   const [isSeller, setIsSeller] = useState(false);
   const [uploading, setUploading] = useState(false);
-
+  const { theme } = useThemes();
+  const isDark = theme === "dark";
   const flatListRef = useRef<FlatList>(null);
   const textInputRef = useRef<TextInput>(null);
 
@@ -44,7 +46,7 @@ export default function Chat() {
   const user = auth.currentUser;
   const { sid, houseid, userid } = useLocalSearchParams();
 
- 
+
   const getRole = async () => {
     if (user) {
       try {
@@ -64,7 +66,7 @@ export default function Chat() {
     getRole();
   }, [user]);
 
- 
+
   useEffect(() => {
     const fetchSellerInfo = async () => {
       if (!sid) return;
@@ -91,7 +93,7 @@ export default function Chat() {
     fetchSellerInfo();
   }, [sid]);
 
- 
+
   useEffect(() => {
     if (!houseid || !sid || !user?.uid) return;
 
@@ -110,7 +112,7 @@ export default function Chat() {
           messagesList.push({ id: doc.id, ...doc.data() });
         });
 
-      
+
         const localMessages = messages.filter((msg) => msg.local);
         const serverMessages = messagesList.filter(
           (msg) => !localMessages.some((local) => local.id === msg.id)
@@ -200,7 +202,7 @@ export default function Chat() {
 
   const handlePickImage = async () => {
     let tempId = '';
-    
+
     try {
       const permissionResult =
         await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -273,14 +275,14 @@ export default function Chat() {
     }
   };
 
- 
+
   const formatTimestamp = (timestamp: any) => {
     if (!timestamp) return "";
-    
-    const messageDate = timestamp?.toDate 
-      ? timestamp.toDate() 
+
+    const messageDate = timestamp?.toDate
+      ? timestamp.toDate()
       : new Date(timestamp);
-    
+
     if (isNaN(messageDate.getTime())) return "";
 
     return messageDate.toLocaleTimeString([], {
@@ -304,15 +306,15 @@ export default function Chat() {
 
   if (loading) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color={Colors.assest} />
+      <View style={[styles.loadingContainer, { backgroundColor: isDark ? Colors.darkModeBackground : Colors.background }]}>
+        <ActivityIndicator size="large" color={isDark ? Colors.darkIndicator : Colors.indicator} />
       </View>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.chatContainer}>
+    <SafeAreaView style={[styles.container, { backgroundColor: isDark ? Colors.darkModeBackground : Colors.background }]}>
+      <View style={[styles.chatContainer, { backgroundColor: isDark ? Colors.darkModeBackground : Colors.background }]}>
         <FlatList
           ref={flatListRef}
           data={messages}
@@ -326,8 +328,8 @@ export default function Chat() {
                 style={[
                   styles.messageContainer,
                   isMyMessage
-                    ? styles.myMessage
-                    : styles.otherMessage,
+                    ? [styles.myMessage, { backgroundColor: isDark ? Colors.assestGreen : Colors.primary }]
+                    : [styles.otherMessage, { backgroundColor: isDark ? Colors.assestGreenTwo : Colors.assestGreenThree }],
                 ]}
               >
                 {item.message ? (
@@ -336,8 +338,8 @@ export default function Chat() {
                       styles.messageText,
                       {
                         color: isMyMessage
-                          ? Colors.whiteText
-                          : Colors.assest,
+                          ? isDark ? Colors.text : Colors.whiteText
+                          : isDark ? Colors.whiteText : Colors.text,
                       },
                     ]}
                   >
@@ -360,8 +362,8 @@ export default function Chat() {
                         styles.timestamp,
                         {
                           color: isMyMessage
-                            ? Colors.whiteText
-                            : Colors.assestGray,
+                            ? isDark ? Colors.text : Colors.whiteText
+                            : isDark ? Colors.whiteText : Colors.text,
                         },
                       ]}
                     >
@@ -378,15 +380,15 @@ export default function Chat() {
           onLayout={() => flatListRef.current?.scrollToEnd({ animated: true })}
         />
 
-        <View style={styles.inputContainer}>
+        <View style={[styles.inputContainer, { backgroundColor: isDark ? Colors.darkModeBackground : Colors.background }]}>
           <Pressable
             onPress={handlePickImage}
-            style={styles.mediaButton}
+            style={[styles.mediaButton, { backgroundColor: isDark ? Colors.assestGreenTwo : Colors.assest }]}
             disabled={uploading}
-            android_ripple={{ color: Colors.assest}}
+            android_ripple={{ color: Colors.assest }}
           >
             {uploading ? (
-              <ActivityIndicator size="small" color={Colors.whiteText} />
+              <ActivityIndicator size="small" color={isDark ? Colors.darkIndicator : Colors.indicator} />
             ) : (
               <Text style={styles.mediaButtonText}>📎</Text>
             )}
@@ -410,6 +412,7 @@ export default function Chat() {
             onPress={handleSendMessage}
             style={[
               styles.sendButton,
+              { backgroundColor: isDark ? Colors.assestGreenTwo : Colors.assest },
               (!messageText.trim() || uploading) && styles.disabledButton,
             ]}
             disabled={!messageText.trim() || uploading}
@@ -484,7 +487,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     padding: 10,
     borderTopWidth: 1,
-    borderTopColor: Colors.assestGray,
+    // borderTopColor: Colors.assestGray,
     backgroundColor: Colors.assestWhite,
     alignItems: "center",
   },
