@@ -123,8 +123,7 @@ const PurchaseForm = () => {
 
       Alert.alert("Success", "Purchase completed successfully!");
       router.push({
-        pathname: "/screens/:LeaseAgreementScreen",
-
+        pathname: "../screens/LeaseAgreementScreen",
         params: {
           sellerid: sellerid,
           name: name,
@@ -198,7 +197,7 @@ const PurchaseForm = () => {
       <Text
         style={[
           styles.sectionTitle,
-          { color: isDark ? Colors.darkModeText : "#555" },
+          { color: isDark ? Colors.darkModeText : Colors.text },
         ]}
       >
         Select Semester
@@ -216,7 +215,7 @@ const PurchaseForm = () => {
 
       {semester !== "" && (
         <View>
-          <Text style={styles.label}>Start Date</Text>{" "}
+          <Text style={[styles.label,{color:isDark?Colors.darkModeText:Colors.text}]}>Start Date</Text>{" "}
           <Pressable
             style={styles.dateInputContainer}
             onPress={() => setShowStartDateCalendar(!showStartDateCalendar)}
@@ -247,7 +246,7 @@ const PurchaseForm = () => {
               }}
             />
           )}
-          <Text style={styles.label}>End Date</Text>{" "}
+          <Text style={[styles.label,{color:isDark?Colors.darkModeText:Colors.text}]}>End Date</Text>{" "}
           <Pressable
             style={styles.dateInputContainer}
             onPress={() => setShowEndDateCalendar(!showEndDateCalendar)}
@@ -282,7 +281,7 @@ const PurchaseForm = () => {
       <Text
         style={[
           styles.sectionTitle,
-          { color: isDark ? Colors.darkModeText : "#555" },
+          { color: isDark ? Colors.darkModeText : Colors.text},
         ]}
       >
         Select Payment Method
@@ -334,7 +333,7 @@ const PurchaseForm = () => {
         <Pressable
           style={[
             styles.confirmButton,
-            { backgroundColor: isDark ? Colors.darkModeSecondary : "#333" },
+            { backgroundColor: isDark ? Colors.darkModeSecondary : Colors.assestGreenTwo },
           ]}
           onPress={handlePurchase}
         >

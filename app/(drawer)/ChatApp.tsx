@@ -21,6 +21,7 @@ import {
 import { getAuth } from "firebase/auth";
 import { useRouter } from "expo-router";
 import Colors from "@/components/colors";
+import { useThemes } from "@/components/themeContext";
 
 const ChatList = () => {
   const [chats, setChats] = useState<any[]>([]);
@@ -29,8 +30,9 @@ const ChatList = () => {
   const auth = getAuth();
   const user = auth.currentUser;
   const router = useRouter();
+  const { theme } = useThemes();
+  const isDark = theme === "dark";
 
- 
   const fetchUserNames = async (userIds: string[]) => {
     const names: { [key: string]: string } = {};
     for (const userId of userIds) {
@@ -162,7 +164,7 @@ const ChatList = () => {
 
     return (
       <Pressable
-        style={styles.chatItem}
+        style={[styles.chatItem,{backgroundColor:isDark?Colors.assestWhite:Colors.assestWhite}]}
         onPress={() =>
           navigateToChat(item.houseid, item.sellerId, otherParticipantId)
         }
@@ -195,21 +197,21 @@ const ChatList = () => {
 
   if (loading) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color={Colors.assestBlue} />
+      <View style={[styles.loadingContainer,{backgroundColor:isDark?Colors.darkModeBackground:Colors.background}]}>
+        <ActivityIndicator size="large" color={isDark?Colors.darkIndicator:Colors.indicator} />
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container,{backgroundColor:isDark?Colors.darkModeBackground:Colors.background}]}>
       <FlatList
         data={chats}
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>No Chats Available</Text>
+            <Text style={[styles.emptyText, { color: isDark ? Colors.darkModeText : Colors.assest }]}>No Chats Available</Text>
           </View>
         }
         contentContainerStyle={styles.listContent}
@@ -221,7 +223,6 @@ const ChatList = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
   },
   loadingContainer: {
     flex: 1,
@@ -229,23 +230,28 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   listContent: {
-    paddingVertical: 8,
+    padding: 12,
   },
   chatItem: {
     flexDirection: "row",
-    padding: 16,
     alignItems: "center",
+    padding: 16,
+    marginBottom: 12,
     backgroundColor: Colors.assestWhite,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.assestGray,
+    borderRadius: 16,
+    elevation: 2, 
+    // shadowColor: "#000", 
+    // shadowOffset: { width: 0, height: 2 },
+    // shadowOpacity: 0.1,
+    // shadowRadius: 4,
   },
   avatarContainer: {
-    marginRight: 12,
+    marginRight: 14,
   },
   avatar: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    width: 52,
+    height: 52,
+    borderRadius: 26,
     backgroundColor: Colors.assestGray,
   },
   chatContent: {
@@ -253,35 +259,32 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   sellerName: {
-  fontSize: 16,
-  fontWeight: "600",
-  color: Colors.assest,
-  textAlign: "left", 
-  flex: 1,
-},
-lastMessage: {
-  fontSize: 14,
-  color: "#555",
-  textAlign: "left", 
-  flex: 2,
-},
-
+    fontSize: 17,
+    fontWeight: "700",
+    color: Colors.assest,
+    marginBottom: 4,
+  },
+  lastMessage: {
+    fontSize: 15,
+    color: "#666",
+  },
   timeContainer: {
+    marginLeft: 12,
     alignItems: "flex-end",
-    marginLeft: 8,
   },
   timeText: {
-    fontSize: 12,
+    fontSize: 13,
     color: Colors.assestGray,
   },
   emptyContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    padding: 20,
+    paddingTop: 80,
   },
   emptyText: {
-    fontSize: 16,
+    fontSize: 17,
+    fontWeight: "500",
     color: Colors.assestGray,
   },
 });

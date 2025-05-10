@@ -9,6 +9,8 @@ import {
 } from "react-native";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "@/services/firebase";
+import Colors from "@/components/colors";
+import { useThemes } from "@/components/themeContext";
 
 interface Apartment {
   id: string;
@@ -43,7 +45,8 @@ export default function EditApartmentModal({
   });
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-
+  const { theme } = useThemes();
+  const isDark = theme === "dark";
   useEffect(() => {
     if (apartment) {
       setForm({
@@ -103,8 +106,8 @@ export default function EditApartmentModal({
   return (
     <Modal visible={visible} transparent animationType="slide">
       <View style={styles.modalContainer}>
-        <View style={styles.modalContent}>
-          <Text style={styles.title}>Edit Apartment</Text>
+        <View style={[styles.modalContent,{backgroundColor:isDark?Colors.darkModeBackground:Colors.background}]}>
+          <Text style={[styles.title,{color:isDark?Colors.darkModeText:Colors.text}]}>Edit Apartment</Text>
 
           {[
             {
@@ -134,9 +137,9 @@ export default function EditApartmentModal({
             { key: "nearby", label: "Nearby", placeholder: "e.g. Metro, Mall" },
           ].map(({ key, label, placeholder, keyboardType }) => (
             <View key={key} style={{ marginBottom: 10 }}>
-              <Text style={styles.label}>{label}</Text>
+              <Text style={[styles.label,{color:isDark?Colors.darkModeText:Colors.text}]}>{label}</Text>
               <TextInput
-                style={styles.input}
+                style={[styles.input,{color:isDark?Colors.darkModeText:Colors.text}]}
                 placeholder={placeholder}
                 keyboardType={keyboardType as any}
                 value={form[key as keyof typeof form]}
@@ -149,10 +152,10 @@ export default function EditApartmentModal({
           ))}
 
           <View style={styles.buttonRow}>
-            <TouchableOpacity onPress={handleSave} style={styles.saveBtn}>
+            <TouchableOpacity onPress={handleSave} style={[styles.saveBtn,{backgroundColor:isDark?Colors.assestGray:Colors.assestGreenTwo}]}>
               <Text style={styles.btnText}>Save</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={onClose} style={styles.cancelBtn}>
+            <TouchableOpacity onPress={onClose} style={[styles.cancelBtn,{backgroundColor:isDark?Colors.darkModeSecondary:Colors.assestGray}]}>
               <Text style={styles.btnText}>Cancel</Text>
             </TouchableOpacity>
           </View>
