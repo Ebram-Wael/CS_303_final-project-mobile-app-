@@ -1,4 +1,10 @@
-import { View, Platform, StyleSheet, Text } from "react-native";
+import {
+  View,
+  Platform,
+  StyleSheet,
+  Text,
+  ActivityIndicator,
+} from "react-native";
 import { useLinkBuilder, useTheme } from "@react-navigation/native";
 import { PlatformPressable } from "@react-navigation/elements";
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
@@ -19,7 +25,7 @@ import AddIcon from "@/assets/icons/add.svg";
 import AddIconFilled from "@/assets/icons/add-filled.svg";
 import Colors from "@/components/colors";
 import { useThemes } from "@/components/themeContext";
-import { getAuth } from "firebase/auth";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 import auth, { db } from "@/services/firebase";
 import { doc, getDoc } from "firebase/firestore";
 
@@ -31,96 +37,112 @@ export default function TabBar({
   const { theme } = useThemes();
   const isDark = theme === "dark";
 
-  const [role, setRole] = useState();
-  const [load ,setLoading] =useState(true)
+  const [role, setRole] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [authUser, setAuthUser] = useState(null);
 
-  const getUserRole = async () => {
-   try{
-    const auth = getAuth();
-    const user = auth.currentUser;
-    if (user) {
-      const userDocRef = doc(db, "Users", user.uid);
-      const userDoc = await getDoc(userDocRef);
-      setRole(userDoc.data()?.role);
-    }
-    }catch (error){
-        console.log(error)
-    }finally{
-      setLoading(false)
-      
-    }
-  };
   useEffect(() => {
-    getUserRole();
+    const auth = getAuth();
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setAuthUser(user);
+      setLoading(true);
+    });
+
+    return () => unsubscribe();
   }, []);
 
-  if(load)return
-  if(!role)return
+  useEffect(() => {
+    const getUserRole = async () => {
+      try {
+        setLoading(true);
+
+        if (authUser) {
+          const userDocRef = doc(db, "Users", authUser.uid);
+          const userDoc = await getDoc(userDocRef);
+
+          if (userDoc.exists()) {
+            const userData = userDoc.data();
+            console.log("User role found:", userData?.role);
+            setRole(userData?.role || "buyer");
+          } else {
+            console.log("No user document found");
+            setRole("buyer");
+          }
+        } else {
+          console.log("No auth user - setting default role");
+          setRole("buyer");
+        }
+      } catch (error) {
+        console.error("Error fetching user role:", error);
+        setRole("buyer");
+      } finally {
+        setTimeout(() => {
+          setLoading(false);
+        }, 100);
+      }
+    };
+
+    getUserRole();
+
+    return () => {};
+  }, [authUser]);
 
   const icons = {
     index: {
-      outline: (props: any) => <HouseIcon width={30} height={30} {...props} />,
-      filled: (props: any) => (
-        <HouseFilledIcon width={30} height={30} {...props} />
-      ),
+      outline: (props) => <HouseIcon width={30} height={30} {...props} />,
+      filled: (props) => <HouseFilledIcon width={30} height={30} {...props} />,
     },
     explore: {
-      outline: (props: any) => (
-        <ExploreIcon width={30} height={30} {...props} />
-      ),
-      filled: (props: any) => (
+      outline: (props) => <ExploreIcon width={30} height={30} {...props} />,
+      filled: (props) => (
         <ExploreFilledIcon width={30} height={30} {...props} />
       ),
     },
     cart: {
-      outline: (props: any) => <CartIcon width={30} height={30} {...props} />,
-      filled: (props: any) => (
-        <CartFilledIcon width={30} height={30} {...props} />
-      ),
+      outline: (props) => <CartIcon width={30} height={30} {...props} />,
+      filled: (props) => <CartFilledIcon width={30} height={30} {...props} />,
     },
     profile: {
-      outline: (props: any) => (
-        <ProfileIcon width={30} height={30} {...props} />
-      ),
-      filled: (props: any) => (
+      outline: (props) => <ProfileIcon width={30} height={30} {...props} />,
+      filled: (props) => (
         <ProfileFilledIcon width={30} height={30} {...props} />
       ),
     },
     addApartment: {
-      outline: (props: any) => <AddIcon width={30} height={30} {...props} />,
-      filled: (props: any) => (
-        <AddIconFilled width={30} height={30} {...props} />
-      ),
+      outline: (props) => <AddIcon width={30} height={30} {...props} />,
+      filled: (props) => <AddIconFilled width={30} height={30} {...props} />,
     },
     approve: {
-      outline: (props: any) => <CheckIcon width={30} height={30} {...props} />,
-      filled: (props: any) => (
-        <CheckIconFilled width={30} height={30} {...props} />
-      ),
+      outline: (props) => <CheckIcon width={30} height={30} {...props} />,
+      filled: (props) => <CheckIconFilled width={30} height={30} {...props} />,
     },
     amount: {
-      outline: (props: any) => <AmountIcon width={30} height={30} {...props} />,
-      filled: (props: any) => (
-        <AmountIconFilled width={30} height={30} {...props} />
-      ),
+      outline: (props) => <AmountIcon width={30} height={30} {...props} />,
+      filled: (props) => <AmountIconFilled width={30} height={30} {...props} />,
     },
   };
 
-  const filteredRoutes = state.routes.filter((route) => {
+  const defaultTabs = ["index", "explore", "profile"];
+
+  const visibleTabs = (role) => {
     if (role === "admin") {
-      return ["amount", "approve", "profile"].includes(route.name);
+      return ["amount", "approve", "profile"];
     }
     if (role === "buyer") {
-      return ["index", "explore", "cart", "profile"].includes(route.name);
+      return ["index", "explore", "cart", "profile"];
     }
     if (role === "seller") {
-      return ["index", "explore", "addApartment", "profile"].includes(
-        route.name
-      );
+      return ["index", "explore", "addApartment", "profile"];
     }
+    // Default tabs as fallback
+    return defaultTabs;
+  };
 
-    return false;
-  });
+  // Determine which routes to display
+  const tabsToShow = loading ? defaultTabs : visibleTabs(role);
+  const filteredRoutes = state.routes.filter((route) =>
+    tabsToShow.includes(route.name)
+  );
 
   return (
     <View
@@ -132,6 +154,11 @@ export default function TabBar({
         },
       ]}
     >
+      {loading && (
+        <View style={styles.loadingOverlay}>
+          <ActivityIndicator color={Colors.background} size="small" />
+        </View>
+      )}
       {filteredRoutes.map((route, index) => {
         // Find the actual index in the original state.routes array
         const originalIndex = state.routes.findIndex(
@@ -151,8 +178,8 @@ export default function TabBar({
         };
 
         const IconComponent = isFocused
-          ? icons[route.name as keyof typeof icons]?.filled
-          : icons[route.name as keyof typeof icons]?.outline;
+          ? icons[route.name]?.filled
+          : icons[route.name]?.outline;
 
         return (
           <PlatformPressable
@@ -179,11 +206,22 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: Colors.primary,
     paddingVertical: 10,
+    position: "relative", // For positioning loading overlay
   },
   tabbarItem: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
     paddingVertical: 8,
+  },
+  loadingOverlay: {
+    position: "absolute",
+    top: 0,
+    right: 0,
+    backgroundColor: "rgba(0,0,0,0.1)",
+    padding: 4,
+    borderRadius: 10,
+    margin: 4,
+    zIndex: 100,
   },
 });
