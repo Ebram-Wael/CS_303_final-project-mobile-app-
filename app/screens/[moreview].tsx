@@ -14,7 +14,7 @@ import React, { useEffect, useState, useRef, useLayoutEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { router, useLocalSearchParams } from "expo-router";
 import { db } from "@/services/firebase";
-import { addDoc, collection, doc, getDoc ,getDocs,query,updateDoc, where } from "firebase/firestore";
+import { addDoc, collection, doc, getDoc, getDocs, query, updateDoc, where } from "firebase/firestore";
 import Heart from "@/assets/icons/heart-svgrepo-com.svg";
 import RedHeart from "@/assets/icons/heart-svgrepo-com (1).svg";
 import TopArrow from "@/assets/icons/top-arrow-5-svgrepo-com.svg";
@@ -59,13 +59,13 @@ const HouseDesc = ({ house }) => {
   const [owner, setOwner] = useState("");
   const { theme } = useThemes();
   const isDark = theme === 'dark';
-  const [isSeller ,setIsSeller] =useState(false)
+  const [isSeller, setIsSeller] = useState(false)
   const [userRating, setUserRating] = useState(0);
   const [currentRating, setCurrentRating] = useState(house.rating || 0);
   const [ratingCount, setRatingCount] = useState(house.ratingCount || 0);
-  const [click ,setClick]=useState(false)
-  const auth =getAuth();
-  const user =auth.currentUser;
+  const [click, setClick] = useState(false)
+  const auth = getAuth();
+  const user = auth.currentUser;
 
 
   useEffect(() => {
@@ -108,7 +108,7 @@ const HouseDesc = ({ house }) => {
         }
       }
     };
- 
+
     loadUserRating();
   }, [user, house.id]);
 
@@ -121,14 +121,14 @@ const HouseDesc = ({ house }) => {
   const animatedValue = useRef(new Animated.Value(0)).current;
   const [expanded, setExpanded] = useState(false);
 
-  const getRole =async ()=>{
-    const auth =getAuth();
-    const user =auth.currentUser;
-    if(user){
-      const userRef= doc(db,"Users" ,user.uid)
-      const snap =await getDoc(userRef);
-      if(snap.exists()){
-        setIsSeller(snap.data().role=== 'seller');
+  const getRole = async () => {
+    const auth = getAuth();
+    const user = auth.currentUser;
+    if (user) {
+      const userRef = doc(db, "Users", user.uid)
+      const snap = await getDoc(userRef);
+      if (snap.exists()) {
+        setIsSeller(snap.data().role === 'seller');
       }
     }
 
@@ -190,40 +190,40 @@ const HouseDesc = ({ house }) => {
     }
   };
 
-  const handleAddToCart = async()=>{
+  const handleAddToCart = async () => {
     setClick(true);
-    try{
-    const cartRef = (collection(db, 'cart'));
-    const q = query(cartRef, where('id', '==', house.id) ,where ("user_id" ,'==' ,user.uid));
-    const querySnapshot = await getDocs(q);
-    console.log (user.uid)
+    try {
+      const cartRef = (collection(db, 'cart'));
+      const q = query(cartRef, where('id', '==', house.id), where("user_id", '==', user.uid));
+      const querySnapshot = await getDocs(q);
+      console.log(user.uid)
 
-    if (!querySnapshot.empty) {
-      console.log("Item already in cart");
-      Alert.alert("ITEM ALREADY IN CART")
-      return; 
-    }
-    await addDoc(cartRef, 
-      { 
-        id :house.id ,
-        image: house.image[0], 
-        rent: house.rent,
-        location: house.location,
-        features: house.features,
-        floor: house.floor,
-        unit_number: house.unit_number,
-        num_bedrooms: house.num_bedrooms,
-        seller_id :house.seller_id,
-        user_id :user.uid 
+      if (!querySnapshot.empty) {
+        console.log("Item already in cart");
+        Alert.alert("ITEM ALREADY IN CART")
+        return;
+      }
+      await addDoc(cartRef,
+        {
+          id: house.id,
+          image: house.image[0],
+          rent: house.rent,
+          location: house.location,
+          features: house.features,
+          floor: house.floor,
+          unit_number: house.unit_number,
+          num_bedrooms: house.num_bedrooms,
+          seller_id: house.seller_id,
+          user_id: user.uid
 
-      }); 
+        });
       router.push("/(drawer)/(tabs)/cart")
-    }catch (error){
+    } catch (error) {
       console.log("failed to add to cart")
     }
   }
 
-  
+
   const handleRate = async (rating: number) => {
     try {
       if (!user) {
@@ -239,7 +239,7 @@ const HouseDesc = ({ house }) => {
       let newAverage = currentRating;
       let newCount = ratingCount;
       if (querySnapshot.empty) {
-        
+
         await addDoc(ratingsRef, {
           userId: user.uid,
           rating: rating,
@@ -282,7 +282,7 @@ const HouseDesc = ({ house }) => {
     const stars = [];
     const fullStars = Math.floor(rating);
     const hasHalfStar = rating % 1 >= 0.5;
-    
+
     for (let i = 1; i <= 5; i++) {
       if (i <= fullStars) {
         stars.push(
@@ -293,7 +293,7 @@ const HouseDesc = ({ house }) => {
               ) : (
                 <Star width={25} height={25} />
               )}
-              </Pressable>
+            </Pressable>
           ) : (
             isDark ? (
               <DMStar key={i} width={20} height={20} />
@@ -398,7 +398,7 @@ const HouseDesc = ({ house }) => {
               : <DownArrow width={50} height={50} color={isDark ? Colors.darkModeText : "white"} />}
 
             <Text style={[styles.status, { color: isDark ? Colors.darkModeText : Colors.text }]}>{house.availability_status}</Text>
-            <Text style={[styles.price, { color: isDark ? Colors.assestGreenTwo : Colors.assestGreen }]}>
+            <Text style={[styles.price, { color: isDark ? Colors.assestGreenTwo : Colors.assestGreenTwo }]}>
               {house.rent > 0 ? `${house.rent}` : "Invalid Price"} EGP
             </Text>
             <Text style={[styles.address, { color: isDark ? Colors.darkModeText : Colors.text }]}>
@@ -421,51 +421,51 @@ const HouseDesc = ({ house }) => {
               </Text>
               {renderStars(userRating || currentRating, true)}
             </View>
-            <Text style={[styles.owner, { color: isDark ? Colors.assestGreen : Colors.assestGreen }]}>Contact: {owner}</Text>
+            <Text style={[styles.owner, { color: isDark ? Colors.assestGreen : Colors.assestGreenTwo }]}>Contact: {owner}</Text>
             <View style={styles.buyNowStyles}>
-            {!isSeller?
-              (<Pressable onPress={handlePressOnHeart}>
-              {pressHeart ? (
-                <RedHeart width={30} height={30} />
-              ) : (
-                isDark ?
-                  (<DMHeart width={30} height={30} />)
-                  : <Heart width={30} height={30} />
-              )}
-            </Pressable>) :null}
+              {!isSeller ?
+                (<Pressable onPress={handlePressOnHeart}>
+                  {pressHeart ? (
+                    <RedHeart width={30} height={30} />
+                  ) : (
+                    isDark ?
+                      (<DMHeart width={30} height={30} />)
+                      : <Heart width={30} height={30} />
+                  )}
+                </Pressable>) : null}
 
               {!isSeller ?
-               (<Pressable disabled={click} onPress={handleAddToCart} style={[styles.buyNowView, { backgroundColor: isDark ? Colors.darkModeSecondary : Colors.assest }]}>
-               <Text style={styles.buyNowText}>Rent Now!</Text>
-             </Pressable>): null}
-            {!isSeller ? (
-       <Pressable
-        onPress={() =>
-        router.push({
-          pathname: "/screens/Chat",
-          params: {
-            houseid: house.id,
-            sid: house.seller_id,
-            userid: user.uid,
-          },
-        })
-      }
-      style={[styles.buyNowView, { backgroundColor: isDark ? Colors.assestBlue : Colors.assest }]}
-    >
-      <Text style={styles.buyNowText}>Contact Me</Text>
-    </Pressable>
-  ) : null}
+                (<Pressable disabled={click} onPress={handleAddToCart} style={[styles.buyNowView, { backgroundColor: isDark ? Colors.darkModeSecondary : Colors.assest }]}>
+                  <Text style={styles.buyNowText}>Rent Now!</Text>
+                </Pressable>) : null}
+              {!isSeller ? (
+                <Pressable
+                  onPress={() =>
+                    router.push({
+                      pathname: "/screens/Chat",
+                      params: {
+                        houseid: house.id,
+                        sid: house.seller_id,
+                        userid: user.uid,
+                      },
+                    })
+                  }
+                  style={[styles.buyNowView, { backgroundColor: isDark ? Colors.assestGreenTwo : Colors.assest }]}
+                >
+                  <Text style={styles.buyNowText}>Contact Me</Text>
+                </Pressable>
+              ) : null}
             </View>
 
 
-            
+
           </Animated.View>
         ) : (
           <View style={[styles.moreDetails, , { backgroundColor: isDark ? Colors.darkModeBackground : "white" }]}>
             {isDark ? <DMTopArrow width={30} height={30} />
               : <TopArrow width={30} height={30} />
             }
-            <Text style={[styles.moreDetailsText, , { color: isDark ? Colors.darkModeText : Colors.text }]}>More Details</Text>
+            <Text style={[styles.moreDetailsText, { color: isDark ? Colors.darkModeText : Colors.text }]}>More Details</Text>
           </View>
         )}
       </Pressable>
@@ -477,7 +477,8 @@ export default function moreView() {
   const moreview = useLocalSearchParams<{ moreview: string }>();
   const houseId = moreview?.moreview;
   const [houses, setHouses] = useState([]);
-
+  const { theme } = useThemes();
+  const isDark = theme === "dark";
   useEffect(() => {
     const fetchHouse = async () => {
       try {
@@ -498,7 +499,7 @@ export default function moreView() {
   }, [houseId]);
 
   return (
-    <Animated.ScrollView contentContainerStyle={styles.scrollStyle}>
+    <Animated.ScrollView contentContainerStyle={[styles.scrollStyle, { backgroundColor: isDark?Colors.darkModeBackground:Colors.background }]}>
       {houses.map((house) => (
         <HouseDesc key={house.id} house={house} />
       ))}
@@ -614,13 +615,13 @@ const styles = StyleSheet.create({
     bottom: 0,
     width: "100%",
   },
- buyNowStyles: {
-  flexDirection: "column", 
-  alignItems: "center",
-  justifyContent: "center",
-  rowGap: 10, 
-  marginTop: 10,
-},
+  buyNowStyles: {
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    rowGap: 10,
+    marginTop: 10,
+  },
 
   buyNowView: {
     flex: 1,

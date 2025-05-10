@@ -154,6 +154,18 @@ export default function Layout() {
             }}
           />
         )}
+        <Drawer.Screen
+            name="ChatApp"
+            options={{
+              drawerLabel: "Chat",
+              drawerLabelStyle: {
+                color: isDark ? Colors.darkModeText : Colors.text,
+              },
+              drawerIcon: ({ size }) => (
+                <Ionicons name="mail-unread-outline" size={size} color={"#4DA674"} />
+              ),
+            }}
+          />
       </Drawer>
     </GestureHandlerRootView>
   );

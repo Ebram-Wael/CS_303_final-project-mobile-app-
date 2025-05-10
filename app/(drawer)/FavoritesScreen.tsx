@@ -104,12 +104,14 @@ const FavoriteItem: React.FC<FavoriteItemProps> = ({
       console.error("Failed to update favorites", error);
     }
   };
+  const { theme } = useThemes();
+  const isDark = theme === "dark";
 
   if (loading) {
     return (
       <View style={styles.favoriteItem}>
         <View style={styles.favoriteImage}>
-          <ActivityIndicator size="large" color={Colors.assestGreen} />
+          <ActivityIndicator size="large" color={isDark ? Colors.darkIndicator : Colors.indicator} />
         </View>
       </View>
     );
@@ -200,7 +202,7 @@ const FavoriteScreen: React.FC = () => {
         ]}
       >
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={Colors.assestGreen} />
+          <ActivityIndicator size="large" color={isDark ? Colors.darkIndicator : Colors.indicator} />
         </View>
       </SafeAreaView>
     );
@@ -317,7 +319,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 16,
     marginBottom: 5,
-    color: Colors.assestGreen,
+    color: Colors.assestGreenTwo,
   },
   favoriteLocation: {
     fontSize: 14,

@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import { useLocalSearchParams, router } from "expo-router";
 import Colors from "@/components/colors";
+import { useThemes } from "@/components/themeContext";
 
 interface LeaseAgreementScreenRouteParams {
   sellerid?: string;
@@ -46,10 +47,13 @@ const LeaseAgreementScreen: React.FC = () => {
       ]
     );
   };
-
+  const { theme } = useThemes();
+  const isDark = theme === "dark";
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.title}>Lease Agreement</Text>
+    <ScrollView
+      showsVerticalScrollIndicator={false}
+      style={[styles.container, { backgroundColor: isDark ? Colors.darkModeBackground : Colors.background }]}>
+      <Text style={[styles.title, { color: isDark ? Colors.darkModeText : Colors.text }]}>Lease Agreement</Text>
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Parties</Text>
@@ -94,16 +98,16 @@ const LeaseAgreementScreen: React.FC = () => {
 
       <View style={styles.signatures}>
         <View style={styles.signatureLine}>
-          <Text style={styles.signatureLabel}>Landlord's Signature</Text>
+          <Text style={[styles.signatureLabel, { color: isDark ? Colors.assestWhite : Colors.assest }]}>Landlord's Signature</Text>
           <View style={styles.signatureBorder}></View>
         </View>
         <View style={styles.signatureLine}>
-          <Text style={styles.signatureLabel}>Tenant's Signature</Text>
+          <Text style={[styles.signatureLabel, { color: isDark ? Colors.assestWhite : Colors.assest }]}>Tenant's Signature</Text>
           <View style={styles.signatureBorder}></View>
         </View>
       </View>
 
-      <Pressable style={styles.backButton} onPress={handleBack}>
+      <Pressable style={[styles.backButton, { backgroundColor: isDark ? Colors.darkModeSecondary : Colors.primary }]} onPress={handleBack}>
         <Text style={styles.backButtonText}>Back to Form</Text>
       </Pressable>
     </ScrollView>
@@ -114,7 +118,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: "#f5f5f5",
+    backgroundColor: Colors.background,
   },
   title: {
     fontSize: 22,
@@ -141,7 +145,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: "bold",
     marginBottom: 5,
-    color: Colors.assestGreen,
+    color: Colors.assest,
   },
   boldText: {
     fontSize: 13,
@@ -168,7 +172,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   backButton: {
-    backgroundColor: Colors.assestGreen,
+    backgroundColor: Colors.assestGreenTwo,
     padding: 12,
     borderRadius: 5,
     alignItems: "center",

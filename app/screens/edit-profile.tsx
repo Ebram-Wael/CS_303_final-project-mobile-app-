@@ -86,11 +86,11 @@ export default function EditProfile() {
     return (
         <SafeAreaView style={[styles.container, { backgroundColor: isDark ? Colors.darkModeBackground : Colors.background }]}>
             <Text style={[styles.label, { color: isDark ? Colors.darkModeText : "#555" }]}>Name</Text>
-            <TextInput value={name} onChangeText={setName} style={styles.input} />
+            <TextInput value={name} onChangeText={setName} style={[styles.input,{color:isDark?Colors.whiteText:Colors.text}]} />
             <Text style={[styles.label, , { color: isDark ? Colors.darkModeText : "#555" }]}>Phone</Text>
-            <TextInput value={phone} onChangeText={setPhone} style={styles.input} keyboardType="phone-pad" />
+            <TextInput value={phone} onChangeText={setPhone} style={[styles.input,{color:isDark?Colors.whiteText:Colors.text}]} keyboardType="phone-pad" />
             <Text style={[styles.label, , { color: isDark ? Colors.darkModeText : "#555" }]}>Email</Text>
-            <TextInput value={email} onChangeText={setEmail} style={styles.input} keyboardType="email-address" />
+            <TextInput value={email} onChangeText={setEmail} style={[styles.input,{color:isDark?Colors.whiteText:Colors.text}]} keyboardType="email-address" />
             <Pressable onPress={handleUpdate} style={[styles.button, { backgroundColor: isDark ? Colors.darkModeSecondary : Colors.primary }]}>
                 {loading ? (
                     <ActivityIndicator size="small" color={Colors.indicator} />
