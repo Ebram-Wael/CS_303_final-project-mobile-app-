@@ -48,7 +48,7 @@ export default function index() {
       ]}
     >
       <StatusBar
-        barStyle="light-content"
+        barStyle={isDark ? "dark-content" : "light-content"}
         backgroundColor={isDark ? Colors.darkModePrimary : Colors.primary}
       />
       <FloatingMenuButton />
@@ -62,9 +62,7 @@ export default function index() {
       >
         HOMY
       </Text>
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        style={styles.content}>
+      <ScrollView showsVerticalScrollIndicator={false} style={styles.content}>
         <View>
           <Text
             style={[

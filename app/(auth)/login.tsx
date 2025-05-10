@@ -9,7 +9,7 @@ import {
   KeyboardAvoidingView,
   ScrollView,
   Platform,
-  Image,
+  StatusBar,
 } from "react-native";
 import { useRouter } from "expo-router";
 import auth from "@/services/firebase";
@@ -70,7 +70,7 @@ const Login = () => {
       });
     }
   }
-  
+
   useEffect(() => {
     const isEmailValid = email.includes("@");
     const isPasswordValid = password.length >= 8;
@@ -124,6 +124,7 @@ const Login = () => {
 
   return (
     <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="dark-content" backgroundColor={Colors.background} />
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1 }}

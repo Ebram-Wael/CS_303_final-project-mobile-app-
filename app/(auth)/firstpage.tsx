@@ -79,13 +79,13 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     color: Colors.primary,
-    marginBottom: 20,
     marginTop: -70,
   },
   txt: {
     fontWeight: "bold",
     color: Colors.primary,
     marginBottom: 20,
+    alignSelf: "center",
   },
   btnRegister: {
     display: "flex",

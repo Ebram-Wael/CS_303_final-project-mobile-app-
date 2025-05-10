@@ -9,6 +9,7 @@ import {
   TextInput,
   ActivityIndicator,
   Platform,
+  StatusBar,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
@@ -146,6 +147,10 @@ const HouseItem = ({ house }) => {
         },
       ]}
     >
+      <StatusBar
+        barStyle={isDark ? "light-content" : "dark-content"}
+        backgroundColor={isDark ? Colors.darkModePrimary : Colors.background}
+      />
       <Pressable
         onPress={navigateToDetails}
         style={({ pressed }) => [
@@ -710,8 +715,6 @@ const styles = StyleSheet.create({
     // shadowColor: "#000",
     // shadowOffset: { width: 0, height: 2 },
     // shadowOpacity: 0.1,
-    
-    
   },
   card: {
     padding: 16,
@@ -829,7 +832,6 @@ const styles = StyleSheet.create({
   },
   pressed: {
     opacity: 0.7,
-    transform: [{ scale: 0.98 }],
   },
   commetns: {
     flex: 1,
@@ -837,7 +839,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     paddingLeft: "10%",
-    
   },
   commentIcon: {
     marginBottom: 8,
