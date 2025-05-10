@@ -17,10 +17,14 @@ import { useThemes } from "@/components/themeContext";
 interface AddCommentProps {
   apartmentId: string;
   userId: string;
-  userName: string
+  userName: string;
 }
 
-const AddComment: React.FC<AddCommentProps> = ({ apartmentId, userId, userName }) => {
+const AddComment: React.FC<AddCommentProps> = ({
+  apartmentId,
+  userId,
+  userName,
+}) => {
   const [commentText, setCommentText] = useState<string>("");
   const { theme } = useThemes();
   const isDark = theme === "dark";
@@ -45,17 +49,36 @@ const AddComment: React.FC<AddCommentProps> = ({ apartmentId, userId, userName }
   };
 
   return (
-    <View style={[styles.container,{backgroundColor:isDark?Colors.darkModeBackground:Colors.assestWhite}]}>
+    <View
+      style={[
+        styles.container,
+        {
+          backgroundColor: isDark
+            ? Colors.darkModeBackground
+            : Colors.assestWhite,
+        },
+      ]}
+    >
       <TextInput
-        style={[styles.input,{backgroundColor:isDark?Colors.darkModeSecondary:Colors.assestWhite
-          ,color:isDark?Colors.darkModeText:Colors.text
-        }]}
+        style={[
+          styles.input,
+          {
+            backgroundColor: isDark
+              ? Colors.darkModeSecondary
+              : Colors.assestWhite,
+            color: isDark ? Colors.darkModeText : Colors.text,
+          },
+        ]}
         placeholder="add comment here"
         value={commentText}
         onChangeText={setCommentText}
       />
       <Pressable style={styles.button} onPress={handleSubmit}>
-        <Feather name="send" size={20} color={isDark?Colors.assestWhite:Colors.text} />
+        <Feather
+          name="send"
+          size={20}
+          color={isDark ? Colors.assestWhite : Colors.text}
+        />
       </Pressable>
     </View>
   );
@@ -72,7 +95,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   input: {
-
     borderColor: "#ccc",
     borderWidth: 1,
     padding: 10,
@@ -84,6 +106,5 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     alignItems: "center",
     justifyContent: "center",
-
   },
 });
