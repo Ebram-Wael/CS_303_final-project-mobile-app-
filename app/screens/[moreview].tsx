@@ -14,25 +14,33 @@ import React, { useEffect, useState, useRef, useLayoutEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { router, useLocalSearchParams } from "expo-router";
 import { db } from "@/services/firebase";
-import { addDoc, collection, doc, getDoc, getDocs, query, updateDoc, where } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  query,
+  updateDoc,
+  where,
+} from "firebase/firestore";
 import Heart from "@/assets/icons/heart-svgrepo-com.svg";
 import RedHeart from "@/assets/icons/heart-svgrepo-com (1).svg";
 import TopArrow from "@/assets/icons/top-arrow-5-svgrepo-com.svg";
 import DMTopArrow from "@/assets/icons/top-arrow-5-svgrepo-com (1).svg";
 import DMDownArrow from "@/assets/icons/top-arrow-5-svgrepo-com_down.svg";
 import DownArrow from "@/assets/icons/down-arrow-5-svgrepo-com.svg";
-import DMHeart from '@/assets/icons/favorite_dark_mode.svg';
-import Star from '@/assets/icons/star-svgrepo-com.svg';
-import DMStar from '@/assets/icons/star_dark_mode.svg';
-import HalfStar from '@/assets/icons/star-half-svgrepo-com.svg';
-import DMHalfStar from '@/assets/icons/star-half_dark_mode.svg';
-import EmptyStar from '@/assets/icons/star-outline-svgrepo-com.svg';
-import DMEmptyStar from '@/assets/icons/star-outline_dark_mode.svg';
-
+import DMHeart from "@/assets/icons/favorite_dark_mode.svg";
+import Star from "@/assets/icons/star-svgrepo-com.svg";
+import DMStar from "@/assets/icons/star_dark_mode.svg";
+import HalfStar from "@/assets/icons/star-half-svgrepo-com.svg";
+import DMHalfStar from "@/assets/icons/star-half_dark_mode.svg";
+import EmptyStar from "@/assets/icons/star-outline-svgrepo-com.svg";
+import DMEmptyStar from "@/assets/icons/star-outline_dark_mode.svg";
 
 import * as Notifications from "expo-notifications";
 import Colors from "@/components/colors";
-import { useThemes } from '@/components/themeContext';
+import { useThemes } from "@/components/themeContext";
 
 const defaultImage = "https://via.placeholder.com/150";
 const windowWidth = Dimensions.get("window").width;
@@ -58,15 +66,14 @@ const HouseDesc = ({ house }) => {
   const navigation = useNavigation();
   const [owner, setOwner] = useState("");
   const { theme } = useThemes();
-  const isDark = theme === 'dark';
-  const [isSeller, setIsSeller] = useState(false)
+  const isDark = theme === "dark";
+  const [isSeller, setIsSeller] = useState(false);
   const [userRating, setUserRating] = useState(0);
   const [currentRating, setCurrentRating] = useState(house.rating || 0);
   const [ratingCount, setRatingCount] = useState(house.ratingCount || 0);
-  const [click, setClick] = useState(false)
+  const [click, setClick] = useState(false);
   const auth = getAuth();
   const user = auth.currentUser;
-
 
   useEffect(() => {
     requestNotificationPermissions();
@@ -97,7 +104,10 @@ const HouseDesc = ({ house }) => {
       if (user) {
         try {
           const ratingsRef = collection(db, "Apartments", house.id, "ratings");
-          const userRatingQuery = query(ratingsRef, where("userId", "==", user.uid));
+          const userRatingQuery = query(
+            ratingsRef,
+            where("userId", "==", user.uid)
+          );
           const querySnapshot = await getDocs(userRatingQuery);
 
           if (!querySnapshot.empty) {
@@ -125,18 +135,17 @@ const HouseDesc = ({ house }) => {
     const auth = getAuth();
     const user = auth.currentUser;
     if (user) {
-      const userRef = doc(db, "Users", user.uid)
+      const userRef = doc(db, "Users", user.uid);
       const snap = await getDoc(userRef);
       if (snap.exists()) {
-        setIsSeller(snap.data().role === 'seller');
+        setIsSeller(snap.data().role === "seller");
       }
     }
-
-  }
+  };
 
   useEffect(() => {
     getRole();
-  }, [])
+  }, []);
 
   useEffect(() => {
     const checkFavorite = async () => {
@@ -193,36 +202,37 @@ const HouseDesc = ({ house }) => {
   const handleAddToCart = async () => {
     setClick(true);
     try {
-      const cartRef = (collection(db, 'cart'));
-      const q = query(cartRef, where('id', '==', house.id), where("user_id", '==', user.uid));
+      const cartRef = collection(db, "cart");
+      const q = query(
+        cartRef,
+        where("id", "==", house.id),
+        where("user_id", "==", user.uid)
+      );
       const querySnapshot = await getDocs(q);
-      console.log(user.uid)
+      console.log(user.uid);
 
       if (!querySnapshot.empty) {
         console.log("Item already in cart");
-        Alert.alert("ITEM ALREADY IN CART")
+        Alert.alert("ITEM ALREADY IN CART");
         return;
       }
-      await addDoc(cartRef,
-        {
-          id: house.id,
-          image: house.image[0],
-          rent: house.rent,
-          location: house.location,
-          features: house.features,
-          floor: house.floor,
-          unit_number: house.unit_number,
-          num_bedrooms: house.num_bedrooms,
-          seller_id: house.seller_id,
-          user_id: user.uid
-
-        });
-      router.push("/(drawer)/(tabs)/cart")
+      await addDoc(cartRef, {
+        id: house.id,
+        image: house.image[0],
+        rent: house.rent,
+        location: house.location,
+        features: house.features,
+        floor: house.floor,
+        unit_number: house.unit_number,
+        num_bedrooms: house.num_bedrooms,
+        seller_id: house.seller_id,
+        user_id: user.uid,
+      });
+      router.push("/(drawer)/(tabs)/cart");
     } catch (error) {
-      console.log("failed to add to cart")
+      console.log("failed to add to cart");
     }
-  }
-
+  };
 
   const handleRate = async (rating: number) => {
     try {
@@ -233,32 +243,35 @@ const HouseDesc = ({ house }) => {
 
       const houseRef = doc(db, "Apartments", house.id);
       const ratingsRef = collection(db, "Apartments", house.id, "ratings");
-      const userRatingQuery = query(ratingsRef, where("userId", "==", user.uid));
+      const userRatingQuery = query(
+        ratingsRef,
+        where("userId", "==", user.uid)
+      );
       const querySnapshot = await getDocs(userRatingQuery);
 
       let newAverage = currentRating;
       let newCount = ratingCount;
       if (querySnapshot.empty) {
-
         await addDoc(ratingsRef, {
           userId: user.uid,
           rating: rating,
-          createdAt: new Date()
+          createdAt: new Date(),
         });
         newCount = ratingCount + 1;
-        newAverage = ((currentRating * ratingCount) + rating) / newCount;
+        newAverage = (currentRating * ratingCount + rating) / newCount;
       } else {
         const docRef = querySnapshot.docs[0].ref;
         const oldRating = querySnapshot.docs[0].data().rating;
         await updateDoc(docRef, {
           rating: rating,
-          updatedAt: new Date()
+          updatedAt: new Date(),
         });
-        newAverage = ((currentRating * ratingCount) - oldRating + rating) / ratingCount;
+        newAverage =
+          (currentRating * ratingCount - oldRating + rating) / ratingCount;
       }
       await updateDoc(houseRef, {
         rating: newAverage,
-        ratingCount: newCount
+        ratingCount: newCount,
       });
 
       setUserRating(rating);
@@ -266,7 +279,9 @@ const HouseDesc = ({ house }) => {
       setRatingCount(newCount);
       await Notifications.scheduleNotificationAsync({
         content: {
-          title: querySnapshot.empty ? "Thank you for rating!" : "Rating updated!",
+          title: querySnapshot.empty
+            ? "Thank you for rating!"
+            : "Rating updated!",
           body: `You rated this property ${rating} stars`,
           sound: "default",
         },
@@ -294,12 +309,10 @@ const HouseDesc = ({ house }) => {
                 <Star width={25} height={25} />
               )}
             </Pressable>
+          ) : isDark ? (
+            <DMStar key={i} width={20} height={20} />
           ) : (
-            isDark ? (
-              <DMStar key={i} width={20} height={20} />
-            ) : (
-              <Star key={i} width={20} height={20} />
-            )
+            <Star key={i} width={20} height={20} />
           )
         );
       } else if (i === fullStars + 1 && hasHalfStar) {
@@ -312,12 +325,10 @@ const HouseDesc = ({ house }) => {
                 <HalfStar width={25} height={25} />
               )}
             </Pressable>
+          ) : isDark ? (
+            <DMHalfStar key={i} width={20} height={20} />
           ) : (
-            isDark ? (
-              <DMHalfStar key={i} width={20} height={20} />
-            ) : (
-              <HalfStar key={i} width={20} height={20} />
-            )
+            <HalfStar key={i} width={20} height={20} />
           )
         );
       } else {
@@ -330,12 +341,10 @@ const HouseDesc = ({ house }) => {
                 <EmptyStar width={25} height={25} />
               )}
             </Pressable>
+          ) : isDark ? (
+            <DMEmptyStar key={i} width={20} height={20} />
           ) : (
-            isDark ? (
-              <DMEmptyStar key={i} width={20} height={20} />
-            ) : (
-              <EmptyStar key={i} width={20} height={20} />
-            )
+            <EmptyStar key={i} width={20} height={20} />
           )
         );
       }
@@ -343,8 +352,14 @@ const HouseDesc = ({ house }) => {
     return (
       <View style={styles.starContainer}>
         {stars}
-        <Text style={[styles.ratingText, { color: isDark ? Colors.darkModeText : Colors.text }]}>
-          {currentRating.toFixed(1)} ({ratingCount} {ratingCount === 1 ? 'rating' : 'ratings'})
+        <Text
+          style={[
+            styles.ratingText,
+            { color: isDark ? Colors.darkModeText : Colors.text },
+          ]}
+        >
+          {currentRating.toFixed(1)} ({ratingCount}{" "}
+          {ratingCount === 1 ? "rating" : "ratings"})
           {userRating > 0 && ` • Your rating: ${userRating}`}
         </Text>
       </View>
@@ -365,7 +380,16 @@ const HouseDesc = ({ house }) => {
   });
 
   return (
-    <View style={[styles.container, { backgroundColor: isDark ? Colors.darkModeBackground : Colors.background }]}>
+    <View
+      style={[
+        styles.container,
+        {
+          backgroundColor: isDark
+            ? Colors.darkModeBackground
+            : Colors.background,
+        },
+      ]}
+    >
       <ScrollView style={styles.imageContainer}>
         {house.image.length === 1 ? (
           <Image
@@ -392,52 +416,137 @@ const HouseDesc = ({ house }) => {
       <Pressable onPress={handlePress} style={styles.pressableContainer}>
         {press ? (
           <Animated.View
-            style={[styles.detailed, { transform: [{ translateY }], backgroundColor: isDark ? Colors.darkModeBackground : "white" }]}
+            style={[
+              styles.detailed,
+              {
+                transform: [{ translateY }],
+                backgroundColor: isDark ? Colors.darkModeBackground : "white",
+              },
+            ]}
           >
-            {isDark ? <DMDownArrow width={50} height={50} color={isDark ? Colors.darkModeText : "white"} />
-              : <DownArrow width={50} height={50} color={isDark ? Colors.darkModeText : "white"} />}
+            {isDark ? (
+              <DMDownArrow
+                width={50}
+                height={50}
+                color={isDark ? Colors.darkModeText : "white"}
+              />
+            ) : (
+              <DownArrow
+                width={50}
+                height={50}
+                color={isDark ? Colors.darkModeText : "white"}
+              />
+            )}
 
-            <Text style={[styles.status, { color: isDark ? Colors.darkModeText : Colors.text }]}>{house.availability_status}</Text>
-            <Text style={[styles.price, { color: isDark ? Colors.assestGreenTwo : Colors.assestGreenTwo }]}>
+            <Text
+              style={[
+                styles.status,
+                { color: isDark ? Colors.darkModeText : Colors.text },
+              ]}
+            >
+              {house.availability_status}
+            </Text>
+            <Text
+              style={[
+                styles.price,
+                {
+                  color: isDark ? Colors.assestGreenTwo : Colors.assestGreenTwo,
+                },
+              ]}
+            >
               {house.rent > 0 ? `${house.rent}` : "Invalid Price"} EGP
             </Text>
-            <Text style={[styles.address, { color: isDark ? Colors.darkModeText : Colors.text }]}>
+            <Text
+              style={[
+                styles.address,
+                { color: isDark ? Colors.darkModeText : Colors.text },
+              ]}
+            >
               {house.location || "Unknown Address"}
             </Text>
-            <Text style={[styles.title, { color: isDark ? Colors.darkModeText : Colors.text }]}>Floor: {house.floor}</Text>
-            <Text style={[styles.title, { color: isDark ? Colors.darkModeText : Colors.text }]}>
+            <Text
+              style={[
+                styles.title,
+                { color: isDark ? Colors.darkModeText : Colors.text },
+              ]}
+            >
+              Floor: {house.floor}
+            </Text>
+            <Text
+              style={[
+                styles.title,
+                { color: isDark ? Colors.darkModeText : Colors.text },
+              ]}
+            >
               The Number of the unit: {house.unit_number}
             </Text>
-            <Text style={[styles.description, { color: isDark ? Colors.darkModeText : Colors.text }]}>
+            <Text
+              style={[
+                styles.description,
+                { color: isDark ? Colors.darkModeText : Colors.text },
+              ]}
+            >
               Description: {house.features || "No description available"}
             </Text>
-            <Text style={[styles.NoOfRooms, { color: isDark ? Colors.darkModeText : Colors.text }]}>
-              Number of rooms:{" "}
-              {house.num_bedrooms || "Unknown Number Of Rooms"}
+            <Text
+              style={[
+                styles.NoOfRooms,
+                { color: isDark ? Colors.darkModeText : Colors.text },
+              ]}
+            >
+              Number of rooms: {house.num_bedrooms || "Unknown Number Of Rooms"}
             </Text>
             <View style={styles.ratingSection}>
-              <Text style={[styles.rateTitle, { color: isDark ? Colors.darkModeText : Colors.text }]}>
+              <Text
+                style={[
+                  styles.rateTitle,
+                  { color: isDark ? Colors.darkModeText : Colors.text },
+                ]}
+              >
                 Rate this property:
               </Text>
               {renderStars(userRating || currentRating, true)}
             </View>
-            <Text style={[styles.owner, { color: isDark ? Colors.assestGreen : Colors.assestGreenTwo }]}>Contact: {owner}</Text>
+            <Text
+              style={[
+                styles.owner,
+                { color: isDark ? Colors.assestGreen : Colors.assestGreenTwo },
+              ]}
+            >
+              Contact: {owner}
+            </Text>
             <View style={styles.buyNowStyles}>
-              {!isSeller ?
-                (<Pressable onPress={handlePressOnHeart}>
+              {!isSeller ? (
+                <Pressable 
+                  onPress={handlePressOnHeart}
+                  style={styles.heartButton}
+                >
                   {pressHeart ? (
                     <RedHeart width={30} height={30} />
+                  ) : isDark ? (
+                    <DMHeart width={30} height={30} />
                   ) : (
-                    isDark ?
-                      (<DMHeart width={30} height={30} />)
-                      : <Heart width={30} height={30} />
+                    <Heart width={30} height={30} />
                   )}
-                </Pressable>) : null}
+                </Pressable>
+              ) : null}
 
-              {!isSeller ?
-                (<Pressable disabled={click} onPress={handleAddToCart} style={[styles.buyNowView, { backgroundColor: isDark ? Colors.darkModeSecondary : Colors.assest }]}>
-                  <Text style={styles.buyNowText}>Rent Now!</Text>
-                </Pressable>) : null}
+              {!isSeller ? (
+                <Pressable
+                  disabled={click}
+                  onPress={handleAddToCart}
+                  style={[
+                    styles.actionButton,
+                    {
+                      backgroundColor: isDark
+                        ? Colors.darkModeSecondary
+                        : Colors.assest,
+                    },
+                  ]}
+                >
+                  <Text style={styles.buttonText}>Rent Now!</Text>
+                </Pressable>
+              ) : null}
               {!isSeller ? (
                 <Pressable
                   onPress={() =>
@@ -450,22 +559,41 @@ const HouseDesc = ({ house }) => {
                       },
                     })
                   }
-                  style={[styles.buyNowView, { backgroundColor: isDark ? Colors.assestGreenTwo : Colors.assest }]}
+                  style={[
+                    styles.actionButton,
+                    {
+                      backgroundColor: isDark
+                        ? Colors.assestGreenTwo
+                        : Colors.assest,
+                    },
+                  ]}
                 >
-                  <Text style={styles.buyNowText}>Contact Me</Text>
+                  <Text style={styles.buttonText}>Contact Me</Text>
                 </Pressable>
               ) : null}
             </View>
-
-
-
           </Animated.View>
         ) : (
-          <View style={[styles.moreDetails, , { backgroundColor: isDark ? Colors.darkModeBackground : "white" }]}>
-            {isDark ? <DMTopArrow width={30} height={30} />
-              : <TopArrow width={30} height={30} />
-            }
-            <Text style={[styles.moreDetailsText, { color: isDark ? Colors.darkModeText : Colors.text }]}>More Details</Text>
+          <View
+            style={[
+              styles.moreDetails,
+              ,
+              { backgroundColor: isDark ? Colors.darkModeBackground : "white" },
+            ]}
+          >
+            {isDark ? (
+              <DMTopArrow width={30} height={30} />
+            ) : (
+              <TopArrow width={30} height={30} />
+            )}
+            <Text
+              style={[
+                styles.moreDetailsText,
+                { color: isDark ? Colors.darkModeText : Colors.text },
+              ]}
+            >
+              More Details
+            </Text>
           </View>
         )}
       </Pressable>
@@ -499,7 +627,16 @@ export default function moreView() {
   }, [houseId]);
 
   return (
-    <Animated.ScrollView contentContainerStyle={[styles.scrollStyle, { backgroundColor: isDark?Colors.darkModeBackground:Colors.background }]}>
+    <Animated.ScrollView
+      contentContainerStyle={[
+        styles.scrollStyle,
+        {
+          backgroundColor: isDark
+            ? Colors.darkModeBackground
+            : Colors.background,
+        },
+      ]}
+    >
       {houses.map((house) => (
         <HouseDesc key={house.id} house={house} />
       ))}
@@ -524,10 +661,6 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-    // shadowColor: "#000",
-    // shadowOpacity: 0.1,
-    // shadowOffset: { width: 0, height: -4 },
-    // shadowRadius: 6,
     elevation: 5,
     rowGap: 5,
     alignItems: "center",
@@ -549,22 +682,22 @@ const styles = StyleSheet.create({
     color: Colors.assestGreen,
   },
   starContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginVertical: 5,
   },
   ratingText: {
     marginLeft: 5,
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   ratingSection: {
     marginVertical: 10,
-    alignItems: 'center',
+    alignItems: "center",
   },
   rateTitle: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
     marginBottom: 5,
   },
   description: {
@@ -594,10 +727,6 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     paddingVertical: 12,
-    // shadowColor: "#000",
-    // shadowOpacity: 0.05,
-    // shadowOffset: { width: 0, height: -2 },
-    // shadowRadius: 4,
     elevation: 3,
   },
   moreDetailsText: {
@@ -605,10 +734,6 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: Colors.text,
     marginTop: 5,
-  },
-  arrow: {
-    width: windowWidth / 6,
-    height: windowHeight / 40,
   },
   pressableContainer: {
     position: "absolute",
@@ -619,21 +744,33 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     alignItems: "center",
     justifyContent: "center",
-    rowGap: 10,
-    marginTop: 10,
+    rowGap: 15,
+    marginTop: 15,
+    width: '100%',
   },
-
-  buyNowView: {
-    flex: 1,
-    backgroundColor: Colors.text,
-    paddingVertical: 10,
-    paddingHorizontal: 25,
-    borderRadius: 8,
+  heartButton: {
+    padding: 10,
+    borderRadius: 50,
+    backgroundColor: 'rgba(0,0,0,0.1)',
+    marginBottom: 5,
+  },
+  actionButton: {
+    width: '90%',
+    paddingVertical: 15,
+    borderRadius: 10,
     alignItems: "center",
     justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
-  buyNowText: {
-    fontSize: 16,
+  buttonText: {
+    fontSize: 18,
     fontWeight: "bold",
     color: Colors.whiteText,
   },
